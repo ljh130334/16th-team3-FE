@@ -15,7 +15,7 @@ const buttonVariants = cva(
         primary:
           'bg-[linear-gradient(269deg,_#DDD9F8_6.08%,_#E4E4FF_31.42%,_#CCE4FF_62.59%)] text-black ',
         pointer:
-          'bg-[conic-gradient(from_210deg_at_50%_50%,_#CCE4FF_0deg,_#BBBBF1_50.05924701690674deg,_#B8E2FB_85.93855619430542deg,_#F2EFE8_134.97360706329346deg,_#CCE4FF_172.04890251159668deg,_#BBBBF1_224.6718692779541deg,_#C7EDEB_259.35521364212036deg,_#E7F5EB_298.8224387168884deg,_#F2F0E7_328.72185945510864deg)] text-black ',
+          'relative overflow-hidden before:absolute before:inset-0 before:bg-[conic-gradient(from_220deg_at_50%_50%,_#F2F0E7_0%,_#BBBBF1_14%,_#B8E2FB_24%,_#F2EFE8_37%,_#CCE4FF_48%,_#BBBBF1_62%,_#C7EDEB_72%,_#E7F5EB_83%,_#F2F0E7_91%,_#F2F0E7_100%)] before:[transform:scale(4,1)] before:-z-10 text-black ',
       },
       size: {
         default: 'h-14 w-full rounded-2xl py-[18.5px]',
