@@ -23,16 +23,17 @@
     #17191f;
 
   --gradient-component-02: linear-gradient(
-      180deg,
-      rgba(121, 121, 235, 0.15) 0%,
-      rgba(121, 121, 235, 0.05) 29.17%,
-      rgba(121, 121, 235, 0) 100%
-    ),
-    --error: linear-gradient(
-        180deg,
-        var(--Red-400, #dd6875) 0%,
-        var(--Red-200, #ed98a2) 100%
-      );
+    180deg,
+    rgba(121, 121, 235, 0.15) 0%,
+    rgba(121, 121, 235, 0.05) 29.17%,
+    rgba(121, 121, 235, 0) 100%
+  );
+
+  --error: linear-gradient(
+    180deg,
+    var(--Red-400, #dd6875) 0%,
+    var(--Red-200, #ed98a2) 100%
+  );
 
   --linear-black: linear-gradient(180deg, rgba(15, 17, 20, 0) 30%, #0f1114 80%);
 
