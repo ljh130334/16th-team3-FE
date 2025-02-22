@@ -28,13 +28,11 @@
       rgba(121, 121, 235, 0.05) 29.17%,
       rgba(121, 121, 235, 0) 100%
     ),
-    #ffffff;
-
-  --error: linear-gradient(
-    180deg,
-    var(--Red-400, #dd6875) 0%,
-    var(--Red-200, #ed98a2) 100%
-  );
+    --error: linear-gradient(
+        180deg,
+        var(--Red-400, #dd6875) 0%,
+        var(--Red-200, #ed98a2) 100%
+      );
 
   --linear-black: linear-gradient(180deg, rgba(15, 17, 20, 0) 30%, #0f1114 80%);
 
@@ -145,7 +143,7 @@ body {
 
 /* 버튼 스타일 */
 .button-primary {
-  @apply rounded-md bg-main-300 px-4 py-2 text-white;
+  @apply bg-main-300 rounded-md px-4 py-2 text-white;
 }
 
 .button-secondary {

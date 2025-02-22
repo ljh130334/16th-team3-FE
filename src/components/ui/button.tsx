@@ -9,12 +9,11 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // TODO: tailwind 지정색상 적용 후 변경 필요
-        default: 'bg-primary text-white ',
-        tertiary: 'bg-tertiary text-white ',
-        primary:
+        default: 'bg-component-gray-tertiary text-white ',
+        primary: 'bg-component-accent-primary text-white ',
+        point:
           'bg-[linear-gradient(269deg,_#DDD9F8_6.08%,_#E4E4FF_31.42%,_#CCE4FF_62.59%)] text-black ',
-        pointer:
+        hologram:
           'relative overflow-hidden before:absolute before:inset-0 before:bg-[conic-gradient(from_220deg_at_50%_50%,_#F2F0E7_0%,_#BBBBF1_14%,_#B8E2FB_24%,_#F2EFE8_37%,_#CCE4FF_48%,_#BBBBF1_62%,_#C7EDEB_72%,_#E7F5EB_83%,_#F2F0E7_91%,_#F2F0E7_100%)] before:[transform:scale(4,1)] before:-z-10 text-black ',
       },
       size: {
