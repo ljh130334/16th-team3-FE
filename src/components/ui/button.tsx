@@ -5,24 +5,21 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap text-base font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-30 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        destructive:
-          'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-        outline:
-          'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
-        secondary:
-          'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
-        link: 'text-primary underline-offset-4 hover:underline',
+        default: 'bg-component-gray-tertiary text-white ',
+        primary: 'bg-component-accent-primary text-white ',
+        point:
+          'bg-[linear-gradient(269deg,_#DDD9F8_6.08%,_#E4E4FF_31.42%,_#CCE4FF_62.59%)] text-black ',
+        hologram:
+          'relative overflow-hidden before:absolute before:inset-0 before:bg-[conic-gradient(from_220deg_at_50%_50%,_#F2F0E7_0%,_#BBBBF1_14%,_#B8E2FB_24%,_#F2EFE8_37%,_#CCE4FF_48%,_#BBBBF1_62%,_#C7EDEB_72%,_#E7F5EB_83%,_#F2F0E7_91%,_#F2F0E7_100%)] before:[transform:scale(4,1)] before:-z-10 text-black ',
       },
       size: {
-        default: 'h-10 px-4 py-2',
-        sm: 'h-9 rounded-md px-3',
-        lg: 'h-11 rounded-md px-8',
+        default: 'h-14 w-full rounded-2xl py-[18.5px]',
+        md: 'h-12 w-[98px] rounded-xl py-[14.5px]',
+        sm: 'h-9 w-[49px] rounded-[8px] py-[9.5px]',
         icon: 'h-10 w-10',
       },
     },
