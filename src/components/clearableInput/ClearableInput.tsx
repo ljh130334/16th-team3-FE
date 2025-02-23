@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { Input } from '../ui/input';
-import { X } from 'lucide-react';
 import { RefObject } from 'react';
+import Image from 'next/image';
 
 interface ClearableInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -19,9 +19,12 @@ const ClearableInput = ({
 }: ClearableInputProps) => {
   return (
     <div className="relative w-full">
-      <span>할 일 입력</span>
+      <span className="text-primary b3">할 일 입력</span>
       <Input
-        className={cn('pr-10', className)}
+        className={cn(
+          'focus-within: t3 w-full border-0 border-b bg-transparent pl-0 pr-10 transition-colors focus:border-b-2 focus:border-b-component-accent-primary',
+          className,
+        )}
         value={value}
         ref={ref}
         onChange={onChange}
@@ -31,14 +34,14 @@ const ClearableInput = ({
       {value && (
         <button
           type="button"
-          className="absolute right-3 top-1/2 translate-y-1/4 text-black hover:text-gray-600"
+          className="absolute right-0 top-[24px] translate-y-1/4 text-black hover:text-gray-600"
           onClick={() =>
             onChange({
               target: { value: '' },
             } as React.ChangeEvent<HTMLInputElement>)
           }
         >
-          <X className="h-4 w-4" />
+          <Image src="icons/x-circle.svg" alt="제거" width={24} height={24} />
         </button>
       )}
     </div>
