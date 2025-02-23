@@ -10,6 +10,8 @@ interface ClearableInputProps
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
+const MAX_TASK_LENGTH = 15;
+
 const ClearableInput = ({
   className,
   value,
@@ -17,12 +19,19 @@ const ClearableInput = ({
   onChange,
   ...props
 }: ClearableInputProps) => {
+  const isInvalid = value.length > MAX_TASK_LENGTH;
+
   return (
     <div className="relative w-full">
-      <span className="text-primary b3">할 일 입력</span>
+      <span className={cn(isInvalid ? 'text-red-500' : 'text-primary', 'b3')}>
+        할 일 입력
+      </span>
       <Input
         className={cn(
-          'focus-within: t3 w-full border-0 border-b bg-transparent pl-0 pr-10 transition-colors focus:border-b-2 focus:border-b-component-accent-primary',
+          't3 w-full border-0 border-b bg-transparent pl-0 pr-10 transition-colors focus:border-b-2',
+          isInvalid
+            ? 'border-red-500 focus:border-red-500'
+            : 'focus:border-b-component-accent-primary',
           className,
         )}
         value={value}
