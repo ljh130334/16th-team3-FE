@@ -10,6 +10,7 @@ import {
 } from './context';
 import useMount from '@/hooks/useMount';
 import TaskInput from './_components/taskInput/TaskInput';
+import BackHeader from '@/components/backHeader/BackHeader';
 
 type FormState = {
   task?: string;
@@ -53,8 +54,8 @@ const TaskCreate = () => {
   if (!isMounted) return null;
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-start gap-6 overflow-y-auto bg-white px-4 py-6 dark:bg-gray-900">
-      할 일 등록 페이지
+    <div className="background-primary flex min-h-screen w-full flex-col items-center justify-start overflow-y-auto px-5">
+      <BackHeader onClick={() => funnel.history.back()} />
       <funnel.Render
         taskForm={({ history }) => (
           <TaskInput

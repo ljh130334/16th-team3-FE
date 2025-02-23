@@ -28,7 +28,8 @@ const TaskInput = ({ onClick }: TaskInputProps) => {
   }, []);
 
   return (
-    <div>
+    <div className="flex w-full flex-col">
+      <span className="t2 pb-10 pt-4">어떤 일의 마감이 급하신가요?</span>
       <ClearableInput ref={inputRef} value={task} onChange={handleTaskChange} />
 
       {task.length > MAX_TASK_LENGTH && (
