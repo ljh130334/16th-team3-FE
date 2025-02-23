@@ -33,7 +33,7 @@ const TaskInput = ({ onClick }: TaskInputProps) => {
       <ClearableInput ref={inputRef} value={task} onChange={handleTaskChange} />
 
       {task.length > MAX_TASK_LENGTH && (
-        <p className="text-sm text-red-500">
+        <p className="mt-2 text-sm text-red-500">
           최대 16자 이내로 입력할 수 있어요.
         </p>
       )}
