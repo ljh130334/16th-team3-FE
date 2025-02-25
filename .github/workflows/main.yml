@@ -10,12 +10,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Debug: List files in the working directory
+        run: ls -al
+
       - name: Install mustache (to update the date)
         run: sudo apt-get update && sudo apt-get install -y ruby && gem install mustache
+
+      - name: Verify mustache installation
+        run: mustache --version
+
       - name: Set execution permission for build.sh
         run: chmod +x ./build.sh
-      - name: creates output
-        run: ./build.sh
+
+      - name: Debug: Check script syntax
+        run: bash -n ./build.sh
+
+      - name: Run build script with verbose output
+        run: bash -x ./build.sh
+
       - name: Pushes to another repository
         id: push_directory
         uses: cpina/github-action-push-to-another-repository@main
@@ -28,5 +41,6 @@ jobs:
           user-email: 'ljh130334@naver.com'
           commit-message: "Auto commit: ${{ github.event.head_commit.message }}"
           target-branch: main
+
       - name: Test get variable exported by push-to-another-repository
         run: echo $DESTINATION_CLONED_DIRECTORY
