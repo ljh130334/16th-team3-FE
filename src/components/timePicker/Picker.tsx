@@ -8,6 +8,7 @@ interface PickerProps {
 }
 
 const ITEM_HEIGHT = 50;
+const DRAG_SENSITIVITY = 1.5;
 
 const Picker = ({ list, onSelectedChange }: PickerProps) => {
   const newList = ['', ...list, ''];
@@ -26,8 +27,6 @@ const Picker = ({ list, onSelectedChange }: PickerProps) => {
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    e.preventDefault();
-
     if (!isDragging.current || !ref.current) return;
 
     if (animationFrame.current) {
@@ -36,7 +35,7 @@ const Picker = ({ list, onSelectedChange }: PickerProps) => {
 
     animationFrame.current = requestAnimationFrame(() => {
       const deltaY = startY.current - e.touches[0].clientY;
-      ref.current!.scrollTop += deltaY;
+      ref.current!.scrollTop += deltaY * DRAG_SENSITIVITY;
       startY.current = e.touches[0].clientY;
 
       let index =
@@ -50,6 +49,7 @@ const Picker = ({ list, onSelectedChange }: PickerProps) => {
 
   const handleTouchEnd = () => {
     isDragging.current = false;
+
     if (!ref.current) return;
 
     let index =
