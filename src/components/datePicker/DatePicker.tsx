@@ -7,7 +7,7 @@ import { Calendar } from '@/components/ui/calendar';
 import Image from 'next/image';
 
 interface DatePickerProps {
-  selectedDate: Date | undefined;
+  selectedDate: Date;
   handleDateChange: (date: Date) => void;
 }
 

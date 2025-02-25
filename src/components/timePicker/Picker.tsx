@@ -101,7 +101,7 @@ const Picker = ({ list, onSelectedChange }: PickerProps) => {
           }}
           className={`flex h-[50px] items-center justify-center transition-colors ${
             index === selected + 1
-              ? 'font-bold text-white opacity-100'
+              ? 't3 font-bold text-white opacity-100'
               : 'opacity-40'
           }`}
         >

@@ -29,7 +29,7 @@ const TimePicker = ({
   };
 
   return (
-    <div className="background-primary flex justify-center gap-6 p-4">
+    <div className="background-primary flex justify-center gap-6">
       <Picker list={meridiem} onSelectedChange={handleSelectedMeridiem} />
       <Picker list={hours} onSelectedChange={handleSelectedHour} />
       <Picker list={minutes} onSelectedChange={handleSelectedMinute} />

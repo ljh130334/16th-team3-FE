@@ -17,7 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 
 interface DateSelectedComponentProps {
-  selectedDate: Date | undefined;
+  selectedDate: Date;
   handleDateChange: (date: Date) => void;
 }
 
@@ -26,16 +26,22 @@ const DateSelectedComponent = ({
   handleDateChange,
 }: DateSelectedComponentProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [temporaryDate, setTemporaryDate] = useState<Date | undefined>(
-    selectedDate,
-  );
+  const [temporaryDate, setTemporaryDate] = useState<Date>(new Date());
+  const [isFirstTouched, setIsFirstTouched] = useState(true);
 
   const handleToggle = () => {
     setIsOpen((prev) => !prev);
   };
 
   const handleTemporaryDate = (date: Date) => {
-    setTemporaryDate(date);
+    setTemporaryDate(date || new Date());
+    setIsFirstTouched(false);
+  };
+
+  const handleConfirmButtonClick = () => {
+    handleDateChange(temporaryDate);
+    setIsOpen(false);
+    setIsFirstTouched(false);
   };
 
   return (
@@ -48,18 +54,16 @@ const DateSelectedComponent = ({
           >
             <span
               className={`absolute left-0 text-gray-500 transition-all duration-200 ${
-                selectedDate !== undefined
-                  ? 'text-neutral b3 top-[-8px]'
-                  : 't3 top-1'
+                isFirstTouched ? 't3 top-1' : 'text-neutral b3 top-[-8px]'
               }`}
             >
               마감일 선택
             </span>
             <div className="flex w-full items-center justify-between pt-4">
               <span className="t3 text-base font-semibold">
-                {selectedDate
-                  ? format(selectedDate, 'M월 d일 (E)', { locale: ko })
-                  : ''}
+                {isFirstTouched
+                  ? ''
+                  : format(selectedDate, 'M월 d일 (E)', { locale: ko })}
               </span>
               <ChevronDown
                 className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
@@ -83,12 +87,7 @@ const DateSelectedComponent = ({
                 <Button
                   variant="primary"
                   className="mt-4 flex w-full items-center justify-center"
-                  onClick={() => {
-                    if (temporaryDate) {
-                      handleDateChange(temporaryDate);
-                      setIsOpen(false);
-                    }
-                  }}
+                  onClick={handleConfirmButtonClick}
                 >
                   확인
                 </Button>

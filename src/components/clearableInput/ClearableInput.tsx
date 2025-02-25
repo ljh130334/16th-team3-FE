@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { Input } from '../ui/input';
-import { RefObject } from 'react';
+import { useState, RefObject } from 'react';
 import Image from 'next/image';
 
 interface ClearableInputProps
@@ -17,9 +17,19 @@ const ClearableInput = ({
   onChange,
   ...props
 }: ClearableInputProps) => {
+  const [isFocused, setIsFocused] = useState(false);
+
   return (
     <div className="relative w-full">
-      <span className="text-primary b3">할 일 입력</span>
+      <span
+        className={cn(
+          'b3 transition-colors',
+          isFocused ? 'text-primary' : 'text-neutral',
+        )}
+      >
+        할 일 입력
+      </span>
+
       <Input
         className={cn(
           'focus-within: t3 w-full border-0 border-b bg-transparent pl-0 pr-10 transition-colors focus:border-b-2 focus:border-b-component-accent-primary',
@@ -28,10 +38,12 @@ const ClearableInput = ({
         value={value}
         ref={ref}
         onChange={onChange}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         {...props}
       />
 
-      {value && (
+      {value && isFocused && (
         <button
           type="button"
           className="absolute right-0 top-[24px] translate-y-1/4 text-black hover:text-gray-600"
