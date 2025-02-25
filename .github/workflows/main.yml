@@ -1,8 +1,9 @@
 name: git push into another repo to deploy to vercel
 
 on:
-	push:
-		branches: [dev]
+  push:
+    branches:
+      - dev
 
 jobs:
   build:
@@ -11,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install mustache (to update the date)
-        run: apk add ruby && gem install mustache
+        run: sudo apt-get update && sudo apt-get install -y ruby && gem install mustache
       - name: creates output
         run: sh ./build.sh
       - name: Pushes to another repository
@@ -23,8 +24,8 @@ jobs:
           source-directory: 'output'
           destination-github-username: 'ljh130334'
           destination-repository-name: '16th-team3-FE'
-          user-email: ${{ ljh130334@naver.com }}
-          commit-message: ${{ github.event.commits[0].message }}
+          user-email: 'ljh130334@naver.com'
+          commit-message: "Auto commit: ${{ github.event.head_commit.message }}"
           target-branch: main
       - name: Test get variable exported by push-to-another-repository
         run: echo $DESTINATION_CLONED_DIRECTORY
