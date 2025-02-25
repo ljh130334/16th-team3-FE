@@ -8,13 +8,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: pandoc/latex
     steps:
       - uses: actions/checkout@v2
       - name: Install mustache (to update the date)
         run: sudo apt-get update && sudo apt-get install -y ruby && gem install mustache
+      - name: Set execution permission for build.sh
+        run: chmod +x ./build.sh
       - name: creates output
-        run: sh ./build.sh
+        run: ./build.sh
       - name: Pushes to another repository
         id: push_directory
         uses: cpina/github-action-push-to-another-repository@main
