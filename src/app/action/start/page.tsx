@@ -1,9 +1,9 @@
 'use client';
 
-import { SmallActionCard } from './component/SmallActionCard';
-import { ScheduleCard } from './component/ScheduleCard';
-import { ActionStartDrawer } from './component/ActionStartDrawer';
-import { ActionStartHeader } from './component/ActionStartHeader';
+import ActionCard from './_component/ActionCard';
+import ScheduleCard from './_component/ScheduleCard';
+import ActionStartDrawer from './_component/ActionStartDrawer';
+import ActionStartHeader from './_component/ActionStartHeader';
 declare global {
   interface Window {
     ReactNativeWebView: {
@@ -29,7 +29,7 @@ export default function Start() {
       <ActionStartHeader />
 
       <div className="flex flex-col gap-4 px-5">
-        <SmallActionCard title="책상에서 피그마 프로그램 켜기" />
+        <ActionCard title="책상에서 피그마 프로그램 켜기" />
         <ScheduleCard
           title="디자인 포트폴리오 점검하기"
           dueDate="2월 12일 (목) 오후 08:00"
