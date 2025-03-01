@@ -14,15 +14,18 @@ type TaskDetailSheetProps = {
     dueTime?: string;
     timeRequired?: string;
     description?: string;
+    status?: string;
   };
   onDelete?: (taskId: number) => void;
+  onStart?: (taskId: number) => void;
 };
 
 const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   isOpen,
   onClose,
   task,
-  onDelete
+  onDelete,
+  onStart
 }) => {
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
@@ -56,8 +59,15 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   };
 
   const handleStartTask = () => {
-    console.log('몰입 화면으로 이동:', task);
-    router.push('/focus'); // 몰입 화면으로 이동
+    console.log('태스크 시작:', task);
+    
+    // task.id가 있고 onStart 함수가 제공된 경우 태스크 상태 변경
+    if (task.id && onStart) {
+      onStart(task.id);
+    }
+    
+    // 몰입 화면으로 이동
+    router.push(`/focus${task.id ? `?taskId=${task.id}` : ''}`);
     onClose();
   };
 
@@ -69,7 +79,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   const handleEditTitle = () => {
     console.log('할일 이름 바꾸기:', task.title);
     setShowMenu(false);
-    // 여기에 이름 변경 로직 추가
+    // 이름 변경 로직 추가
   };
 
   const handleDelete = () => {
@@ -81,16 +91,17 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
     onClose();
   };
 
-  // Format the due date and time for display
   const formatDueDateTime = () => {
     if (!task.dueDate) return '-';
     
-    // Extract month and day from date (format: YYYY-MM-DD)
     const month = task.dueDate.substring(5, 7);
     const day = task.dueDate.substring(8, 10);
     
     return `${month}월 ${day}일 ${task.dueDay || ''}, ${task.dueTime || ''}`;
   };
+
+  // 진행 중인 태스크인지 확인
+  const isInProgress = task.status === 'inProgress';
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end">
@@ -99,7 +110,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
           <div className="absolute inset-x-0 text-center">
             <h3 className="t3 text-text-normal">{task.title}</h3>
           </div>
-          <div className="w-6"></div> {/* 여백 요소 */}
+          <div className="w-6"></div>
           <button ref={buttonRef} className="px-2 z-10" onClick={handleMoreClick}>
             <Image
               src="/icons/home/dots-vertical.svg"
@@ -233,7 +244,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               className="l2 w-full text-text-strong rounded-xl py-4"
               onClick={handleStartTask}
             >
-              미리 시작
+              {isInProgress ? '이어서 몰입' : '미리 시작'}
             </Button>
           </div>
           
