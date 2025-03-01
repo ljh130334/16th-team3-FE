@@ -17,6 +17,8 @@ interface InProgressTaskItemProps {
 const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ task, onContinue }) => {
   const [showRemaining, setShowRemaining] = useState(true);
   const [remainingTime, setRemainingTime] = useState('');
+  const [isUrgent, setIsUrgent] = useState(false);
+  const [timeLeftMs, setTimeLeftMs] = useState(0);
 
   // 남은 시간 계산 함수
   const calculateRemainingTime = () => {
@@ -44,6 +46,12 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ task, onContinu
     
     dueDateTime.setHours(hours, 0, 0, 0);
     const timeLeft = dueDateTime.getTime() - now;
+    
+    // 남은 시간(ms) 저장
+    setTimeLeftMs(timeLeft);
+    
+    // 1시간 이내인지 체크
+    setIsUrgent(timeLeft <= 60 * 60 * 1000 && timeLeft > 0);
     
     if (timeLeft <= 0) return '00:00:00 남음';
     
@@ -83,30 +91,65 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ task, onContinu
     return () => clearInterval(timeInterval);
   }, [task]);
 
-  return (
-    <div className="bg-component-gray-secondary rounded-[12px] p-4 mb-4">
-      <div className="flex items-center gap-4 mb-4">
-        <div className="bg-component-gray-tertiary rounded-xl p-2 w-12 h-12 flex items-center justify-center">
-          <Image
-            src="/icons/home/happy-character.svg"
-            alt="Task"
-            width={32}
-            height={32}
-          />
+  // 일반 진행 중 컴포넌트
+  if (!isUrgent) {
+    return (
+      <div className="bg-component-gray-secondary rounded-[12px] p-4 mb-4">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="bg-component-gray-tertiary rounded-xl p-2 w-12 h-12 flex items-center justify-center">
+            <Image
+              src="/icons/home/happy-character.svg"
+              alt="Task"
+              width={32}
+              height={32}
+            />
+          </div>
+          <div className="flex-1">
+            <p className="text-text-neutral b3">
+              {task.dueTime}
+            </p>
+            <h3 className="s1 text-text-strong t3 truncate" style={{ maxWidth: '240px' }}>
+              {task.title}
+            </h3>
+          </div>
         </div>
-        <div className="flex-1">
-          <p className="text-text-neutral b3">
-            {task.dueTime}
-          </p>
-          <h3 className="s1 text-text-strong t3 truncate" style={{ maxWidth: '240px' }}>
-            {task.title}
-          </h3>
-        </div>
+        
+        <button 
+          onClick={() => onContinue(task.id)}
+          className="w-full bg-component-accent-primary text-text-strong rounded-[12px] p-3.5 text-center l2"
+        >
+          {showRemaining ? (
+            <TimeDisplay time={remainingTime} />
+          ) : (
+            '이어서 몰입'
+          )}
+        </button>
       </div>
-      
+    );
+  }
+
+  // 시간 임박 컴포넌트 (1시간 이내)
+  return (
+    <div 
+      className="rounded-[24px] p-4 mb-4 h-auto flex flex-col justify-between bg-gradient-component-01"
+    >
+      <div>
+        <h2 className="s1 text-text-strong mb-1">{task.title}</h2>
+        <p className="b3 text-text-neutral">{task.dueTime}</p>
+      </div>
+
+      <div className='flex justify-center overflow-hidden'>
+        <Image
+          src="/icons/home/happy-character-1hour.svg"
+          alt="Character"
+          width={140}
+          height={120}
+        />
+      </div>
+
       <button 
         onClick={() => onContinue(task.id)}
-        className="w-full bg-component-accent-primary text-text-strong rounded-[12px] p-4 text-center l2"
+        className="w-full bg-hologram text-text-inverse rounded-[12px] p-3.5 text-center l2"
       >
         {showRemaining ? (
           <TimeDisplay time={remainingTime} />
@@ -119,7 +162,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ task, onContinu
 };
 
 // 시간 표시 컴포넌트
-const TimeDisplay = ({ time }: { time: string }) => {
+const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: boolean }) => {
   const splitTime = time.split(' ');
   const timeString = splitTime[0] || '00:00:00';
   const timeParts = timeString.split(':');
@@ -156,6 +199,15 @@ const TimeDisplay = ({ time }: { time: string }) => {
       h1, h2, m1, m2, s1, s2
     };
   }, [timeString]);
+
+  if (isUrgent) {
+    return (
+      <div className="l1 text-text-strong">
+        {timeString.replace(/\:/g, ':')}
+        {suffix && <span className="ml-1">{suffix}</span>}
+      </div>
+    );
+  }
 
   return (
     <span className="inline-flex items-center justify-center">

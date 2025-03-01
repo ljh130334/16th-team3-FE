@@ -44,7 +44,7 @@ const SAMPLE_IN_PROGRESS_TASKS = [
     title: 'PPT 만들고 대본 작성하기',
     dueDate: '2025-03-01',
     dueDay: '(금)',
-    dueTime: '오후 7시까지',
+    dueTime: '오후 5시까지',
     timeRequired: '3시간 소요',
     dDayCount: 0,
     description: 'PPT 슬라이드 20장 준비 및 발표 대본 작성',
@@ -278,6 +278,9 @@ const HomePage = () => {
   // 6. 진행 중인 일만 있는 경우
   const hasInProgressTasksOnly = inProgressTasks.length > 0 && todayTasks.filter(t => t.status !== 'inProgress').length === 0;
 
+  // 7. 진행 중인 일은 없고 오늘 진행 예정인 일만 있는 경우
+  const hasTodayTasksOnly = inProgressTasks.length === 0 && todayTasks.filter(t => t.status !== 'inProgress').length > 0;
+
   return (
     <div className="flex flex-col min-h-screen bg-background-primary">
       <header className="fixed top-0 left-0 right-0 bg-background-primary z-20">
@@ -339,7 +342,7 @@ const HomePage = () => {
               <>
                 {/* 진행 중 섹션 */}
                 <div className="mb-6">
-                  <h3 className="s3 text-text-neutral mb-2">진행 중</h3>
+                  <h3 className="s2 text-text-neutral mb-2 mt-2">진행 중</h3>
                   {inProgressTasks.map(task => (
                     <InProgressTaskItem
                       key={task.id}
@@ -351,7 +354,7 @@ const HomePage = () => {
 
                 {/* 진행 예정 섹션 */}
                 <div className="mb-8">
-                  <h3 className="s3 text-text-neutral mb-2">진행 예정</h3>
+                  <h3 className="s2 text-text-neutral mb-2 mt-2">진행 예정</h3>
                   {todayTasks.filter(t => t.status !== 'inProgress').map(task => (
                     <TaskItem
                       key={task.id}
@@ -393,6 +396,42 @@ const HomePage = () => {
                       key={task.id}
                       task={task}
                       onContinue={handleContinueTask}
+                    />
+                  ))}
+                </div>
+
+                <div>
+                  <button 
+                    className="flex justify-between items-center w-full px-4 py-4 bg-component-gray-secondary rounded-[20px]"
+                    onClick={() => router.push('/home/weekly-tasks')}
+                  >
+                    <span className="s2 text-text-neutral">이번주 할일</span>
+                    <Image
+                      src="/icons/home/arrow-right.svg"
+                      alt="Arrow Right"
+                      width={7}
+                      height={12}
+                    />
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* 진행 중인 일은 없고 오늘 진행 예정인 일만 있는 경우 */}
+            {hasTodayTasksOnly && (
+              <>
+                {/* 진행 예정 섹션 */}
+                <div className="mb-8">
+                  <h3 className="s2 text-text-neutral mb-2 mt-2">진행 예정</h3>
+                  {todayTasks.filter(t => t.status !== 'inProgress').map(task => (
+                    <TaskItem
+                      key={task.id}
+                      title={task.title}
+                      dueDate={task.dueDate}
+                      dueTime={task.dueTime}
+                      onClick={() => handleTaskClick(task)}
+                      onDelete={() => handleDeleteTask(task.id)}
+                      onPreviewStart={() => handleDetailTask(task)}
                     />
                   ))}
                 </div>
