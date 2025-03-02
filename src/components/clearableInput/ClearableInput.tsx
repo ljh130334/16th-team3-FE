@@ -5,27 +5,39 @@ import Image from 'next/image';
 
 interface ClearableInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
+  ref?: RefObject<HTMLInputElement | null>;
   value: string;
-  ref: RefObject<HTMLInputElement | null>;
+  title: string;
+  isFocused?: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleInputFocus?: (value: boolean) => void;
 }
 
 const MAX_TASK_LENGTH = 15;
 
 const ClearableInput = ({
   className,
-  value,
   ref,
+  value,
+  title,
+  isFocused,
   onChange,
+  handleInputFocus,
   ...props
 }: ClearableInputProps) => {
   const isInvalid = value.length > MAX_TASK_LENGTH;
 
   return (
     <div className="relative w-full">
-      <span className={cn(isInvalid ? 'text-red-500' : 'text-primary', 'b3')}>
-        할 일 입력
+      <span
+        className={cn(
+          'b3 transition-colors',
+          isFocused ? 'text-primary' : 'text-neutral',
+        )}
+      >
+        {title}
       </span>
+
       <Input
         className={cn(
           't3 w-full border-0 border-b bg-transparent pl-0 pr-10 transition-colors focus:border-b-2',
@@ -36,6 +48,8 @@ const ClearableInput = ({
         )}
         value={value}
         ref={ref}
+        onFocus={() => handleInputFocus?.(true)}
+        onBlur={() => handleInputFocus?.(false)}
         onChange={onChange}
         {...props}
       />
