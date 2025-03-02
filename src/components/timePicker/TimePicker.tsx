@@ -1,7 +1,7 @@
 'use client';
 
+import { TimePickerType } from '@/types/create';
 import Picker from './Picker';
-import { TimePickerType } from '@/types/time';
 
 interface TimePickerProps {
   time: TimePickerType | undefined;
