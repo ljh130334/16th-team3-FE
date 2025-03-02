@@ -38,3 +38,4 @@ jobs:
       git checkout dev
       git pull origin dev
       git push -f forked-repo dev
+      
