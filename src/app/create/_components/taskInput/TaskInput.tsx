@@ -5,7 +5,7 @@ import TimeSelectedComponent from '../timeSelectedComponent/TimeSelectedComponen
 import { TimePickerType } from '@/types/create';
 import HeaderTitle from '../headerTitle/HeaderTitle';
 import { TaskInputType } from '../../context';
-import DateSelectedComponent from '../DateSelectedComponent/DateSelectedComponent';
+import DateSelectedComponent from '../dateSelectedComponent/DateSelectedComponent';
 
 interface TaskInputProps {
   context: TaskInputType;
