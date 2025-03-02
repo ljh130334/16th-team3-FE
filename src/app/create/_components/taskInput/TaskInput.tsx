@@ -3,9 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import TimeSelectedComponent from '../timeSelectedComponent/TimeSelectedComponent';
 import { TimePickerType } from '@/types/create';
-import DateSelectedComponent from '../dateSelectedComponent/DateSelectedComponent';
 import HeaderTitle from '../headerTitle/HeaderTitle';
 import { TaskInputType } from '../../context';
+import DateSelectedComponent from '../DateSelectedComponent/DateSelectedComponent';
 
 interface TaskInputProps {
   context: TaskInputType;
