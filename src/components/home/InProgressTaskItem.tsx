@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 interface InProgressTaskItemProps {
   task: {
@@ -15,10 +17,12 @@ interface InProgressTaskItemProps {
 }
 
 const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ task, onContinue }) => {
+  const router = useRouter();
   const [showRemaining, setShowRemaining] = useState(true);
   const [remainingTime, setRemainingTime] = useState('');
   const [isUrgent, setIsUrgent] = useState(false);
   const [timeLeftMs, setTimeLeftMs] = useState(0);
+  const [showBottomSheet, setShowBottomSheet] = useState(false);
 
   // 남은 시간 계산 함수
   const calculateRemainingTime = () => {
@@ -91,73 +95,140 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ task, onContinu
     return () => clearInterval(timeInterval);
   }, [task]);
 
+  // 이어서 몰입 버튼 클릭 시 바텀시트 표시
+  const handleContinueClick = () => {
+    setShowBottomSheet(true);
+  };
+  
+  const handleCloseBottomSheet = () => {
+    setShowBottomSheet(false);
+  };
+  
+  const handleContinueToFocus = () => {
+    router.push(`/focus?taskId=${task.id}`);
+    setShowBottomSheet(false);
+  };
+
   // 일반 진행 중 컴포넌트
   if (!isUrgent) {
     return (
-      <div className="bg-component-gray-secondary rounded-[12px] p-4 mb-4">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="bg-component-gray-tertiary rounded-xl p-2 w-12 h-12 flex items-center justify-center">
-            <Image
-              src="/icons/home/happy-character.svg"
-              alt="Task"
-              width={32}
-              height={32}
-            />
+      <>
+        <div className="bg-component-gray-secondary rounded-[12px] p-4 mb-4">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="bg-component-gray-tertiary rounded-[20px] p-2 w-12 h-12 flex items-center justify-center">
+              <Image
+                src="/icons/home/happy-character.svg"
+                alt="Task"
+                width={32}
+                height={32}
+              />
+            </div>
+            <div className="flex-1">
+              <p className="text-text-neutral b3">
+                {task.dueTime}
+              </p>
+              <h3 className="s1 text-text-strong t3 truncate" style={{ maxWidth: '240px' }}>
+                {task.title}
+              </h3>
+            </div>
           </div>
-          <div className="flex-1">
-            <p className="text-text-neutral b3">
-              {task.dueTime}
-            </p>
-            <h3 className="s1 text-text-strong t3 truncate" style={{ maxWidth: '240px' }}>
-              {task.title}
-            </h3>
-          </div>
+          
+          <button 
+            onClick={handleContinueClick}
+            className="w-full bg-component-accent-primary text-text-strong rounded-[12px] p-3.5 text-center l2"
+          >
+            {showRemaining ? (
+              <TimeDisplay time={remainingTime} />
+            ) : (
+              '이어서 몰입'
+            )}
+          </button>
         </div>
         
-        <button 
-          onClick={() => onContinue(task.id)}
-          className="w-full bg-component-accent-primary text-text-strong rounded-[12px] p-3.5 text-center l2"
+        {/* 이어서 몰입 바텀시트 */}
+        {showBottomSheet && (
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
+            <div className="w-full bg-component-gray-secondary rounded-t-[28px] p-4 pt-10 flex flex-col items-center">
+              <h2 className="t3 text-text-strong text-center">{task.title}를</h2>
+              <p className="t3 text-text-strong text-center mb-2">하던 중이었어요. 이어서 몰입할까요?</p>
+              <p className="b3 text-text-neutral text-center mb-7">마감까지 {remainingTime}</p>
+              <button
+                className="w-full bg-component-accent-primary text-white rounded-[16px] py-4 mb-3 l2"
+                onClick={handleContinueToFocus}
+              >
+                이어서 몰입
+              </button>
+              
+              <button
+                className="w-full text-text-neutral py-4 l2"
+                onClick={handleCloseBottomSheet}
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  }
+
+  // 시간 임박 컴포넌트 (1시간 이내)
+  return (
+    <>
+      <div 
+        className="rounded-[24px] p-4 mb-4 h-auto flex flex-col justify-between bg-gradient-component-01"
+      >
+        <div>
+          <h2 className="s1 text-text-strong mb-1">{task.title}</h2>
+          <p className="b3 text-text-neutral">{task.dueTime}</p>
+        </div>
+
+        <div className='flex justify-center overflow-hidden my-8'>
+          <Image
+            src="/icons/home/happy-character.svg"
+            alt="Character"
+            width={87}
+            height={87}
+          />
+        </div>
+
+        <Button 
+          variant="hologram"
+          onClick={handleContinueClick}
+          className="w-full z-10 text-text-inverse rounded-[12px] p-3.5 text-center l2"
         >
           {showRemaining ? (
             <TimeDisplay time={remainingTime} />
           ) : (
             '이어서 몰입'
           )}
-        </button>
+        </Button>
       </div>
-    );
-  }
-
-  // 시간 임박 컴포넌트 (1시간 이내)
-  return (
-    <div 
-      className="rounded-[24px] p-4 mb-4 h-auto flex flex-col justify-between bg-gradient-component-01"
-    >
-      <div>
-        <h2 className="s1 text-text-strong mb-1">{task.title}</h2>
-        <p className="b3 text-text-neutral">{task.dueTime}</p>
-      </div>
-
-      <div className='flex justify-center overflow-hidden'>
-        <Image
-          src="/icons/home/happy-character-1hour.svg"
-          alt="Character"
-          width={140}
-          height={120}
-        />
-      </div>
-
-      <button 
-        onClick={() => onContinue(task.id)}
-        className="w-full bg-hologram text-text-inverse rounded-[12px] p-3.5 text-center l2"
-      >
-        {showRemaining ? (
-          <TimeDisplay time={remainingTime} />
-        ) : (
-          '이어서 몰입'
-        )}
-      </button>
-    </div>
+      
+      {/* 이어서 몰입 바텀시트 */}
+      {showBottomSheet && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
+          <div className="w-full bg-component-gray-secondary rounded-t-[28px] p-4 pt-10 flex flex-col items-center">
+            <h2 className="t3 text-text-strong text-center">{task.title}</h2>
+            <p className="t3 text-text-strong text-center mb-2">이어서 몰입할까요?</p>
+            <p className="b3 text-text-neutral text-center mb-7">마감까지 {remainingTime}</p>
+            <button
+              className="w-full bg-component-accent-primary text-white rounded-[16px] py-4 mb-3 l2"
+              onClick={handleContinueToFocus}
+            >
+              이어서 몰입
+            </button>
+            
+            <button
+              className="w-full text-text-neutral py-4 l2"
+              onClick={handleCloseBottomSheet}
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

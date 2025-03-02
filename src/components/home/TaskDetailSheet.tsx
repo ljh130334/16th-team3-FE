@@ -241,7 +241,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
             <Button 
               variant="primary"
               size="default"
-              className="l2 w-full text-text-strong rounded-xl py-4"
+              className="l2 w-full text-text-strong rounded-[20px] py-4"
               onClick={handleStartTask}
             >
               {isInProgress ? '이어서 몰입' : '미리 시작'}
@@ -250,7 +250,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
           
           <div className="mb-10">
             <div
-              className="b2 flex justify-center w-full text-text-neutral rounded-xl py-4 bg-none"
+              className="b2 flex justify-center w-full text-text-neutral py-4 bg-none"
               onClick={onClose}
             >
               닫기

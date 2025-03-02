@@ -14,19 +14,20 @@ const SAMPLE_TODAY_TASKS = [
   {
     id: 1,
     title: '산학 발표 준비하기',
-    dueDate: '2025-02-11',
+    dueDate: '2025-03-02',
     dueDay: '(수)',
     dueTime: '오후 6시까지',
     timeRequired: '3시간 소요',
     dDayCount: 0,
     description: '산학 협력 프로젝트 중간 발표 준비하기',
     type: 'today',
-    status: 'pending' // pending 또는 inProgress
+    status: 'pending', // pending 또는 inProgress
+    ignoredAlerts: 3
   },
   {
     id: 2,
     title: '산학 발표 준비하기',
-    dueDate: '2025-02-11',
+    dueDate: '2025-03-02',
     dueDay: '(수)',
     dueTime: '오후 6시까지',
     timeRequired: '3시간 소요',
@@ -42,7 +43,7 @@ const SAMPLE_IN_PROGRESS_TASKS = [
   {
     id: 7,
     title: 'PPT 만들고 대본 작성하기',
-    dueDate: '2025-03-01',
+    dueDate: '2025-03-02',
     dueDay: '(금)',
     dueTime: '오후 5시까지',
     timeRequired: '3시간 소요',
@@ -51,6 +52,19 @@ const SAMPLE_IN_PROGRESS_TASKS = [
     type: 'today',
     status: 'inProgress',
     startedAt: '2025-03-01T13:00:00' // 태스크 시작 시간
+  },
+  {
+    id: 8,
+    title: 'PPT 만들고 대본 작성하기',
+    dueDate: '2025-03-02',
+    dueDay: '(금)',
+    dueTime: '오후 9시까지',
+    timeRequired: '3시간 소요',
+    dDayCount: 0,
+    description: 'PPT 슬라이드 20장 준비 및 발표 대본 작성',
+    type: 'today',
+    status: 'inProgress',
+    startedAt: '2025-03-01T13:00:00'
   }
 ];
 
@@ -59,7 +73,7 @@ const SAMPLE_THISWEEK_TASKS = [
   {
     id: 3,
     title: '산학 발표 준비하기',
-    dueDate: '2025-02-11',
+    dueDate: '2025-03-05',
     dueDay: '(수)',
     dueTime: '오후 6시까지',
     timeRequired: '3시간 소요',
@@ -70,7 +84,7 @@ const SAMPLE_THISWEEK_TASKS = [
   {
     id: 4,
     title: '블로그 글쓰기 챌린지하기',
-    dueDate: '2025-02-12',
+    dueDate: '2025-03-07',
     dueDay: '(목)',
     dueTime: '오후 6시까지',
     timeRequired: '1일 소요',
@@ -85,7 +99,7 @@ const SAMPLE_FUTURE_TASKS = [
   {
     id: 5,
     title: '블로그 글쓰기 챌린지하기',
-    dueDate: '2025-02-10',
+    dueDate: '2025-04-02',
     dueDay: '(수)',
     dueTime: '오후 6시까지',
     timeRequired: '4시간 30분 소요',
@@ -145,6 +159,54 @@ const HomePage = () => {
   const [activeTab, setActiveTab] = useState<'today' | 'all'>('today');
   const router = useRouter();
   const [detailTask, setDetailTask] = useState<any>(null);
+  const [showExpiredTaskSheet, setShowExpiredTaskSheet] = useState(false);
+  const [expiredTask, setExpiredTask] = useState<any>(null);
+
+const handleGoToReflection = (taskId: number) => {
+  router.push(`/reflection?taskId=${taskId}`);
+  setShowExpiredTaskSheet(false);
+};
+
+// 앱 진입 시 마감 지난 태스크 확인
+useEffect(() => {
+  const now = new Date('2025-03-10');
+  
+  // 마감 지난 태스크 찾기
+  const expiredTasks = allTasks.filter(task => {
+    const dueDate = new Date(task.dueDate);
+    
+    // 시간 추출
+    let hours = 0;
+    if (task.dueTime.includes('오후')) {
+      const match = task.dueTime.match(/오후\s*(\d+)시/);
+      if (match && match[1]) {
+        hours = parseInt(match[1]);
+        if (hours !== 12) hours += 12;
+      }
+    } else if (task.dueTime.includes('오전')) {
+      const match = task.dueTime.match(/오전\s*(\d+)시/);
+      if (match && match[1]) {
+        hours = parseInt(match[1]);
+        if (hours === 12) hours = 0;
+      }
+    }
+    
+    dueDate.setHours(hours, 0, 0, 0);
+    
+    // 마감일이 현재 시간보다 이전이고, 회고를 완료하지 않은 태스크
+    return dueDate.getTime() < now.getTime() && task.status !== 'reflected';
+  });
+  
+  // 마감 지난 태스크가 있으면 첫 번째 태스크로 바텀시트 표시
+  if (expiredTasks.length > 0) {
+    setExpiredTask(expiredTasks[0]);
+    setShowExpiredTaskSheet(true);
+  }
+}, [allTasks]);
+
+const handleCloseExpiredSheet = () => {
+  setShowExpiredTaskSheet(false);
+};
 
   const handleDetailTask = (task: any) => {
     setDetailTask(task);
@@ -166,6 +228,28 @@ const HomePage = () => {
       localStorage.setItem('hasVisitedBefore', 'true');
     }
   }, []);
+
+  const resetAlerts = (taskId: number) => {
+    console.log('알림 초기화:', taskId);
+    
+    // 해당 태스크의 ignoredAlerts 값을 0으로 초기화
+    setAllTasks(prevTasks => 
+      prevTasks.map(task => 
+        task.id === taskId 
+          ? { ...task, ignoredAlerts: 0 } 
+          : task
+      )
+    );
+    
+    // 오늘 할 일 목록도 업데이트
+    setTodayTasks(prevTasks => 
+      prevTasks.map(task => 
+        task.id === taskId 
+          ? { ...task, ignoredAlerts: 0 } 
+          : task
+      )
+    );
+  };
 
   // 진행 중인 작업 계속하기
   const handleContinueTask = (taskId: number) => {
@@ -353,20 +437,23 @@ const HomePage = () => {
                 </div>
 
                 {/* 진행 예정 섹션 */}
-                <div className="mb-8">
-                  <h3 className="s2 text-text-neutral mb-2 mt-2">진행 예정</h3>
-                  {todayTasks.filter(t => t.status !== 'inProgress').map(task => (
-                    <TaskItem
-                      key={task.id}
-                      title={task.title}
-                      dueDate={task.dueDate}
-                      dueTime={task.dueTime}
-                      onClick={() => handleTaskClick(task)}
-                      onDelete={() => handleDeleteTask(task.id)}
-                      onPreviewStart={() => handleDetailTask(task)}
-                    />
-                  ))}
-                </div>
+                  <div className="mb-8">
+                    <h3 className="s2 text-text-neutral mb-2 mt-2">진행 예정</h3>
+                    {todayTasks.filter(t => t.status !== 'inProgress').map(task => (
+                      <TaskItem
+                        key={task.id}
+                        title={task.title}
+                        dueDate={task.dueDate}
+                        dueTime={task.dueTime}
+                        taskId={task.id}
+                        onClick={() => handleTaskClick(task)}
+                        onDelete={() => handleDeleteTask(task.id)}
+                        onPreviewStart={() => handleDetailTask(task)}
+                        ignoredAlerts={task.ignoredAlerts || 0}
+                        resetAlerts={resetAlerts}
+                      />
+                    ))}
+                  </div>
 
                 <div>
                   <button 
@@ -421,21 +508,23 @@ const HomePage = () => {
             {hasTodayTasksOnly && (
               <>
                 {/* 진행 예정 섹션 */}
-                <div className="mb-8">
-                  <h3 className="s2 text-text-neutral mb-2 mt-2">진행 예정</h3>
-                  {todayTasks.filter(t => t.status !== 'inProgress').map(task => (
-                    <TaskItem
-                      key={task.id}
-                      title={task.title}
-                      dueDate={task.dueDate}
-                      dueTime={task.dueTime}
-                      onClick={() => handleTaskClick(task)}
-                      onDelete={() => handleDeleteTask(task.id)}
-                      onPreviewStart={() => handleDetailTask(task)}
-                    />
-                  ))}
-                </div>
-
+                  <div className="mb-8">
+                    <h3 className="s2 text-text-neutral mb-2 mt-2">진행 예정</h3>
+                    {todayTasks.filter(t => t.status !== 'inProgress').map(task => (
+                      <TaskItem
+                        key={task.id}
+                        title={task.title}
+                        dueDate={task.dueDate}
+                        dueTime={task.dueTime}
+                        taskId={task.id}
+                        onClick={() => handleTaskClick(task)}
+                        onDelete={() => handleDeleteTask(task.id)}
+                        onPreviewStart={() => handleDetailTask(task)}
+                        ignoredAlerts={task.ignoredAlerts || 0}
+                        resetAlerts={resetAlerts}
+                      />
+                    ))}
+                  </div>
                 <div>
                   <button 
                     className="flex justify-between items-center w-full px-4 py-4 bg-component-gray-secondary rounded-[20px]"
@@ -473,14 +562,17 @@ const HomePage = () => {
                 <div className="mb-4">
                   {topWeeklyTasks.map(task => (
                     <TaskItem
-                      key={task.id}
-                      title={task.title}
-                      dueDate={task.dueDate}
-                      dueTime={task.dueTime}
-                      onClick={() => handleTaskClick(task)}
-                      onDelete={() => handleDeleteTask(task.id)}
-                      onPreviewStart={() => handleDetailTask(task)}
-                    />
+                    key={task.id}
+                    title={task.title}
+                    dueDate={task.dueDate}
+                    dueTime={task.dueTime}
+                    taskId={task.id}
+                    onClick={() => handleTaskClick(task)}
+                    onDelete={() => handleDeleteTask(task.id)}
+                    onPreviewStart={() => handleDetailTask(task)}
+                    ignoredAlerts={task.ignoredAlerts || 0}
+                    resetAlerts={resetAlerts}
+                  />
                   ))}
                 </div>
 
@@ -521,14 +613,17 @@ const HomePage = () => {
                 <div className="mb-4">
                   {topAllTasks.map(task => (
                     <TaskItem
-                      key={task.id}
-                      title={task.title}
-                      dueDate={task.dueDate}
-                      dueTime={task.dueTime}
-                      onClick={() => handleTaskClick(task)}
-                      onDelete={() => handleDeleteTask(task.id)}
-                      onPreviewStart={() => handleDetailTask(task)}
-                    />
+                    key={task.id}
+                    title={task.title}
+                    dueDate={task.dueDate}
+                    dueTime={task.dueTime}
+                    taskId={task.id}
+                    onClick={() => handleTaskClick(task)}
+                    onDelete={() => handleDeleteTask(task.id)}
+                    onPreviewStart={() => handleDetailTask(task)}
+                    ignoredAlerts={task.ignoredAlerts || 0}
+                    resetAlerts={resetAlerts}
+                  />
                   ))}
                 </div>
 
@@ -545,6 +640,29 @@ const HomePage = () => {
                     height={12}
                   />
                 </button>
+                </div>
+              </div>
+            )}
+
+            {showExpiredTaskSheet && expiredTask && (
+              <div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
+                <div className="w-full bg-component-gray-secondary rounded-t-[28px] p-4 pt-10 flex flex-col items-center">
+                  <h2 className="t3 text-text-strong text-center">{expiredTask.title}</h2>
+                  <p className="t3 text-text-strong text-center mb-2">작업이 끝났어요. 짧게 돌아볼까요?</p>
+                  <p className="b3 text-text-neutral text-center mb-7">마감일 {new Date(expiredTask.dueDate).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })} ({expiredTask.dueDay}), {expiredTask.dueTime}</p>
+                  <button
+                    className="w-full bg-component-accent-primary text-white rounded-[16px] py-4 mb-3 l2"
+                    onClick={() => handleGoToReflection(expiredTask.id)}
+                  >
+                    회고하기
+                  </button>
+                  
+                  <button
+                    className="w-full text-text-neutral py-4 l2"
+                    onClick={handleCloseExpiredSheet}
+                  >
+                    닫기
+                  </button>
                 </div>
               </div>
             )}
@@ -673,6 +791,8 @@ const HomePage = () => {
         onStart={handleStartTask}
       />
     </div>
+
+    
   );
 };
 
