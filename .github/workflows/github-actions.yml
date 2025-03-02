@@ -26,6 +26,7 @@ jobs:
       user-email: ${{ secrets.GIT_EMAIL }}
       commit-message: ${{ github.event.commits[0].message }}
       target-branch: main
+      force: true
    - name: Test get variable exported by push-to-another-repository
      run: echo $DESTINATION_CLONED_DIRECTORY
    - name: Push to forked repository
