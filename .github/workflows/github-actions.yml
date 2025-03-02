@@ -32,7 +32,7 @@ jobs:
      run: |
       git clone https://github.com/depromeet/16th-team3-FE.git deployed-repo
       cd deployed-repo
-      git remote add forked-repo https://x-access-token:${{ secrets.FORKED_REPO_TOKEN }}@github.com/ljh130334/16th-team3-FE.git
+      git remote add forked-repo https://${{ secrets.FORKED_REPO_TOKEN }}@github.com/ljh130334/16th-team3-FE.git
       git config user.name "ljh130334"
       git config user.email "${{ secrets.GIT_EMAIL }}"
       git checkout dev
