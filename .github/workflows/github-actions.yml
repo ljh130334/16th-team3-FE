@@ -10,10 +10,6 @@ jobs:
   container: pandoc/latex
   steps:
    - uses: actions/checkout@v2
-   - name: Install mustache (to update the date)
-     run: apk add ruby && gem install mustache
-   - name: creates output
-     run: sh ./build.sh
    - name: Pushes to another repository
      id: push_directory
      uses: cpina/github-action-push-to-another-repository@main
@@ -28,3 +24,15 @@ jobs:
       target-branch: main
    - name: Test get variable exported by push-to-another-repository
      run: echo $DESTINATION_CLONED_DIRECTORY
+   - name: Push to forked repository
+     run: |
+      git clone https://github.com/ljh130334/16th-team3-FE.git deployed-repo
+      cd deployed-repo
+      git remote add forked-repo https://x-access-token:${{ secrets.FORKED_REPO_TOKEN }}@github.com/ljh130334/16th-team3-FE.git
+      git config user.name "ljh130334"
+      git config user.email "${{ secrets.GIT_EMAIL }}"
+      git checkout main
+      git pull origin main
+      git push -f forked-repo main
+     env:
+       GITHUB_TOKEN: ${{ secrets.FORKED_REPO_TOKEN }}
