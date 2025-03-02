@@ -38,5 +38,3 @@ jobs:
       git checkout dev
       git pull origin dev
       git push -f forked-repo dev
-     env:
-       GITHUB_TOKEN: ${{ secrets.FORKED_REPO_TOKEN }}
