@@ -9,10 +9,9 @@ jobs:
   runs-on: ubuntu-latest
   steps:
    - uses: actions/checkout@v2
-   - name: Install required packages (Git & Ruby)
+   - name: Install Git
      run: |
-       apt-get update && apt-get install -y git ruby
-       gem install mustache
+       sudo apt-get update && sudo apt-get install -y git
    - name: creates output
      run: sh ./build.sh
    - name: Pushes to another repository
