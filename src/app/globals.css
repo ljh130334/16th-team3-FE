@@ -2,71 +2,264 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://cdn.jsdelivr.net/npm/pretendard@latest/dist/web/static/pretendard.css');
+
+:root {
+  --font-pretendard: 'Pretendard', sans-serif;
+
+  --point-gradient: linear-gradient(
+    269deg,
+    #ddd9f8 6.08%,
+    #e4e4ff 31.42%,
+    #cce4ff 62.59%
+  );
+
+  --gradient-component-01: linear-gradient(
+      180deg,
+      rgba(121, 121, 235, 0.3) 0%,
+      rgba(121, 121, 235, 0.1) 29.17%,
+      rgba(121, 121, 235, 0) 100%
+    ),
+    #17191f;
+
+  --gradient-component-02: linear-gradient(
+    180deg,
+    rgba(121, 121, 235, 0.15) 0%,
+    rgba(121, 121, 235, 0.05) 29.17%,
+    rgba(121, 121, 235, 0) 100%
+  );
+
+  --error: linear-gradient(
+    180deg,
+    var(--Red-400, #dd6875) 0%,
+    var(--Red-200, #ed98a2) 100%
+  );
+
+  --linear-black: linear-gradient(180deg, rgba(15, 17, 20, 0) 30%, #0f1114 80%);
+
+  --linear-black-inverse: linear-gradient(
+    180deg,
+    #0f1114 20%,
+    rgba(15, 17, 20, 0) 70%
+  );
+}
+
+html {
+  font-family: var(--font-pretendard);
+}
+
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-background-primary text-text-normal;
 }
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-  }
-  .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
+/* 기본 헤더 스타일 */
+.h1 {
+  @apply text-h1;
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+.h2 {
+  @apply text-h2;
+}
+
+.h3 {
+  @apply text-h3;
+}
+
+/* 기본 제목 스타일 */
+.t1 {
+  @apply text-t1;
+}
+
+.t2 {
+  @apply text-t2;
+}
+
+.t3 {
+  @apply text-t3;
+}
+
+/* 기본 부제목 스타일 */
+.s1 {
+  @apply text-s1;
+}
+
+.s2 {
+  @apply text-s2;
+}
+
+.s3 {
+  @apply text-s3;
+}
+
+/* 본문 스타일 */
+.b1 {
+  @apply text-b1;
+}
+
+.b2 {
+  @apply text-b2;
+}
+
+.b3 {
+  @apply text-b3;
+}
+
+/* 캡션 스타일 */
+.c1 {
+  @apply text-c1;
+}
+
+.c2 {
+  @apply text-c2;
+}
+
+.c3 {
+  @apply text-c3;
+}
+
+/* 라벨 스타일 */
+.l1 {
+  @apply text-l1;
+}
+
+.l2 {
+  @apply text-l2;
+}
+
+.l3 {
+  @apply text-l3;
+}
+
+.l4 {
+  @apply text-l4;
+}
+
+.l5 {
+  @apply text-l5;
+}
+
+.l6 {
+  @apply text-l6;
+}
+
+/* 버튼 스타일 */
+.button-primary {
+  @apply rounded-md bg-main-300 px-4 py-2 text-white;
+}
+
+.button-secondary {
+  @apply rounded-md bg-gray-300 px-4 py-2 text-gray-900;
+}
+
+.button-danger {
+  @apply rounded-md bg-red-300 px-4 py-2 text-white;
+}
+
+/* 아이콘 스타일 */
+.icon-primary {
+  @apply text-icon-primary;
+}
+
+.icon-inverse {
+  @apply text-icon-inverse;
+}
+
+/* 엘리베이티드 컬러 */
+.elevated-primary {
+  @apply bg-elevated-primary;
+}
+
+.elevated-secondary {
+  @apply bg-elevated-secondary;
+}
+
+/* 컴포넌트 컬러 */
+.component-primary {
+  @apply bg-component-accent-primary;
+}
+
+.component-secondary {
+  @apply bg-component-accent-secondary;
+}
+
+.component-red {
+  @apply bg-component-accent-red;
+}
+
+/* 라인 컬러 */
+.line-primary {
+  @apply border-line-primary;
+}
+
+.line-secondary {
+  @apply border-line-secondary;
+}
+
+.line-tertiary {
+  @apply border-line-tertiary;
+}
+
+/* 텍스트 컬러 */
+.text-primary {
+  @apply text-text-primary;
+}
+
+.text-red {
+  @apply text-text-red;
+}
+
+.text-secondary {
+  @apply text-text-secondary;
+}
+
+.text-inverse {
+  @apply text-text-inverse;
+}
+
+.text-disabled {
+  @apply text-text-disabled;
+}
+
+.text-strong {
+  @apply text-text-strong;
+}
+
+.text-alternative {
+  @apply text-text-alternative;
+}
+
+.text-neutral {
+  @apply text-text-neutral;
+}
+
+.text-normal {
+  @apply text-text-normal;
+}
+
+.bg-point-gradient {
+  background: var(--point-gradient);
+}
+
+.bg-gradient-component-01 {
+  background: var(--gradient-component-01);
+}
+
+.bg-gradient-component-02 {
+  background: var(--gradient-component-02);
+}
+
+.bg-gradient-error {
+  background: var(--error);
+}
+
+.bg-gradient-black {
+  background: var(--linear-black);
+}
+
+.bg-gradient-black-inverse {
+  background: var(--linear-black-inverse);
+}
+
+.bg-blur-purple {
+  @apply bg-background-purple;
 }
