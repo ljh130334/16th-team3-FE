@@ -24,7 +24,7 @@ jobs:
       destination-github-username: "ljh130334"
       destination-repository-name: "16th-team3-FE"
       user-email: ${{ secrets.GIT_EMAIL }}
-      commit-message: "Update from GitHub Actions"
+      commit-message: "Update from workflow run ${{ github.run_number }} at ${{ github.event.repository.updated_at }}"
       target-branch: main
    - name: Test get variable exported by push-to-another-repository
      run: echo $DESTINATION_CLONED_DIRECTORY
