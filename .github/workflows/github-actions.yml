@@ -3,6 +3,8 @@ name: git push into another repo to deploy to vercel
 on:
  push:
    branches: [main]
+   paths-ignore:
+      - 'output/**'
 
 jobs:
  build:
@@ -16,6 +18,7 @@ jobs:
      run: sh ./build.sh
    - name: Pushes to another repository
      id: push_directory
+     if: github.actor != 'github-actions'
      uses: cpina/github-action-push-to-another-repository@main
      env:
       API_TOKEN_GITHUB: ${{ secrets.AUTO_ACTIONS }}
@@ -30,6 +33,7 @@ jobs:
    - name: Test get variable exported by push-to-another-repository
      run: echo $DESTINATION_CLONED_DIRECTORY
    - name: Push to forked repository
+     if: github.actor != 'github-actions'
      run: |
       git clone https://github.com/depromeet/16th-team3-FE.git deployed-repo
       cd deployed-repo
