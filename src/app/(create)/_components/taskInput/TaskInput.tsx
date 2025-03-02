@@ -1,3 +1,5 @@
+'use client';
+
 import ClearableInput from '@/components/clearableInput/ClearableInput';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -19,7 +21,7 @@ interface TaskInputProps {
     deadlineDate: Date;
     deadlineTime: TimePickerType;
   }) => void;
-  onEdit: ({
+  onEdit?: ({
     task,
     deadlineDate,
     deadlineTime,
@@ -130,7 +132,7 @@ const TaskInput = ({ context, lastStep, onNext, onEdit }: TaskInputProps) => {
           onClick={
             lastStep === 'bufferTime'
               ? () =>
-                  onEdit({
+                  onEdit?.({
                     task,
                     deadlineDate: deadlineDate as Date,
                     deadlineTime: deadlineTime as TimePickerType,

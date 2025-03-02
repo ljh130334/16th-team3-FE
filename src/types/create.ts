@@ -2,6 +2,7 @@ export interface TimePickerType {
   meridiem: string;
   hour: string;
   minute: string;
+  second?: string;
 }
 
 export interface BufferTimeDataType {
@@ -39,6 +40,13 @@ export interface ScheduledTaskType {
   triggerAction: string;
   estimatedTime: number;
   triggerActionAlarmTime: string;
+  taskType: string;
+  taskMode: string;
+}
+
+export interface InstantTaskType {
+  name: string;
+  dueDatetime: string;
   taskType: string;
   taskMode: string;
 }
