@@ -263,3 +263,24 @@ body {
 .bg-blur-purple {
   @apply bg-background-purple;
 }
+
+.purple-blur-effect {
+  opacity: 0.4;
+  background: var(
+    --PurpleBlur-Light,
+    conic-gradient(
+      from 210deg at 50% 50%,
+      #cce4ff 0deg,
+      #c1a4e8 50.05925238132477deg,
+      #b8e2fb 85.93856155872345deg,
+      #f2efe8 134.97360706329346deg,
+      #cce4ff 172.04889178276062deg,
+      #bdafe3 224.6718692779541deg,
+      #c7edeb 259.35521364212036deg,
+      #e7f5eb 298.8224387168884deg,
+      #f2f0e7 328.72185945510864deg
+    )
+  );
+  mix-blend-mode: color-dodge;
+  filter: blur(62px);
+}
