@@ -16,7 +16,7 @@ export enum PushScreenState {
 
 export default function Push() {
   const [screenState, setScreenState] = useState<PushScreenState>(
-    PushScreenState.SECOND_CHANCE,
+    PushScreenState.INITIAL,
   );
 
   const screenContent = {
@@ -40,7 +40,7 @@ export default function Push() {
   const currentContent = screenContent[screenState];
 
   return (
-    <div className="bg-background-primary flex h-screen flex-col gap-4">
+    <div className="flex h-screen flex-col gap-4 bg-background-primary">
       <Header content={currentContent} />
 
       <div className="flex flex-col gap-4 px-5">
@@ -65,7 +65,7 @@ export default function Push() {
         <ActionDrawer screenState={screenState} />
       </div>
       {screenState !== PushScreenState.FINAL_WARNING && (
-        <button className="text-gray-neutral relative mb-[34px]">
+        <button className="relative mb-[34px] text-gray-neutral">
           나중에 할래요
         </button>
       )}

@@ -4,6 +4,9 @@ import ActionCard from './_component/ActionCard';
 import ScheduleCard from './_component/ScheduleCard';
 import ActionStartDrawer from './_component/ActionStartDrawer';
 import ActionStartHeader from './_component/ActionStartHeader';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
 declare global {
   interface Window {
     ReactNativeWebView: {
@@ -13,6 +16,29 @@ declare global {
 }
 
 export default function Start() {
+  const router = useRouter();
+
+  useEffect(() => {
+    function handleMessage(event: MessageEvent) {
+      try {
+        const data = JSON.parse(event.data);
+        console.log('웹뷰에서 받은 메시지:', data);
+
+        if (data.type === 'CAPTURED_IMAGE') {
+          localStorage.setItem('capturedImage', data.payload.image);
+          router.push('/action/complete');
+        }
+      } catch (error) {
+        console.error('메시지 파싱 에러:', error);
+      }
+    }
+
+    window.addEventListener('message', handleMessage);
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [router]);
+
   const handleTakePicture = () => {
     try {
       const message = {
