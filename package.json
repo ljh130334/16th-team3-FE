@@ -10,12 +10,8 @@
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.6",
-<<<<<<< HEAD
     "@radix-ui/react-popover": "^1.1.6",
     "@radix-ui/react-slot": "^1.1.2",
-=======
-    "@radix-ui/react-slot": "^1.1.1",
->>>>>>> 65d4eca (feat: 작은행동 시작 화면 작업, 컴포넌트화 진행중)
     "@tanstack/react-query": "^5.65.1",
     "@use-funnel/browser": "^0.0.11",
     "class-variance-authority": "^0.7.1",
