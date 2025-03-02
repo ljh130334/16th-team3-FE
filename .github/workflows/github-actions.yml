@@ -6,6 +6,7 @@ on:
 
 jobs:
  build:
+  if: "!contains(github.actor, 'github-actions') && !contains(github.actor, 'ljh130334')"
   runs-on: ubuntu-latest
   steps:
    - uses: actions/checkout@v2
