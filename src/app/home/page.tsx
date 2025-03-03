@@ -130,74 +130,74 @@ const SAMPLE_FUTURE_TASKS = [
 
 const SAMPLE_ALL_TASKS = [...SAMPLE_TODAY_TASKS, ...SAMPLE_THISWEEK_TASKS, ...SAMPLE_FUTURE_TASKS, ...SAMPLE_IN_PROGRESS_TASKS];
 
-const SAMPLE_WEEKLY_TASKS = [
-  {
-    id: 1,
-    title: '산학 발표 준비하기',
-    dueDate: '2025-02-10',
-    dueDay: '(화)',
-    dueTime: '오후 6시까지',
-    timeRequired: '3시간 소요',
-    dDayCount: 1,
-    description: '산학 협력 프로젝트 중간 발표 준비하기',
-    dueDateTime: '2025-02-10T18:00:00.000Z'
-  },
-  {
-    id: 2,
-    title: '산학 발표 준비하기',
-    dueDate: '2025-02-11',
-    dueDay: '(수)',
-    dueTime: '오후 6시까지',
-    timeRequired: '3시간 소요',
-    dDayCount: 2,
-    description: '산학 협력 프로젝트 최종 발표 준비하기',
-    dueDateTime: '2025-02-11T18:00:00.000Z'
-  },
-  {
-    id: 3,
-    title: '블로그 글쓰기 챌린지하기',
-    dueDate: '2025-02-12',
-    dueDay: '(목)',
-    dueTime: '오후 6시까지',
-    timeRequired: '1일 소요',
-    dDayCount: 3,
-    description: '기술 블로그 첫 번째 글 작성하기',
-    dueDateTime: '2025-02-12T18:00:00.000Z'
-  },
-  {
-    id: 4,
-    title: '블로그 글쓰기 챌린지하기',
-    dueDate: '2025-02-13',
-    dueDay: '(금)',
-    dueTime: '오후 6시까지',
-    timeRequired: '1일 소요',
-    dDayCount: 4,
-    description: '기술 블로그 두 번째 글 작성하기',
-    dueDateTime: '2025-02-13T18:00:00.000Z'
-  },
-  {
-    id: 5,
-    title: '블로그 글쓰기 챌린지하기',
-    dueDate: '2025-02-14',
-    dueDay: '(토)',
-    dueTime: '오후 6시까지',
-    timeRequired: '1일 소요',
-    dDayCount: 5,
-    description: '기술 블로그 세 번째 글 작성하기',
-    dueDateTime: '2025-02-14T18:00:00.000Z'
-  },
-  {
-    id: 6,
-    title: '블로그 글쓰기 챌린지하기',
-    dueDate: '2025-02-15',
-    dueDay: '(일)',
-    dueTime: '오후 6시까지',
-    timeRequired: '1일 반 소요',
-    dDayCount: 6,
-    description: '기술 블로그 네 번째 글 작성하기',
-    dueDateTime: '2025-02-15T18:00:00.000Z'
-  }
-];
+// const SAMPLE_WEEKLY_TASKS = [
+//   {
+//     id: 1,
+//     title: '산학 발표 준비하기',
+//     dueDate: '2025-02-10',
+//     dueDay: '(화)',
+//     dueTime: '오후 6시까지',
+//     timeRequired: '3시간 소요',
+//     dDayCount: 1,
+//     description: '산학 협력 프로젝트 중간 발표 준비하기',
+//     dueDateTime: '2025-02-10T18:00:00.000Z'
+//   },
+//   {
+//     id: 2,
+//     title: '산학 발표 준비하기',
+//     dueDate: '2025-02-11',
+//     dueDay: '(수)',
+//     dueTime: '오후 6시까지',
+//     timeRequired: '3시간 소요',
+//     dDayCount: 2,
+//     description: '산학 협력 프로젝트 최종 발표 준비하기',
+//     dueDateTime: '2025-02-11T18:00:00.000Z'
+//   },
+//   {
+//     id: 3,
+//     title: '블로그 글쓰기 챌린지하기',
+//     dueDate: '2025-02-12',
+//     dueDay: '(목)',
+//     dueTime: '오후 6시까지',
+//     timeRequired: '1일 소요',
+//     dDayCount: 3,
+//     description: '기술 블로그 첫 번째 글 작성하기',
+//     dueDateTime: '2025-02-12T18:00:00.000Z'
+//   },
+//   {
+//     id: 4,
+//     title: '블로그 글쓰기 챌린지하기',
+//     dueDate: '2025-02-13',
+//     dueDay: '(금)',
+//     dueTime: '오후 6시까지',
+//     timeRequired: '1일 소요',
+//     dDayCount: 4,
+//     description: '기술 블로그 두 번째 글 작성하기',
+//     dueDateTime: '2025-02-13T18:00:00.000Z'
+//   },
+//   {
+//     id: 5,
+//     title: '블로그 글쓰기 챌린지하기',
+//     dueDate: '2025-02-14',
+//     dueDay: '(토)',
+//     dueTime: '오후 6시까지',
+//     timeRequired: '1일 소요',
+//     dDayCount: 5,
+//     description: '기술 블로그 세 번째 글 작성하기',
+//     dueDateTime: '2025-02-14T18:00:00.000Z'
+//   },
+//   {
+//     id: 6,
+//     title: '블로그 글쓰기 챌린지하기',
+//     dueDate: '2025-02-15',
+//     dueDay: '(일)',
+//     dueTime: '오후 6시까지',
+//     timeRequired: '1일 반 소요',
+//     dDayCount: 6,
+//     description: '기술 블로그 네 번째 글 작성하기',
+//     dueDateTime: '2025-02-15T18:00:00.000Z'
+//   }
+// ];
 
 const HomePage = () => {
   // 화면 분기 처리를 위한 상태

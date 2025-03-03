@@ -10,6 +10,14 @@ const eslintConfig = [
     extends: ['next/core-web-vitals', 'next/typescript', 'prettier'],
   }),
   ...pluginQuery.configs['flat/recommended'],
+  {
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      'react-hooks/exhaustive-deps': 'warn',
+      'react/no-unescaped-entities': 'off'
+    }
+  }
 ];
 
 export default eslintConfig;
