@@ -1,7 +1,7 @@
 'use client';
 
 import { TimePickerType } from '@/types/create';
-import Picker from './Picker';
+import Wheel from './Wheel';
 
 interface TimePickerProps {
   time: TimePickerType | undefined;
@@ -42,10 +42,20 @@ const TimePicker = ({ time, handleTime }: TimePickerProps) => {
   };
 
   return (
-    <div className="background-primary flex justify-center gap-6">
-      <Picker list={MERIDIEM} onSelectedChange={handleSelectedMeridiem} />
-      <Picker list={HOURS} onSelectedChange={handleSelectedHour} />
-      <Picker list={MINUTES} onSelectedChange={handleSelectedMinute} />
+    <div className="background-primary flex h-[180px] justify-center gap-6">
+      <div className="h-[180px] w-[80px]">
+        <Wheel
+          length={2}
+          width={80}
+          setValue={(relative) => (relative % 2 === 0 ? '오전' : '오후')}
+        />
+      </div>
+      <div className="h-[180px] w-[100px]">
+        <Wheel initIdx={1} length={12} width={50} loop={true} />
+      </div>
+      <div className="h-[180px] w-[100px]">
+        <Wheel initIdx={35} length={60} width={50} loop={true} />
+      </div>
     </div>
   );
 };
