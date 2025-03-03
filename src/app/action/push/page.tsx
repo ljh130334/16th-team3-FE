@@ -65,7 +65,10 @@ export default function Push() {
         <ActionDrawer screenState={screenState} />
       </div>
       {screenState !== PushScreenState.FINAL_WARNING && (
-        <button className="relative mb-[34px] text-gray-neutral">
+        <button
+          className="relative mb-[34px] text-gray-neutral"
+          onClick={() => setScreenState(PushScreenState.SECOND_CHANCE)}
+        >
           나중에 할래요
         </button>
       )}
