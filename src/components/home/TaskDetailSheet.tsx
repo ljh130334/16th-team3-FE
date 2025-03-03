@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import { parseDateAndTime, calculateRemainingTime } from '@/utils/dateFormat';
 
 type TaskDetailSheetProps = {
   isOpen: boolean;
@@ -16,6 +17,7 @@ type TaskDetailSheetProps = {
     description?: string;
     status?: string;
     dueDateTime?: string;
+    ignoredAlerts?: number;
   };
   onDelete?: (taskId: number) => void;
   onStart?: (taskId: number) => void;
@@ -32,6 +34,44 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const [remainingTime, setRemainingTime] = useState('');
+  const [isUrgent, setIsUrgent] = useState(false);
+  
+  // 남은 시간 계산 함수
+  const calculateRemainingTimeLocal = () => {
+    if (!task.dueDate) return '';
+    
+    // dueDateTime이 있으면 사용, 없으면 dueDate와 dueTime에서 계산
+    let dueDateTime;
+    if (task.dueDateTime) {
+      dueDateTime = new Date(task.dueDateTime);
+    } else if (task.dueDate && task.dueTime) {
+      dueDateTime = parseDateAndTime(task.dueDate, task.dueTime || '');
+    } else {
+      return '';
+    }
+    
+    const now = new Date();
+    const diffMs = dueDateTime.getTime() - now.getTime();
+    
+    // 1시간 이내인지 체크 또는 ignoredAlerts가 3 이상인지 확인
+    setIsUrgent(diffMs <= 60 * 60 * 1000 && diffMs > 0 || (task.ignoredAlerts || 0) >= 3);
+    
+    return calculateRemainingTime(dueDateTime);
+  };
+  
+  // 남은 시간 업데이트
+  useEffect(() => {
+    if (isOpen) {
+      setRemainingTime(calculateRemainingTimeLocal());
+      
+      const interval = setInterval(() => {
+        setRemainingTime(calculateRemainingTimeLocal());
+      }, 1000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [isOpen, task]);
   
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -199,12 +239,6 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               <div className="b2 text-text-alternative">마감일</div>
               <div className="flex items-center">
                 <span className="b2 text-text-neutral mr-3">{formatDueDateTime()}</span>
-                <Image
-                  src="/icons/home/arrow-right.svg"
-                  alt="Arrow Right"
-                  width={7}
-                  height={12}
-                />
               </div>
             </div>
           </div>
@@ -214,12 +248,6 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               <div className="b2 text-text-alternative">작은 행동</div>
               <div className="flex items-center">
                 <span className="b2 text-text-neutral mr-3">노트북 켜기</span>
-                <Image
-                  src="/icons/home/arrow-right.svg"
-                  alt="Arrow Right"
-                  width={7}
-                  height={12}
-                />
               </div>
             </div>
           </div>
@@ -229,12 +257,6 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               <div className="b2 text-text-alternative">예상 소요시간</div>
               <div className="flex items-center">
                 <span className="b2 text-text-neutral mr-3">{task.timeRequired || '-'}</span>
-                <Image
-                  src="/icons/home/arrow-right.svg"
-                  alt="Arrow Right"
-                  width={7}
-                  height={12}
-                />
               </div>
             </div>
           </div>
@@ -252,12 +274,12 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
           
           <div className="mt-6">
             <Button 
-              variant="primary"
+              variant={isUrgent ? "hologram" : "primary"}
               size="default"
-              className="l2 w-full text-text-strong rounded-[20px] py-4"
+              className={`l2 w-full z-10 ${isUrgent ? 'text-text-inverse' : 'text-text-strong'} rounded-[20px] py-4`}
               onClick={handleStartTask}
             >
-              {isInProgress ? '이어서 몰입' : '미리 시작'}
+              {isInProgress ? '이어서 몰입' : isUrgent ? '지금 시작' : '미리 시작'}
             </Button>
           </div>
           

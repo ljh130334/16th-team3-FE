@@ -16,9 +16,16 @@ interface InProgressTaskItemProps {
     dueDateTime?: string;
   };
   onContinue: (taskId: number) => void;
+  isReentry?: boolean; // 홈화면 재진입 여부를 확인하는 props
+  onShowDetails?: (task: any) => void; // 상세 정보 표시 콜백 추가
 }
 
-const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ task, onContinue }) => {
+const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ 
+  task, 
+  onContinue, 
+  isReentry = false,
+  onShowDetails
+}) => {
   const router = useRouter();
   const [showRemaining, setShowRemaining] = useState(true);
   const [remainingTime, setRemainingTime] = useState('');
@@ -26,10 +33,9 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ task, onContinu
   const [timeLeftMs, setTimeLeftMs] = useState(0);
   const [showBottomSheet, setShowBottomSheet] = useState(false);
 
-  // 남은 시간 계산 함수
+  // 남은 시간 계산 함수 개선
   const calculateRemainingTimeLocal = () => {
-    if (!task.startedAt) return '';
-    
+    // startedAt이 없어도 계산할 수 있도록 수정
     const now = new Date().getTime();
     
     // dueDateTime이 있으면 사용, 없으면 dueDate와 dueTime에서 계산
@@ -72,9 +78,28 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ task, onContinu
     return () => clearInterval(timeInterval);
   }, [task]);
 
-  // 이어서 몰입 버튼 클릭 시 바텀시트 표시
+  // 홈화면 재진입 시 자동으로 바텀시트 표시
+  useEffect(() => {
+    // 홈화면 재진입인 경우에만 바텀시트 표시
+    if (isReentry) {
+      setShowBottomSheet(true);
+    }
+  }, [isReentry]);
+
+  // 이어서 몰입 버튼 클릭 시 - 홈화면 재진입이 아닌 경우에는 태스크 상세 바텀시트 표시
   const handleContinueClick = () => {
-    setShowBottomSheet(true);
+    if (isReentry) {
+      // 재진입인 경우 이어서 몰입 바텀시트 표시
+      setShowBottomSheet(true);
+    } else {
+      // 일반 상태에서는 태스크 상세 바텀시트로 이동
+      if (onShowDetails) {
+        onShowDetails(task);
+      } else {
+        // 상세 정보 표시 콜백이 없는 경우 바로 몰입 화면으로 이동
+        router.push(`/focus?taskId=${task.id}`);
+      }
+    }
   };
   
   const handleCloseBottomSheet = () => {
@@ -149,8 +174,8 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ task, onContinu
           </button>
         </div>
         
-        {/* 이어서 몰입 바텀시트 */}
-        {showBottomSheet && (
+        {/* 이어서 몰입 바텀시트 - 재진입 시에만 표시 */}
+        {showBottomSheet && isReentry && (
           <div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
             <div className="w-full bg-component-gray-secondary rounded-t-[28px] p-4 pt-10 flex flex-col items-center">
               <h2 className="t3 text-text-strong text-center">{task.title}를</h2>
@@ -209,8 +234,8 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ task, onContinu
         </Button>
       </div>
       
-      {/* 이어서 몰입 바텀시트 */}
-      {showBottomSheet && (
+      {/* 이어서 몰입 바텀시트 - 재진입 시에만 표시 */}
+      {showBottomSheet && isReentry && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
           <div className="w-full bg-component-gray-secondary rounded-t-[28px] p-4 pt-10 flex flex-col items-center">
             <h2 className="t3 text-text-strong text-center">{task.title}</h2>
