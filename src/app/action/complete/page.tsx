@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { useState, useEffect } from 'react';
 
 import { Badge } from '@/components/component/Badge';
 import Header from './_component/Header';
@@ -9,7 +10,11 @@ import CharacterMotivation from './_component/CharacterMotivation';
 import StartButton from './_component/StartButton';
 
 export default function Complete() {
-  const capturedImage = localStorage.getItem('capturedImage');
+  const [capturedImage, setCapturedImage] = useState<string>('');
+
+  useEffect(() => {
+    setCapturedImage(localStorage.getItem('capturedImage') || '');
+  }, []);
 
   return (
     <div className="flex h-screen flex-col gap-4 bg-background-primary">
