@@ -48,6 +48,11 @@ export default {
       },
       colors: {
         gray: {
+          normal: '#D7E1EF',
+          alternative: '#7E8999',
+          neutral: '#A7B4C7',
+          inverse: '#0F1114',
+          strong: '#E6EDF8',
           0: '#FFFFFF',
           50: '#E6EDF8',
           100: '#D7E1EF',
