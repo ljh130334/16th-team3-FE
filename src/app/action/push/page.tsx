@@ -14,8 +14,11 @@ const PushScreenState = {
   FINAL_WARNING: 'final',
 } as const;
 
+type PushScreenStateType =
+  (typeof PushScreenState)[keyof typeof PushScreenState];
+
 export default function Push() {
-  const [screenState, setScreenState] = useState<PushScreenState>(
+  const [screenState, setScreenState] = useState<PushScreenStateType>(
     PushScreenState.INITIAL,
   );
 
