@@ -55,6 +55,8 @@ const TaskTypeInput = ({ context, onClick }: TaskTypeInputProps) => {
     context.estimatedMinute,
   );
 
+  // * TODO: Dialog 홈 화면으로 옮기기
+
   return (
     <Dialog>
       <div className="flex h-full w-full flex-col justify-between">
@@ -119,16 +121,18 @@ const TaskTypeInput = ({ context, onClick }: TaskTypeInputProps) => {
 
         <CharacterDialog />
 
-        <div className="pb-[46px] transition-all duration-300">
-          <Button
-            variant="primary"
-            className="w-full"
-            disabled={!taskType || !moodType}
-            onClick={() => onClick(convertedData)}
-          >
-            <DialogTrigger>확인</DialogTrigger>
-          </Button>
-        </div>
+        <DialogTrigger>
+          <div className="pb-[46px] transition-all duration-300">
+            <Button
+              variant="primary"
+              className="w-full"
+              disabled={!taskType || !moodType}
+              onClick={() => onClick(convertedData)}
+            >
+              확인
+            </Button>
+          </div>
+        </DialogTrigger>
       </div>
     </Dialog>
   );

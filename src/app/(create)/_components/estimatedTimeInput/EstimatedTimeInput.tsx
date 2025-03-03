@@ -281,7 +281,7 @@ const EstimatedTimeInput = ({
                     />
                     {estimatedHour.length > 0 && (
                       <span
-                        className={`t3 text-normal ${estimatedHour.length === 1 ? 'ml-[-14px]' : 'ml-[-2px]'} transform`}
+                        className={`t3 text-normal ${estimatedHour.length === 1 ? 'ml-[-8px]' : ''} transform`}
                       >
                         시간
                       </span>
@@ -335,7 +335,7 @@ const EstimatedTimeInput = ({
                   />
                   {estimatedMinute.length > 0 && (
                     <span
-                      className={`t3 text-normal ${estimatedMinute.length === 1 ? 'ml-[-14px]' : 'ml-[-2px]'} transform`}
+                      className={`t3 text-normal ${estimatedMinute.length === 1 ? 'ml-[-8px]' : ''} transform`}
                     >
                       분
                     </span>
