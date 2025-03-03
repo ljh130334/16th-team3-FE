@@ -10,9 +10,9 @@ export const transformScheduledTaskData = (
   data: TaskTypeInputType,
 ): ScheduledTaskType => {
   const deadlineDateObj = new Date(data.deadlineDate);
-  let hour = Number(data.deadlineTime.hour);
-  const minute = Number(data.deadlineTime.minute);
-  const second = Number(data.deadlineTime.second);
+  let hour = Number(data.deadlineTime.hour || 0);
+  const minute = Number(data.deadlineTime.minute || 0);
+  const second = Number(data.deadlineTime.second || 0);
 
   if (data.deadlineTime.meridiem === '오후' && hour < 12) {
     hour += 12;
@@ -24,6 +24,7 @@ export const transformScheduledTaskData = (
     minutes: minute,
     seconds: second,
   });
+
   const dueDatetimeStr = format(dueDateTime, 'yyyy-MM-dd HH:mm:ss');
 
   const days = data.estimatedDay ? Number(data.estimatedDay) : 0;
@@ -52,9 +53,9 @@ export const transformInstantScheduledTaskData = (
   data: InstantTaskInputType,
 ): InstantTaskType => {
   const deadlineDateObj = new Date(data.deadlineDate);
-  let hour = Number(data.deadlineTime.hour);
-  const minute = Number(data.deadlineTime.minute);
-  const second = Number(data.deadlineTime.second);
+  let hour = Number(data.deadlineTime.hour || 0);
+  const minute = Number(data.deadlineTime.minute || 0);
+  const second = Number(data.deadlineTime.second || 0);
 
   if (data.deadlineTime.meridiem === '오후' && hour < 12) {
     hour += 12;
