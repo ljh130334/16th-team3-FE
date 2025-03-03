@@ -12,10 +12,11 @@ const Wheel = (props: {
   length: number;
   loop?: boolean;
   perspective?: 'left' | 'right' | 'center';
-  setValue?: (relative: number, absolute: number) => string;
   width: number;
+  setValue?: (relative: number, absolute: number) => string;
+  onChange?: (currentValue: string | number) => void;
 }) => {
-  const perspective = props.perspective || 'center';
+  const perspective = 'center';
   const wheelSize = 20;
   const slides = props.length;
   const slideDegree = 360 / wheelSize;
@@ -49,7 +50,14 @@ const Wheel = (props: {
       size.current = s.size;
     },
     detailsChanged: (s) => {
-      setSliderState(s.track.details);
+      const details = s.track.details;
+      setSliderState(details);
+      if (props.onChange) {
+        const selected = props.setValue
+          ? props.setValue(details.abs, details.abs)
+          : details.abs;
+        props.onChange(selected);
+      }
     },
     rubberband: !props.loop,
     mode: 'free-snap',
@@ -94,7 +102,7 @@ const Wheel = (props: {
       ref={sliderRef}
     >
       <div
-        className="wheel__shadow-top text-disabled t3"
+        className="wheel__shadow-top text-disabled t2"
         style={{
           transform: `translateZ(${radius}px)`,
           WebkitTransform: `translateZ(${radius}px)`,
