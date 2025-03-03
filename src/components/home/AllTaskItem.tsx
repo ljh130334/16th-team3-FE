@@ -13,6 +13,7 @@ type AllTaskItemProps = {
     dDayCount: number;
     description?: string;
     type?: 'today' | 'weekly' | 'future';
+    dueDateTime?: string;
   };
   onClick: (task: any) => void;
   onDelete: (taskId: number) => void;
@@ -85,6 +86,37 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({ task, onClick, onDelete }) =>
     }
   };  
 
+  // 날짜 및 시간 표시 형식 수정
+  const formatDateTime = () => {
+    const month = task.dueDate.substring(5, 7);
+    const day = task.dueDate.substring(8, 10);
+    
+    // 오늘 날짜와 비교
+    const today = new Date();
+    const taskDate = new Date(task.dueDate);
+    const isToday = 
+      today.getDate() === taskDate.getDate() &&
+      today.getMonth() === taskDate.getMonth() &&
+      today.getFullYear() === taskDate.getFullYear();
+    
+    // 시간 형식 처리
+    let timeDisplay = task.dueTime;
+    if (task.dueTime.includes('자정')) {
+      timeDisplay = isToday ? '오늘 자정까지' : '자정까지';
+    } else if (task.dueTime.includes('오후') || task.dueTime.includes('오전')) {
+      // "오후 n시까지" 또는 "오전 n시까지" 형식인지 확인
+      if (!task.dueTime.includes('까지')) {
+        timeDisplay = `${task.dueTime}까지`;
+      }
+      
+      if (isToday) {
+        timeDisplay = `오늘 ${timeDisplay}`;
+      }
+    }
+    
+    return `${month}월 ${day}일 ${task.dueDay} ${timeDisplay}`;
+  };
+
   return (
     <div className="bg-component-gray-secondary rounded-[20px] p-4 mb-4 relative" onClick={handleTaskClick}>
       <div className="flex justify-between items-start">
@@ -93,7 +125,7 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({ task, onClick, onDelete }) =>
             {renderDayChip()}
           </div>
           <div className="c3 flex items-center text-text-primary">
-            <span>{task.dueDate.substring(5).replace('-', '월 ')}일 {task.dueDay} {task.dueTime}</span>
+            <span>{formatDateTime()}</span>
             <span className="c3 text-text-neutral mx-1">•</span>
             <Image 
               src="/icons/home/clock.svg" 

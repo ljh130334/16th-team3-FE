@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { parseDateAndTime, calculateRemainingTime } from '@/utils/dateFormat';
 
 type TaskItemProps = {
   title: string;
@@ -11,7 +12,9 @@ type TaskItemProps = {
   onDelete: () => void;
   onPreviewStart?: () => void;
   ignoredAlerts?: number;
+  timeRequired: string;
   resetAlerts?: (taskId: number) => void;
+  dueDateTime?: string;
 };
 
 const TaskItem: React.FC<TaskItemProps> = ({ 
@@ -20,10 +23,12 @@ const TaskItem: React.FC<TaskItemProps> = ({
   dueDate,
   taskId,
   onClick,
+  timeRequired,
   onDelete,
   onPreviewStart = () => {},
   ignoredAlerts = 0, // 기본값은 0
-  resetAlerts = () => {}
+  resetAlerts = () => {},
+  dueDateTime
 }) => {
   const router = useRouter();
   const [showUrgentBottomSheet, setShowUrgentBottomSheet] = useState(false);
@@ -31,75 +36,28 @@ const TaskItem: React.FC<TaskItemProps> = ({
   const isUrgent = ignoredAlerts >= 3;
   
   // 남은 시간 계산 함수
-  const calculateRemainingTime = () => {
-    // dueDate가 "2025-03-01" 같은 형식일 경우
-    // dueTime이 "오후 7시까지" 같은 형식일 경우 파싱
-    
-    const now = new Date();
-    
-    let dueDateTime = new Date(dueDate);
-    
-    // dueTime에서 시간 추출 (예: "오후 7시까지" -> 19, "오전 9시까지" -> 9)
-    let hours = 0;
-    if (dueTime.includes('오후')) {
-      const match = dueTime.match(/오후\s*(\d+)시/);
-      if (match && match[1]) {
-        hours = parseInt(match[1]);
-        if (hours !== 12) hours += 12; // 오후는 +12 (오후 12시는 그대로 12)
-      }
-    } else if (dueTime.includes('오전')) {
-      const match = dueTime.match(/오전\s*(\d+)시/);
-      if (match && match[1]) {
-        hours = parseInt(match[1]);
-        if (hours === 12) hours = 0; // 오전 12시는 0시
-      }
+  const calculateRemainingTimeLocal = () => {
+    // dueDateTime이 있으면 사용, 없으면 dueDate와 dueTime에서 계산
+    let dueDateObj;
+    if (dueDateTime) {
+      dueDateObj = new Date(dueDateTime);
     } else {
-      // "3시간 소요"와 같은 형식일 경우, 현재 시간 + 소요시간으로 계산
-      const match = dueTime.match(/(\d+)시간/);
-      if (match && match[1]) {
-        const hoursToAdd = parseInt(match[1]);
-        dueDateTime = new Date();
-        dueDateTime.setHours(dueDateTime.getHours() + hoursToAdd);
-      }
+      dueDateObj = parseDateAndTime(dueDate, dueTime);
     }
     
-    // 시간 설정 (dueTime이 "오후 7시까지" 같은 형식일 경우)
-    if (hours > 0) {
-      dueDateTime.setHours(hours, 0, 0, 0);
-    }
-    
-    // 남은 시간 계산 (밀리초)
-    const timeLeft = dueDateTime.getTime() - now.getTime();
-    
-    if (timeLeft <= 0) return '00:00:00 남음';
-    
-    // 24시간 이하일 때
-    if (timeLeft <= 24 * 60 * 60 * 1000) {
-      const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-      const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-      
-      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} 남음`;
-    } else {
-      // 24시간 초과
-      const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-      
-      return `${days}일 ${hours}시간 ${minutes}분 남음`;
-    }
+    return calculateRemainingTime(dueDateObj);
   };
   
   // 1초마다 남은 시간 업데이트
   useEffect(() => {
-    setRemainingTime(calculateRemainingTime());
+    setRemainingTime(calculateRemainingTimeLocal());
     
     const interval = setInterval(() => {
-      setRemainingTime(calculateRemainingTime());
+      setRemainingTime(calculateRemainingTimeLocal());
     }, 1000);
     
     return () => clearInterval(interval);
-  }, [dueDate, dueTime]);
+  }, [dueDate, dueTime, dueDateTime]);
   
   const handleButtonClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -123,6 +81,36 @@ const TaskItem: React.FC<TaskItemProps> = ({
     setShowUrgentBottomSheet(false);
   };
 
+  // 오늘 날짜 확인
+  const isToday = () => {
+    const today = new Date();
+    const taskDate = new Date(dueDate);
+    
+    return (
+      today.getDate() === taskDate.getDate() &&
+      today.getMonth() === taskDate.getMonth() &&
+      today.getFullYear() === taskDate.getFullYear()
+    );
+  };
+  
+  // 시간 표시 형식 수정
+  const formatDueTime = () => {
+    // 자정인 경우
+    if (dueTime.includes('자정')) {
+      return '오늘 자정까지';
+    }
+    
+    // 시간 텍스트에 "오후" 또는 "오전"이 포함되어 있는지 확인
+    if (dueTime.includes('오후') || dueTime.includes('오전')) {
+      // "까지"가 없으면 추가
+      const formattedTime = dueTime.includes('까지') ? dueTime : `${dueTime}까지`;
+      return `오늘 ${formattedTime}`;
+    }
+    
+    // 그 외 경우 (예: "3시간 소요")
+    return dueTime;
+  };
+
   return (
     <>
       <div 
@@ -133,7 +121,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
           <div>
             <div className="c3 flex items-center text-text-primary">
               <span className="flex items-center">
-                <span>오늘 자정까지</span>
+                <span>{formatDueTime()}</span>
                 <span className="c3 text-text-neutral mx-1">•</span>
                 <Image
                   src="/icons/home/clock.svg"
@@ -142,7 +130,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
                   height={14}
                   className="mr-[4px] mb-[2px]"
                   />
-                <span className="c3 text-text-neutral">{dueTime} 소요</span>
+                <span className="c3 text-text-neutral">{timeRequired || '1시간 소요'}</span>
               </span>
             </div>
             <div className="s2 mt-[3px] text-text-strong">

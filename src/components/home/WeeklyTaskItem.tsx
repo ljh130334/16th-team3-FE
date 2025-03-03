@@ -11,6 +11,7 @@ type WeeklyTaskItemProps = {
     timeRequired: string;
     dDayCount: number;
     description?: string;
+    dueDateTime?: string;
   };
   onClick: (task: any) => void;
   onDelete: (taskId: number) => void;
@@ -38,22 +39,36 @@ const WeeklyTaskItem: React.FC<WeeklyTaskItemProps> = ({ task, onClick, onDelete
       };
     }, []);
 
-    const handleMoreClick = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      setShowMenu((prev) => !prev);
-    };
-  
-    const handleDeleteClick = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      setShowMenu(false);
-      onDelete(task.id);
-    };
-  
-    const handleTaskClick = () => {
-      if (!showMenu) {
-        onClick(task);
-      }
-    };
+  const handleMoreClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowMenu((prev) => !prev);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowMenu(false);
+    onDelete(task.id);
+  };
+
+  const handleTaskClick = () => {
+    if (!showMenu) {
+      onClick(task);
+    }
+  };
+
+  // 날짜 및 시간 표시 형식 수정
+  const formatDateTime = () => {
+    const month = task.dueDate.substring(5, 7);
+    const day = task.dueDate.substring(8, 10);
+    
+    // 시간 형식 처리
+    let timeDisplay = task.dueTime;
+    if (!timeDisplay.includes('까지') && (timeDisplay.includes('오후') || timeDisplay.includes('오전'))) {
+      timeDisplay = `${timeDisplay}까지`;
+    }
+    
+    return `${month}월 ${day}일 ${task.dueDay} ${timeDisplay}`;
+  };
 
   return (
     <div className="bg-component-gray-secondary rounded-[20px] p-4 mb-4 relative" onClick={handleTaskClick}>
@@ -65,7 +80,7 @@ const WeeklyTaskItem: React.FC<WeeklyTaskItemProps> = ({ task, onClick, onDelete
             </div>
           </div>
           <div className="c3 flex items-center text-text-primary">
-            <span>{task.dueDate.substring(5).replace('-', '월 ')}일 {task.dueDay} {task.dueTime}</span>
+            <span>{formatDateTime()}</span>
             <span className="c3 text-text-neutral mx-1">•</span>
             <Image 
               src="/icons/home/clock.svg" 

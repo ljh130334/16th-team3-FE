@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import { parseDateAndTime, calculateRemainingTime } from '@/utils/dateFormat';
 
 interface InProgressTaskItemProps {
   task: {
@@ -12,6 +13,7 @@ interface InProgressTaskItemProps {
     dueTime: string;
     timeRequired: string;
     startedAt?: string;
+    dueDateTime?: string;
   };
   onContinue: (taskId: number) => void;
 }
@@ -25,30 +27,19 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ task, onContinu
   const [showBottomSheet, setShowBottomSheet] = useState(false);
 
   // 남은 시간 계산 함수
-  const calculateRemainingTime = () => {
+  const calculateRemainingTimeLocal = () => {
     if (!task.startedAt) return '';
     
     const now = new Date().getTime();
-    let dueDateTime = new Date(task.dueDate);
     
-    let hours = 0;
-    let timeString = task.dueTime;
-    
-    if (timeString.includes('오후')) {
-      const match = timeString.match(/오후\s+(\d+)시/);
-      if (match && match[1]) {
-        hours = parseInt(match[1]);
-        if (hours !== 12) hours += 12;
-      }
-    } else if (timeString.includes('오전')) {
-      const match = timeString.match(/오전\s+(\d+)시/);
-      if (match && match[1]) {
-        hours = parseInt(match[1]);
-        if (hours === 12) hours = 0;
-      }
+    // dueDateTime이 있으면 사용, 없으면 dueDate와 dueTime에서 계산
+    let dueDateTime;
+    if (task.dueDateTime) {
+      dueDateTime = new Date(task.dueDateTime);
+    } else {
+      dueDateTime = parseDateAndTime(task.dueDate, task.dueTime);
     }
     
-    dueDateTime.setHours(hours, 0, 0, 0);
     const timeLeft = dueDateTime.getTime() - now;
     
     // 남은 시간(ms) 저장
@@ -57,21 +48,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ task, onContinu
     // 1시간 이내인지 체크
     setIsUrgent(timeLeft <= 60 * 60 * 1000 && timeLeft > 0);
     
-    if (timeLeft <= 0) return '00:00:00 남음';
-    
-    if (timeLeft <= 24 * 60 * 60 * 1000) {
-      const h = Math.floor(timeLeft / (1000 * 60 * 60));
-      const m = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-      const s = Math.floor((timeLeft % (1000 * 60)) / 1000);
-      
-      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')} 남음`;
-    } else {
-      const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-      const h = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const m = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-      
-      return `${days}일 ${h}시간 ${m}분 남음`;
-    }
+    return calculateRemainingTime(dueDateTime);
   };
 
   useEffect(() => {
@@ -85,7 +62,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ task, onContinu
   // 1초마다 남은 시간 업데이트
   useEffect(() => {
     const updateRemainingTime = () => {
-      setRemainingTime(calculateRemainingTime());
+      setRemainingTime(calculateRemainingTimeLocal());
     };
     
     updateRemainingTime();
@@ -109,6 +86,33 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ task, onContinu
     setShowBottomSheet(false);
   };
 
+  // 오늘 날짜 확인
+  const isToday = () => {
+    const today = new Date();
+    const taskDate = new Date(task.dueDate);
+    
+    return (
+      today.getDate() === taskDate.getDate() &&
+      today.getMonth() === taskDate.getMonth() &&
+      today.getFullYear() === taskDate.getFullYear()
+    );
+  };
+  
+  // 시간 표시 형식 수정
+  const formatDueTime = () => {
+    if (task.dueTime.includes('자정')) {
+      return isToday() ? '오늘 자정까지' : task.dueTime;
+    }
+    
+    // "오후 n시" 형식인지 확인하고 "까지" 추가
+    if ((task.dueTime.includes('오후') || task.dueTime.includes('오전')) && !task.dueTime.includes('까지')) {
+      const formattedTime = `${task.dueTime}까지`;
+      return isToday() ? `오늘 ${formattedTime}` : formattedTime;
+    }
+    
+    return isToday() ? `오늘 ${task.dueTime}` : task.dueTime;
+  };
+
   // 일반 진행 중 컴포넌트
   if (!isUrgent) {
     return (
@@ -125,7 +129,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ task, onContinu
             </div>
             <div className="flex-1">
               <p className="text-text-neutral b3">
-                {task.dueTime}
+                {formatDueTime()}
               </p>
               <h3 className="s1 text-text-strong t3 truncate" style={{ maxWidth: '240px' }}>
                 {task.title}
@@ -180,7 +184,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ task, onContinu
       >
         <div>
           <h2 className="s1 text-text-strong mb-1">{task.title}</h2>
-          <p className="b3 text-text-neutral">{task.dueTime}</p>
+          <p className="b3 text-text-neutral">{formatDueTime()}</p>
         </div>
 
         <div className='flex justify-center overflow-hidden my-8'>

@@ -15,6 +15,7 @@ type TaskDetailSheetProps = {
     timeRequired?: string;
     description?: string;
     status?: string;
+    dueDateTime?: string;
   };
   onDelete?: (taskId: number) => void;
   onStart?: (taskId: number) => void;
@@ -94,10 +95,20 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   const formatDueDateTime = () => {
     if (!task.dueDate) return '-';
     
-    const month = task.dueDate.substring(5, 7);
-    const day = task.dueDate.substring(8, 10);
+    // Date 객체로 변환해서 새롭게 포맷팅
+    const dueDate = new Date(task.dueDate);
+    const month = dueDate.getMonth() + 1;
+    const day = dueDate.getDate();
     
-    return `${month}월 ${day}일 ${task.dueDay || ''}, ${task.dueTime || ''}`;
+    // 요일을 직접 계산
+    const days = ['일', '월', '화', '수', '목', '금', '토'];
+    const dayOfWeek = days[dueDate.getDay()];
+    
+    // 시간 처리
+    let timeDisplay = task.dueTime || '';
+    timeDisplay = timeDisplay.replace('까지', '');
+    
+    return `${month}월 ${day}일 (${dayOfWeek}), ${timeDisplay}`;
   };
 
   // 진행 중인 태스크인지 확인
@@ -232,7 +243,9 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
             <div className="flex justify-between items-center py-2.5">
               <div className="b2 text-text-alternative">첫 알림</div>
               <div className="flex items-center">
-                <span className="s2 text-text-neutral mr-3">{task.dueDate ? formatDueDateTime().replace(task.dueTime || '', '오후 07:30') : '-'}</span>
+                <span className="s2 text-text-neutral mr-3">
+                  {task.dueDate ? formatDueDateTime().replace(task.dueTime?.replace('까지', '') || '', '오후 07:30') : '-'}
+                </span>
               </div>
             </div>
           </div>

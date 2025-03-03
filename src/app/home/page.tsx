@@ -21,8 +21,9 @@ const SAMPLE_TODAY_TASKS = [
     dDayCount: 0,
     description: '산학 협력 프로젝트 중간 발표 준비하기',
     type: 'today',
-    status: 'pending', // pending 또는 inProgress
-    ignoredAlerts: 3
+    status: 'pending',
+    ignoredAlerts: 3,
+    dueDateTime: '2025-03-02T18:00:00.000Z'
   },
   {
     id: 2,
@@ -34,7 +35,8 @@ const SAMPLE_TODAY_TASKS = [
     dDayCount: 0,
     description: '산학 협력 프로젝트 최종 발표 준비하기',
     type: 'today',
-    status: 'pending'
+    status: 'pending',
+    dueDateTime: '2025-03-02T18:00:00.000Z'
   }
 ];
 
@@ -51,7 +53,8 @@ const SAMPLE_IN_PROGRESS_TASKS = [
     description: 'PPT 슬라이드 20장 준비 및 발표 대본 작성',
     type: 'today',
     status: 'inProgress',
-    startedAt: '2025-03-01T13:00:00' // 태스크 시작 시간
+    startedAt: '2025-03-01T13:00:00',
+    dueDateTime: '2025-03-02T17:00:00.000Z'
   },
   {
     id: 8,
@@ -64,7 +67,8 @@ const SAMPLE_IN_PROGRESS_TASKS = [
     description: 'PPT 슬라이드 20장 준비 및 발표 대본 작성',
     type: 'today',
     status: 'inProgress',
-    startedAt: '2025-03-01T13:00:00'
+    startedAt: '2025-03-01T13:00:00',
+    dueDateTime: '2025-03-02T21:00:00.000Z'
   }
 ];
 
@@ -79,7 +83,8 @@ const SAMPLE_THISWEEK_TASKS = [
     timeRequired: '3시간 소요',
     dDayCount: 3,
     description: '산학 협력 프로젝트 발표 준비하기',
-    type: 'weekly'
+    type: 'weekly',
+    dueDateTime: '2025-03-05T18:00:00.000Z'
   },
   {
     id: 4,
@@ -90,7 +95,8 @@ const SAMPLE_THISWEEK_TASKS = [
     timeRequired: '1일 소요',
     dDayCount: 3,
     description: '기술 블로그 첫 번째 글 작성하기',
-    type: 'weekly'
+    type: 'weekly',
+    dueDateTime: '2025-03-07T18:00:00.000Z'
   }
 ];
 
@@ -105,7 +111,8 @@ const SAMPLE_FUTURE_TASKS = [
     timeRequired: '4시간 30분 소요',
     dDayCount: 90,
     description: '기술 블로그 첫 번째 글 작성하기',
-    type: 'future'
+    type: 'future',
+    dueDateTime: '2025-04-02T18:00:00.000Z'
   },
   {
     id: 6,
@@ -116,34 +123,79 @@ const SAMPLE_FUTURE_TASKS = [
     timeRequired: '4일 반 소요',
     dDayCount: 100,
     description: '긴 제목의 태스크 예시입니다.',
-    type: 'future'
+    type: 'future',
+    dueDateTime: '2025-12-30T23:00:00.000Z'
   }
 ];
 
 const SAMPLE_ALL_TASKS = [...SAMPLE_TODAY_TASKS, ...SAMPLE_THISWEEK_TASKS, ...SAMPLE_FUTURE_TASKS, ...SAMPLE_IN_PROGRESS_TASKS];
 
-// 샘플 이번주 할 일 데이터
 const SAMPLE_WEEKLY_TASKS = [
   {
     id: 1,
-    title: '디프만 와이어프레임 수정하기',
-    dueDate: '2025-02-25',
-    dueTime: '3시간',
-    description: '디프만 프로젝트의 와이어프레임을 수정해야 합니다.'
+    title: '산학 발표 준비하기',
+    dueDate: '2025-02-10',
+    dueDay: '(화)',
+    dueTime: '오후 6시까지',
+    timeRequired: '3시간 소요',
+    dDayCount: 1,
+    description: '산학 협력 프로젝트 중간 발표 준비하기',
+    dueDateTime: '2025-02-10T18:00:00.000Z'
   },
   {
     id: 2,
-    title: '일이삼사오육칠팔구십일이삼사오육',
-    dueDate: '2025-02-25',
-    dueTime: '3시간',
-    description: '긴 제목의 태스크 예시입니다.'
+    title: '산학 발표 준비하기',
+    dueDate: '2025-02-11',
+    dueDay: '(수)',
+    dueTime: '오후 6시까지',
+    timeRequired: '3시간 소요',
+    dDayCount: 2,
+    description: '산학 협력 프로젝트 최종 발표 준비하기',
+    dueDateTime: '2025-02-11T18:00:00.000Z'
   },
   {
     id: 3,
-    title: '주간 보고서 작성',
-    dueDate: '2025-02-26',
-    dueTime: '2시간',
-    description: '이번 주 진행 상황에 대한 보고서를 작성해야 합니다.'
+    title: '블로그 글쓰기 챌린지하기',
+    dueDate: '2025-02-12',
+    dueDay: '(목)',
+    dueTime: '오후 6시까지',
+    timeRequired: '1일 소요',
+    dDayCount: 3,
+    description: '기술 블로그 첫 번째 글 작성하기',
+    dueDateTime: '2025-02-12T18:00:00.000Z'
+  },
+  {
+    id: 4,
+    title: '블로그 글쓰기 챌린지하기',
+    dueDate: '2025-02-13',
+    dueDay: '(금)',
+    dueTime: '오후 6시까지',
+    timeRequired: '1일 소요',
+    dDayCount: 4,
+    description: '기술 블로그 두 번째 글 작성하기',
+    dueDateTime: '2025-02-13T18:00:00.000Z'
+  },
+  {
+    id: 5,
+    title: '블로그 글쓰기 챌린지하기',
+    dueDate: '2025-02-14',
+    dueDay: '(토)',
+    dueTime: '오후 6시까지',
+    timeRequired: '1일 소요',
+    dDayCount: 5,
+    description: '기술 블로그 세 번째 글 작성하기',
+    dueDateTime: '2025-02-14T18:00:00.000Z'
+  },
+  {
+    id: 6,
+    title: '블로그 글쓰기 챌린지하기',
+    dueDate: '2025-02-15',
+    dueDay: '(일)',
+    dueTime: '오후 6시까지',
+    timeRequired: '1일 반 소요',
+    dDayCount: 6,
+    description: '기술 블로그 네 번째 글 작성하기',
+    dueDateTime: '2025-02-15T18:00:00.000Z'
   }
 ];
 
@@ -448,6 +500,7 @@ const handleCloseExpiredSheet = () => {
                         taskId={task.id}
                         onClick={() => handleTaskClick(task)}
                         onDelete={() => handleDeleteTask(task.id)}
+                        timeRequired={task.timeRequired}
                         onPreviewStart={() => handleDetailTask(task)}
                         ignoredAlerts={task.ignoredAlerts || 0}
                         resetAlerts={resetAlerts}
@@ -519,6 +572,7 @@ const handleCloseExpiredSheet = () => {
                         taskId={task.id}
                         onClick={() => handleTaskClick(task)}
                         onDelete={() => handleDeleteTask(task.id)}
+                        timeRequired={task.timeRequired}
                         onPreviewStart={() => handleDetailTask(task)}
                         ignoredAlerts={task.ignoredAlerts || 0}
                         resetAlerts={resetAlerts}
@@ -569,6 +623,7 @@ const handleCloseExpiredSheet = () => {
                     taskId={task.id}
                     onClick={() => handleTaskClick(task)}
                     onDelete={() => handleDeleteTask(task.id)}
+                    timeRequired={task.timeRequired}
                     onPreviewStart={() => handleDetailTask(task)}
                     ignoredAlerts={task.ignoredAlerts || 0}
                     resetAlerts={resetAlerts}
@@ -620,6 +675,7 @@ const handleCloseExpiredSheet = () => {
                     taskId={task.id}
                     onClick={() => handleTaskClick(task)}
                     onDelete={() => handleDeleteTask(task.id)}
+                    timeRequired={task.timeRequired}
                     onPreviewStart={() => handleDetailTask(task)}
                     ignoredAlerts={task.ignoredAlerts || 0}
                     resetAlerts={resetAlerts}
@@ -649,7 +705,10 @@ const handleCloseExpiredSheet = () => {
                 <div className="w-full bg-component-gray-secondary rounded-t-[28px] p-4 pt-10 flex flex-col items-center">
                   <h2 className="t3 text-text-strong text-center">{expiredTask.title}</h2>
                   <p className="t3 text-text-strong text-center mb-2">작업이 끝났어요. 짧게 돌아볼까요?</p>
-                  <p className="b3 text-text-neutral text-center mb-7">마감일 {new Date(expiredTask.dueDate).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })} ({expiredTask.dueDay}), {expiredTask.dueTime}</p>
+                  <div className="flex justify-between w-full">
+                    <p className="b3 text-text-neutral mb-7">마감일 </p>
+                    <p className="b3 text-text-neutral mb-7">{new Date(expiredTask.dueDate).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })} ({expiredTask.dueDay}), {expiredTask.dueTime}</p>
+                  </div>
                   <button
                     className="w-full bg-component-accent-primary text-white rounded-[16px] py-4 mb-3 l2"
                     onClick={() => handleGoToReflection(expiredTask.id)}
