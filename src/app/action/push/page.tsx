@@ -8,11 +8,11 @@ import ActionCard from './_component/ActionCard';
 import CountdownTimer from './_component/CountdownTimer';
 import ActionDrawer from './_component/ActionDrawer';
 
-export enum PushScreenState {
-  INITIAL = 'initial',
-  SECOND_CHANCE = 'second',
-  FINAL_WARNING = 'final',
-}
+const PushScreenState = {
+  INITIAL: 'initial',
+  SECOND_CHANCE: 'second',
+  FINAL_WARNING: 'final',
+} as const;
 
 export default function Push() {
   const [screenState, setScreenState] = useState<PushScreenState>(

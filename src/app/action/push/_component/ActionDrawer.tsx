@@ -6,13 +6,21 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
-import { PushScreenState } from '../page';
 import ActionCard from './ActionCard';
+
+const PushScreenState = {
+  INITIAL: 'initial',
+  SECOND_CHANCE: 'second',
+  FINAL_WARNING: 'final',
+} as const;
+
+type PushScreenStateType =
+  (typeof PushScreenState)[keyof typeof PushScreenState];
 
 export default function PushActionDrawer({
   screenState,
 }: {
-  screenState: PushScreenState;
+  screenState: PushScreenStateType;
 }) {
   return (
     <Drawer>
