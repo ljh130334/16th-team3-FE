@@ -90,20 +90,20 @@ const ScheduledTaskCreate = () => {
 
   const handleHistoryBack = () => {
     if (funnel.step === 'smallActionInput') {
-      funnel.history.replace('taskForm', {
+      funnel.history.push('taskForm', {
         task: funnel.context.task,
         deadlineDate: funnel.context.deadlineDate,
         deadlineTime: funnel.context.deadlineTime,
       });
     } else if (funnel.step === 'estimatedTimeInput') {
-      funnel.history.replace('smallActionInput', {
+      funnel.history.push('smallActionInput', {
         task: funnel.context.task,
         deadlineDate: funnel.context.deadlineDate,
         deadlineTime: funnel.context.deadlineTime,
         smallAction: funnel.context.smallAction,
       });
     } else if (funnel.step === 'bufferTime') {
-      funnel.history.replace('estimatedTimeInput', {
+      funnel.history.push('estimatedTimeInput', {
         task: funnel.context.task,
         deadlineDate: funnel.context.deadlineDate,
         deadlineTime: funnel.context.deadlineTime,
@@ -113,7 +113,7 @@ const ScheduledTaskCreate = () => {
         estimatedDay: funnel.context.estimatedDay,
       });
     } else if (funnel.step === 'taskTypeInput') {
-      funnel.history.replace('bufferTime', {
+      funnel.history.push('bufferTime', {
         task: funnel.context.task,
         deadlineDate: funnel.context.deadlineDate,
         deadlineTime: funnel.context.deadlineTime,

@@ -47,6 +47,7 @@ const EstimatedTimeInput = ({
   onNext,
   onEdit,
 }: EstimatedTimeInputProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const hourInputRef = useRef<HTMLInputElement>(null);
   const minuteInputRef = useRef<HTMLInputElement>(null);
   const dayInputRef = useRef<HTMLInputElement>(null);
@@ -62,7 +63,9 @@ const EstimatedTimeInput = ({
   );
 
   const [focusedTab, setFocusedTab] = useState<string | null>('시간');
-  const [currentTab, setCurrentTab] = useState('시간');
+  const [currentTab, setCurrentTab] = useState(
+    Boolean(historyDayData) ? '일' : '시간',
+  );
   const [isOnlyMinute, setIsOnlyMinute] = useState(false);
 
   const [hourError, setHourError] = useState<{
@@ -157,12 +160,8 @@ const EstimatedTimeInput = ({
         isValid: false,
         message: '예상 소요시간이 마감 시간보다 길어요.',
       });
+      setMinuteError({ isValid: false, message: '' });
 
-      if (minute > 60) {
-        setMinuteError({ isValid: false, message: '' });
-      } else {
-        setMinuteError({ isValid: true, message: '' });
-      }
       return;
     }
 
@@ -197,12 +196,29 @@ const EstimatedTimeInput = ({
         isValid: false,
         message: '예상 소요시간이 마감 시간보다 길어요.',
       });
+    } else {
+      setDayError({ isValid: true, message: '' });
     }
   }, [estimatedDay, deadlineDate, deadlineTime]);
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setFocusedTab(null);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // ! TODO feat: 일 탭 선택 시, 일 Input 바로 focus 되도록
+
   return (
     <div className="flex h-full w-full flex-col justify-between">
-      <div>
+      <div ref={containerRef}>
         <HeaderTitle title="할일이 얼마나 걸릴 것 같나요?" />
         <div>
           <div className="flex gap-1">
@@ -299,7 +315,7 @@ const EstimatedTimeInput = ({
                   className={`b3 ${
                     !minuteError.isValid
                       ? 'text-red'
-                      : focusedTab === '분' || estimatedMinute.length > 0
+                      : focusedTab === '분'
                         ? 'text-primary'
                         : 'text-neutral'
                   }`}
@@ -310,7 +326,7 @@ const EstimatedTimeInput = ({
                   className={`focus:border-primary relative flex items-center border-0 border-b transition-colors focus:border-b-component-accent-primary focus:outline-none ${
                     !minuteError.isValid
                       ? 'border-b-2 border-line-error'
-                      : focusedTab === '분' || estimatedMinute.length > 0
+                      : focusedTab === '분'
                         ? 'border-b-2 border-b-component-accent-primary'
                         : 'border-gray-300'
                   }`}
@@ -429,7 +445,7 @@ const EstimatedTimeInput = ({
               />
             ) : (
               <Image
-                src="/icons/UncheckedBox.svg"
+                src="/icons/UnCheckedBox.svg"
                 alt="uncheckedBox"
                 width={20}
                 height={20}
