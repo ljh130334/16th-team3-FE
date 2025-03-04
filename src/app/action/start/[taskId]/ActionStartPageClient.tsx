@@ -66,16 +66,13 @@ export default function ActionStartPageClient({ initialTask }: Props) {
       <ActionStartHeader />
 
       <div className="flex flex-col gap-4 px-5">
-        <ActionCard title="책상에서 피그마 프로그램 켜기" />
-        <ScheduleCard
-          title="디자인 포트폴리오 점검하기"
-          dueDate="2월 12일 (목) 오후 08:00"
-        />
+        <ActionCard title={data?.triggerAction} />
+        <ScheduleCard title={data?.name} dueDate={data?.dueDatetime} />
       </div>
 
       <ActionStartDrawer
         onTakePicture={handleTakePicture}
-        smallActionTitle="책상에서 피그마 프로그램 켜기"
+        smallActionTitle={data?.triggerAction}
         timerTime="04 : 59 : 24"
       />
     </div>

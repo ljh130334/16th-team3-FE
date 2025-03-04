@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { fetchTask } from '@/lib/task';
 import { TaskResponse } from '@/types/task';
 import ActionStartPageClient from './ActionStartPageClient';
@@ -16,6 +18,6 @@ export default async function Start({
   params: { taskId: string };
 }) {
   const task: TaskResponse = await fetchTask(params.taskId);
-
+  console.log(task);
   return <ActionStartPageClient initialTask={task} />;
 }
