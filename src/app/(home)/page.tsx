@@ -8,211 +8,40 @@ import TaskItem from '@/app/(home)/_components/TaskItem';
 import TaskDetailSheet from '@/app/(home)/_components/TaskDetailSheet';
 import AllTaskItem from '@/app/(home)/_components/AllTaskItem';
 import InProgressTaskItem from '@/app/(home)/_components/InProgressTaskItem';
-
-// 오늘 할일 샘플 데이터
-const SAMPLE_TODAY_TASKS = [
-  {
-    id: 1,
-    title: '산학 발표 준비하기',
-    dueDate: '2025-03-03',
-    dueDay: '(월)',
-    dueTime: '오후 6시까지',
-    timeRequired: '3시간 소요',
-    dDayCount: 0,
-    description: '산학 협력 프로젝트 중간 발표 준비하기',
-    type: 'today',
-    status: 'pending',
-    ignoredAlerts: 3,
-    dueDateTime: '2025-03-03T18:00:00.000Z'
-  },
-  {
-    id: 2,
-    title: '산학 발표 준비하기',
-    dueDate: '2025-03-03',
-    dueDay: '(월)',
-    dueTime: '오후 6시까지',
-    timeRequired: '3시간 소요',
-    dDayCount: 0,
-    description: '산학 협력 프로젝트 최종 발표 준비하기',
-    type: 'today',
-    status: 'pending',
-    dueDateTime: '2025-03-03T18:00:00.000Z'
-  }
-];
-
-// 진행 중인 태스크 샘플 데이터
-const SAMPLE_IN_PROGRESS_TASKS = [
-  {
-    id: 7,
-    title: 'PPT 만들고 대본 작성하기',
-    dueDate: '2025-03-03',
-    dueDay: '(월)',
-    dueTime: '오후 7시까지',
-    timeRequired: '3시간 소요',
-    dDayCount: 0,
-    description: 'PPT 슬라이드 20장 준비 및 발표 대본 작성',
-    type: 'today',
-    status: 'inProgress',
-    startedAt: '2025-03-01T13:00:00',
-    dueDateTime: '2025-03-03T19:00:00.000Z'
-  },
-  {
-    id: 8,
-    title: 'PPT 만들고 대본 작성하기',
-    dueDate: '2025-03-03',
-    dueDay: '(월)',
-    dueTime: '오후 9시까지',
-    timeRequired: '3시간 소요',
-    dDayCount: 0,
-    description: 'PPT 슬라이드 20장 준비 및 발표 대본 작성',
-    type: 'today',
-    status: 'inProgress',
-    startedAt: '2025-03-01T13:00:00',
-    dueDateTime: '2025-03-03T21:00:00.000Z'
-  }
-];
-
-// 이번주 할일 샘플 데이터
-const SAMPLE_THISWEEK_TASKS = [
-  {
-    id: 3,
-    title: '산학 발표 준비하기',
-    dueDate: '2025-03-05',
-    dueDay: '(수)',
-    dueTime: '오후 6시까지',
-    timeRequired: '3시간 소요',
-    dDayCount: 3,
-    description: '산학 협력 프로젝트 발표 준비하기',
-    type: 'weekly',
-    dueDateTime: '2025-03-05T18:00:00.000Z'
-  },
-  {
-    id: 4,
-    title: '블로그 글쓰기 챌린지하기',
-    dueDate: '2025-03-07',
-    dueDay: '(목)',
-    dueTime: '오후 6시까지',
-    timeRequired: '1일 소요',
-    dDayCount: 3,
-    description: '기술 블로그 첫 번째 글 작성하기',
-    type: 'weekly',
-    dueDateTime: '2025-03-07T18:00:00.000Z'
-  }
-];
-
-// 이후 할일 샘플 데이터
-const SAMPLE_FUTURE_TASKS = [
-  {
-    id: 5,
-    title: '블로그 글쓰기 챌린지하기',
-    dueDate: '2025-04-02',
-    dueDay: '(수)',
-    dueTime: '오후 6시까지',
-    timeRequired: '4시간 30분 소요',
-    dDayCount: 90,
-    description: '기술 블로그 첫 번째 글 작성하기',
-    type: 'future',
-    dueDateTime: '2025-04-02T18:00:00.000Z'
-  },
-  {
-    id: 6,
-    title: '일이삼사오육칠팔구십일이삼사오육칠팔구',
-    dueDate: '2025-12-30',
-    dueDay: '(화)',
-    dueTime: '오후 11시까지',
-    timeRequired: '4일 반 소요',
-    dDayCount: 100,
-    description: '긴 제목의 태스크 예시입니다.',
-    type: 'future',
-    dueDateTime: '2025-12-30T23:00:00.000Z'
-  }
-];
-
-const SAMPLE_ALL_TASKS = [...SAMPLE_TODAY_TASKS, ...SAMPLE_THISWEEK_TASKS, ...SAMPLE_FUTURE_TASKS, ...SAMPLE_IN_PROGRESS_TASKS];
-
-// const SAMPLE_WEEKLY_TASKS = [
-//   {
-//     id: 1,
-//     title: '산학 발표 준비하기',
-//     dueDate: '2025-02-10',
-//     dueDay: '(화)',
-//     dueTime: '오후 6시까지',
-//     timeRequired: '3시간 소요',
-//     dDayCount: 1,
-//     description: '산학 협력 프로젝트 중간 발표 준비하기',
-//     dueDateTime: '2025-02-10T18:00:00.000Z'
-//   },
-//   {
-//     id: 2,
-//     title: '산학 발표 준비하기',
-//     dueDate: '2025-02-11',
-//     dueDay: '(수)',
-//     dueTime: '오후 6시까지',
-//     timeRequired: '3시간 소요',
-//     dDayCount: 2,
-//     description: '산학 협력 프로젝트 최종 발표 준비하기',
-//     dueDateTime: '2025-02-11T18:00:00.000Z'
-//   },
-//   {
-//     id: 3,
-//     title: '블로그 글쓰기 챌린지하기',
-//     dueDate: '2025-02-12',
-//     dueDay: '(목)',
-//     dueTime: '오후 6시까지',
-//     timeRequired: '1일 소요',
-//     dDayCount: 3,
-//     description: '기술 블로그 첫 번째 글 작성하기',
-//     dueDateTime: '2025-02-12T18:00:00.000Z'
-//   },
-//   {
-//     id: 4,
-//     title: '블로그 글쓰기 챌린지하기',
-//     dueDate: '2025-02-13',
-//     dueDay: '(금)',
-//     dueTime: '오후 6시까지',
-//     timeRequired: '1일 소요',
-//     dDayCount: 4,
-//     description: '기술 블로그 두 번째 글 작성하기',
-//     dueDateTime: '2025-02-13T18:00:00.000Z'
-//   },
-//   {
-//     id: 5,
-//     title: '블로그 글쓰기 챌린지하기',
-//     dueDate: '2025-02-14',
-//     dueDay: '(토)',
-//     dueTime: '오후 6시까지',
-//     timeRequired: '1일 소요',
-//     dDayCount: 5,
-//     description: '기술 블로그 세 번째 글 작성하기',
-//     dueDateTime: '2025-02-14T18:00:00.000Z'
-//   },
-//   {
-//     id: 6,
-//     title: '블로그 글쓰기 챌린지하기',
-//     dueDate: '2025-02-15',
-//     dueDay: '(일)',
-//     dueTime: '오후 6시까지',
-//     timeRequired: '1일 반 소요',
-//     dDayCount: 6,
-//     description: '기술 블로그 네 번째 글 작성하기',
-//     dueDateTime: '2025-02-15T18:00:00.000Z'
-//   }
-// ];
+import { Task } from '@/types/task';
+import { 
+  useAllTasks, 
+  useTodayTasks, 
+  useInProgressTasks, 
+  useWeeklyTasks, 
+  useFutureTasks,
+  useStartTask,
+  useResetAlerts
+} from '@/hooks/useTasks';
 
 const HomePage = () => {
+  // React Query 훅 사용
+  const { data: allTasks = [], isLoading: isLoadingAll } = useAllTasks();
+  const { data: todayTasks = [], isLoading: isLoadingToday } = useTodayTasks();
+  const { data: inProgressTasks = [], isLoading: isLoadingInProgress } = useInProgressTasks();
+  const { data: weeklyTasks = [], isLoading: isLoadingWeekly } = useWeeklyTasks();
+  const { data: futureTasks = [], isLoading: isLoadingFuture } = useFutureTasks();
+  
+  // StartTask 뮤테이션 훅
+  const { mutate: startTaskMutation } = useStartTask();
+  
+  // Reset Alerts 훅
+  const resetAlerts = useResetAlerts();
+
   // 화면 분기 처리를 위한 상태
-  const [todayTasks, setTodayTasks] = useState<any[]>(SAMPLE_TODAY_TASKS);
-  const [inProgressTasks, setInProgressTasks] = useState<any[]>(SAMPLE_IN_PROGRESS_TASKS);
-  const [weeklyTasks, setWeeklyTasks] = useState<any[]>(SAMPLE_THISWEEK_TASKS);
-  const [allTasks, setAllTasks] = useState<any[]>(SAMPLE_ALL_TASKS);
-  const [selectedTask, setSelectedTask] = useState<any>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isDetailSheetOpen, setIsDetailSheetOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
   const [activeTab, setActiveTab] = useState<'today' | 'all'>('today');
   const router = useRouter();
-  const [detailTask, setDetailTask] = useState<any>(null);
+  const [detailTask, setDetailTask] = useState<Task | null>(null);
   const [showExpiredTaskSheet, setShowExpiredTaskSheet] = useState(false);
-  const [expiredTask, setExpiredTask] = useState<any>(null);
+  const [expiredTask, setExpiredTask] = useState<Task | null>(null);
   const [isReentry, setIsReentry] = useState(false);
 
   // 다른 페이지에서 돌아올 때 재진입으로 간주
@@ -233,8 +62,8 @@ const HomePage = () => {
     };
   }, []);
 
-   // 세션 스토리지를 사용해 더 확실한 재진입 감지
-   useEffect(() => {
+  // 세션 스토리지를 사용해 더 확실한 재진입 감지
+  useEffect(() => {
     const isFirstVisit = sessionStorage.getItem('visited');
     
     if (isFirstVisit) {
@@ -252,62 +81,41 @@ const HomePage = () => {
     }
   }, []);
 
-const handleGoToReflection = (taskId: number) => {
-  router.push(`/reflection?taskId=${taskId}`);
-  setShowExpiredTaskSheet(false);
-};
+  const handleGoToReflection = (taskId: number) => {
+    router.push(`/reflection?taskId=${taskId}`);
+    setShowExpiredTaskSheet(false);
+  };
 
-// 앱 진입 시 마감 지난 태스크 확인
-useEffect(() => {
-  const now = new Date(); 
-  
-  // 마감 지난 태스크 찾기
-  const expiredTasks = allTasks.filter(task => {
-    const dueDate = new Date(task.dueDate);
-    
-    // 시간 추출
-    let hours = 0;
-    if (task.dueTime.includes('오후')) {
-      const match = task.dueTime.match(/오후\s*(\d+)시/);
-      if (match && match[1]) {
-        hours = parseInt(match[1]);
-        if (hours !== 12) hours += 12;
-      }
-    } else if (task.dueTime.includes('오전')) {
-      const match = task.dueTime.match(/오전\s*(\d+)시/);
-      if (match && match[1]) {
-        hours = parseInt(match[1]);
-        if (hours === 12) hours = 0;
+  // 앱 진입 시 마감 지난 태스크 확인
+  useEffect(() => {
+    // 로딩 중이 아닐 때만 실행
+    if (!isLoadingAll && allTasks.length > 0) {
+      const now = new Date(); 
+      
+      // 마감 지난 태스크 찾기
+      const expiredTasks = allTasks.filter(task => {
+        const dueDate = new Date(task.dueDatetime);
+        
+        // 마감일이 현재 시간보다 이전이고, 회고를 완료하지 않은 태스크
+        return dueDate.getTime() < now.getTime() && task.status !== 'reflected';
+      });
+      
+      // 마감 지난 태스크가 있으면 첫 번째 태스크로 바텀시트 표시
+      if (expiredTasks.length > 0) {
+        setExpiredTask(expiredTasks[0]);
+        setShowExpiredTaskSheet(true);
       }
     }
-    
-    dueDate.setHours(hours, 0, 0, 0);
-    
-    // 마감일이 현재 시간보다 이전이고, 회고를 완료하지 않은 태스크
-    return dueDate.getTime() < now.getTime() && task.status !== 'reflected';
-  });
-  
-  // 마감 지난 태스크가 있으면 첫 번째 태스크로 바텀시트 표시
-  if (expiredTasks.length > 0) {
-    setExpiredTask(expiredTasks[0]);
-    setShowExpiredTaskSheet(true);
-  }
-}, [allTasks]);
+  }, [allTasks, isLoadingAll]);
 
-const handleCloseExpiredSheet = () => {
-  setShowExpiredTaskSheet(false);
-};
+  const handleCloseExpiredSheet = () => {
+    setShowExpiredTaskSheet(false);
+  };
 
-  const handleDetailTask = (task: any) => {
+  const handleDetailTask = (task: Task) => {
     setDetailTask(task);
     setIsDetailSheetOpen(true);
   };
-
-  // 분리된 전체 할일 목록
-  const todayAllTasks = allTasks.filter(task => task.type === 'today' && task.status !== 'inProgress');
-  const inProgressAllTasks = allTasks.filter(task => task.status === 'inProgress');
-  const weeklyAllTasks = allTasks.filter(task => task.type === 'weekly');
-  const futureAllTasks = allTasks.filter(task => task.type === 'future');
 
   // 첫 방문 시 툴팁 표시 관련 로직
   useEffect(() => {
@@ -319,60 +127,29 @@ const handleCloseExpiredSheet = () => {
     }
   }, []);
 
-  const resetAlerts = (taskId: number) => {
-    console.log('알림 초기화:', taskId);
-    
-    // 해당 태스크의 ignoredAlerts 값을 0으로 초기화
-    setAllTasks(prevTasks => 
-      prevTasks.map(task => 
-        task.id === taskId 
-          ? { ...task, ignoredAlerts: 0 } 
-          : task
-      )
-    );
-    
-    // 오늘 할 일 목록도 업데이트
-    setTodayTasks(prevTasks => 
-      prevTasks.map(task => 
-        task.id === taskId 
-          ? { ...task, ignoredAlerts: 0 } 
-          : task
-      )
-    );
-  };
-
   // 진행 중인 작업 계속하기
   const handleContinueTask = (taskId: number) => {
-    console.log('태스크 계속하기:', taskId);
-    
     // 해당 태스크 찾기
     const taskToContinue = inProgressTasks.find(task => task.id === taskId);
     
     if (taskToContinue) {
-      // 필요한 경우 상태 업데이트 (예: 마지막 접속 시간 등)
-      console.log('계속할 태스크:', taskToContinue);
-      
       // 몰입 화면으로 이동
       router.push(`/focus?taskId=${taskId}`);
     }
   };
 
   // 마감이 임박한 순으로 정렬된 이번주 할 일 (최대 2개)
-  const topWeeklyTasks = weeklyTasks
-    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+  const topWeeklyTasks = [...weeklyTasks]
+    .sort((a, b) => new Date(a.dueDatetime).getTime() - new Date(b.dueDatetime).getTime())
     .slice(0, 2);
 
   // 마감이 임박한 순으로 정렬된 전체 할 일 (최대 2개)
-  const topAllTasks = allTasks
-    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+  const topAllTasks = [...allTasks]
+    .sort((a, b) => new Date(a.dueDatetime).getTime() - new Date(b.dueDatetime).getTime())
     .slice(0, 2);
 
   const handleDeleteTask = (taskId: number) => {
-    console.log('삭제할 ID:', taskId);
-    // 특정 ID의 할일을 삭제
-    setAllTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
-    setInProgressTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
-    setTodayTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+    // 삭제 API 연결 필요
     
     // TaskDetailSheet이 열려있는 경우 닫기
     if (isDetailSheetOpen && detailTask && detailTask.id === taskId) {
@@ -380,7 +157,7 @@ const handleCloseExpiredSheet = () => {
     }
   };
 
-  const handleTaskClick = (task: any) => {
+  const handleTaskClick = (task: Task) => {
     setSelectedTask(task);
     setDetailTask(task);
     setIsDetailSheetOpen(true);
@@ -391,47 +168,33 @@ const handleCloseExpiredSheet = () => {
   };
 
   const handleStartTask = (taskId: number) => {
-    console.log('태스크 시작:', taskId);
+    // React Query mutation 실행
+    startTaskMutation(taskId);
     
-    // 선택한 태스크 찾기
-    const taskToStart = allTasks.find(task => task.id === taskId);
+    // 상세 시트 닫기
+    setIsDetailSheetOpen(false);
     
-    if (taskToStart) {
-      // 태스크 상태를 진행 중으로 변경
-      const updatedTask = {
-        ...taskToStart,
-        status: 'inProgress',
-        startedAt: new Date().toISOString()
-      };
-      
-      // 진행 중인 태스크 목록에 추가
-      setInProgressTasks(prev => [...prev, updatedTask]);
-      
-      // 전체 태스크 목록 업데이트
-      setAllTasks(prev => 
-        prev.map(task => task.id === taskId ? updatedTask : task)
-      );
-      
-      // 오늘 할 일 목록 업데이트
-      if (taskToStart.type === 'today') {
-        setTodayTasks(prev => 
-          prev.map(task => task.id === taskId ? updatedTask : task)
-        );
-      }
-      
-      setIsDetailSheetOpen(false);
-    }
+    // 몰입 화면으로 이동
+    router.push(`/focus?taskId=${taskId}`);
   };
 
   const handleAddTask = () => {
-    console.log('할 일 추가');
-    // 할 일 추가 로직 추가
+    router.push('/create');
   };
 
   // 탭 전환 처리
   const handleTabChange = (tab: 'today' | 'all') => {
     setActiveTab(tab);
   };
+
+  // 로딩 상태 처리
+  if (isLoadingAll || isLoadingToday || isLoadingInProgress || isLoadingWeekly || isLoadingFuture) {
+    return (
+      <div className="flex flex-col min-h-screen bg-background-primary items-center justify-center">
+        <p className="text-text-normal">로딩 중...</p>
+      </div>
+    );
+  }
 
   // 화면 분기 처리
   // 1. 오늘 할 일이 없고, 진행 중인 일도 없는 경우 (완전 빈 화면)
@@ -447,13 +210,13 @@ const handleCloseExpiredSheet = () => {
   const isAllEmpty = allTasks.length === 0;
   
   // 5. 진행 중인 일이 있고, 오늘 할 일도 있는 경우
-  const hasTodayAndInProgressTasks = inProgressTasks.length > 0 && todayTasks.filter(t => t.status !== 'inProgress').length > 0;
+  const hasTodayAndInProgressTasks = inProgressTasks.length > 0 && todayTasks.length > 0;
   
   // 6. 진행 중인 일만 있는 경우
-  const hasInProgressTasksOnly = inProgressTasks.length > 0 && todayTasks.filter(t => t.status !== 'inProgress').length === 0;
+  const hasInProgressTasksOnly = inProgressTasks.length > 0 && todayTasks.length === 0;
 
   // 7. 진행 중인 일은 없고 오늘 진행 예정인 일만 있는 경우
-  const hasTodayTasksOnly = inProgressTasks.length === 0 && todayTasks.filter(t => t.status !== 'inProgress').length > 0;
+  const hasTodayTasksOnly = inProgressTasks.length === 0 && todayTasks.length > 0;
 
   return (
     <div className="flex flex-col min-h-screen bg-background-primary">
@@ -523,7 +286,7 @@ const handleCloseExpiredSheet = () => {
                       task={task}
                       onContinue={handleContinueTask}
                       isReentry={isReentry}
-                      onShowDetails={handleDetailTask}
+                      onShowDetails={() => handleDetailTask(task)}
                     />
                   ))}
                 </div>
@@ -531,7 +294,7 @@ const handleCloseExpiredSheet = () => {
                 {/* 진행 예정 섹션 */}
                 <div className="mb-8">
                   <h3 className="s2 text-text-neutral mb-2 mt-2">진행 예정</h3>
-                  {todayTasks.filter(t => t.status !== 'inProgress').map(task => (
+                  {todayTasks.map(task => (
                     <TaskItem
                       key={task.id}
                       title={task.title}
@@ -542,8 +305,9 @@ const handleCloseExpiredSheet = () => {
                       onDelete={() => handleDeleteTask(task.id)}
                       timeRequired={task.timeRequired}
                       onPreviewStart={() => handleDetailTask(task)}
-                      ignoredAlerts={task.ignoredAlerts || 0}
+                      ignoredAlerts={task.ignoredAlerts}
                       resetAlerts={resetAlerts}
+                      dueDatetime={task.dueDatetime}
                     />
                   ))}
                 </div>
@@ -551,7 +315,7 @@ const handleCloseExpiredSheet = () => {
                 <div>
                   <button 
                     className="flex justify-between items-center w-full px-4 py-4 bg-component-gray-secondary rounded-[20px]"
-                    onClick={() => router.push('/home/weekly-tasks')}
+                    onClick={() => router.push('/weekly-tasks')}
                   >
                     <span className="s2 text-text-neutral">이번주 할일</span>
                     <Image
@@ -577,7 +341,7 @@ const handleCloseExpiredSheet = () => {
                       task={task}
                       onContinue={handleContinueTask}
                       isReentry={isReentry}
-                      onShowDetails={handleDetailTask}
+                      onShowDetails={() => handleDetailTask(task)}
                     />
                   ))}
                 </div>
@@ -585,7 +349,7 @@ const handleCloseExpiredSheet = () => {
                 <div>
                   <button 
                     className="flex justify-between items-center w-full px-4 py-4 bg-component-gray-secondary rounded-[20px]"
-                    onClick={() => router.push('/home/weekly-tasks')}
+                    onClick={() => router.push('/weekly-tasks')}
                   >
                     <span className="s2 text-text-neutral">이번주 할일</span>
                     <Image
@@ -603,28 +367,29 @@ const handleCloseExpiredSheet = () => {
             {hasTodayTasksOnly && (
               <>
                 {/* 진행 예정 섹션 */}
-                  <div className="mb-8">
-                    <h3 className="s2 text-text-neutral mb-2 mt-2">진행 예정</h3>
-                    {todayTasks.filter(t => t.status !== 'inProgress').map(task => (
-                      <TaskItem
-                        key={task.id}
-                        title={task.title}
-                        dueDate={task.dueDate}
-                        dueTime={task.dueTime}
-                        taskId={task.id}
-                        onClick={() => handleTaskClick(task)}
-                        onDelete={() => handleDeleteTask(task.id)}
-                        timeRequired={task.timeRequired}
-                        onPreviewStart={() => handleDetailTask(task)}
-                        ignoredAlerts={task.ignoredAlerts || 0}
-                        resetAlerts={resetAlerts}
-                      />
-                    ))}
-                  </div>
+                <div className="mb-8">
+                  <h3 className="s2 text-text-neutral mb-2 mt-2">진행 예정</h3>
+                  {todayTasks.map(task => (
+                    <TaskItem
+                      key={task.id}
+                      title={task.title}
+                      dueDate={task.dueDate}
+                      dueTime={task.dueTime}
+                      taskId={task.id}
+                      onClick={() => handleTaskClick(task)}
+                      onDelete={() => handleDeleteTask(task.id)}
+                      timeRequired={task.timeRequired}
+                      onPreviewStart={() => handleDetailTask(task)}
+                      ignoredAlerts={task.ignoredAlerts}
+                      resetAlerts={resetAlerts}
+                      dueDatetime={task.dueDatetime}
+                    />
+                  ))}
+                </div>
                 <div>
                   <button 
                     className="flex justify-between items-center w-full px-4 py-4 bg-component-gray-secondary rounded-[20px]"
-                    onClick={() => router.push('/home/weekly-tasks')}
+                    onClick={() => router.push('/weekly-tasks')}
                   >
                     <span className="s2 text-text-neutral">이번주 할일</span>
                     <Image
@@ -658,25 +423,26 @@ const handleCloseExpiredSheet = () => {
                 <div className="mb-4">
                   {topWeeklyTasks.map(task => (
                     <TaskItem
-                    key={task.id}
-                    title={task.title}
-                    dueDate={task.dueDate}
-                    dueTime={task.dueTime}
-                    taskId={task.id}
-                    onClick={() => handleTaskClick(task)}
-                    onDelete={() => handleDeleteTask(task.id)}
-                    timeRequired={task.timeRequired}
-                    onPreviewStart={() => handleDetailTask(task)}
-                    ignoredAlerts={task.ignoredAlerts || 0}
-                    resetAlerts={resetAlerts}
-                  />
+                      key={task.id}
+                      title={task.title}
+                      dueDate={task.dueDate}
+                      dueTime={task.dueTime}
+                      taskId={task.id}
+                      onClick={() => handleTaskClick(task)}
+                      onDelete={() => handleDeleteTask(task.id)}
+                      timeRequired={task.timeRequired}
+                      onPreviewStart={() => handleDetailTask(task)}
+                      ignoredAlerts={task.ignoredAlerts}
+                      resetAlerts={resetAlerts}
+                      dueDatetime={task.dueDatetime}
+                    />
                   ))}
                 </div>
 
                 <div>
                   <button 
                     className="flex justify-between items-center w-full px-4 py-4"
-                    onClick={() => router.push('/home/weekly-tasks')}
+                    onClick={() => router.push('/weekly-tasks')}
                   >
                     <span className="s2 text-text-neutral">이번주 할일 더보기</span>
                     <Image
@@ -710,34 +476,35 @@ const handleCloseExpiredSheet = () => {
                 <div className="mb-4">
                   {topAllTasks.map(task => (
                     <TaskItem
-                    key={task.id}
-                    title={task.title}
-                    dueDate={task.dueDate}
-                    dueTime={task.dueTime}
-                    taskId={task.id}
-                    onClick={() => handleTaskClick(task)}
-                    onDelete={() => handleDeleteTask(task.id)}
-                    timeRequired={task.timeRequired}
-                    onPreviewStart={() => handleDetailTask(task)}
-                    ignoredAlerts={task.ignoredAlerts || 0}
-                    resetAlerts={resetAlerts}
-                  />
+                      key={task.id}
+                      title={task.title}
+                      dueDate={task.dueDate}
+                      dueTime={task.dueTime}
+                      taskId={task.id}
+                      onClick={() => handleTaskClick(task)}
+                      onDelete={() => handleDeleteTask(task.id)}
+                      timeRequired={task.timeRequired}
+                      onPreviewStart={() => handleDetailTask(task)}
+                      ignoredAlerts={task.ignoredAlerts}
+                      resetAlerts={resetAlerts}
+                      dueDatetime={task.dueDatetime}
+                    />
                   ))}
                 </div>
 
                 <div>
-                <button 
-                  className="flex justify-between items-center w-full px-4 py-4"
-                  onClick={() => setActiveTab('all')}
-                >
-                  <span className="s2 text-text-neutral">전체 할일 더보기</span>
-                  <Image
-                    src="/icons/home/arrow-right.svg"
-                    alt="Arrow Right"
-                    width={7}
-                    height={12}
-                  />
-                </button>
+                  <button 
+                    className="flex justify-between items-center w-full px-4 py-4"
+                    onClick={() => setActiveTab('all')}
+                  >
+                    <span className="s2 text-text-neutral">전체 할일 더보기</span>
+                    <Image
+                      src="/icons/home/arrow-right.svg"
+                      alt="Arrow Right"
+                      width={7}
+                      height={12}
+                    />
+                  </button>
                 </div>
               </div>
             )}
@@ -797,10 +564,10 @@ const handleCloseExpiredSheet = () => {
                   </button>
                 </div>
 
-                {inProgressAllTasks.length > 0 && (
+                {inProgressTasks.length > 0 && (
                   <div className="mb-6">
                     <h3 className="s3 text-text-neutral mb-2">진행 중</h3>
-                    {inProgressAllTasks.map(task => (
+                    {inProgressTasks.map(task => (
                       <AllTaskItem
                         key={task.id}
                         task={task}
@@ -811,10 +578,10 @@ const handleCloseExpiredSheet = () => {
                   </div>
                 )}
 
-                {todayAllTasks.length > 0 && (
+                {todayTasks.length > 0 && (
                   <div className="mb-6">
                     <h3 className="s3 text-text-neutral mb-2">오늘</h3>
-                    {todayAllTasks.map(task => (
+                    {todayTasks.map(task => (
                       <AllTaskItem
                         key={task.id}
                         task={task}
@@ -825,10 +592,10 @@ const handleCloseExpiredSheet = () => {
                   </div>
                 )}
 
-                {weeklyAllTasks.length > 0 && (
+                {weeklyTasks.length > 0 && (
                   <div className="mb-6">
                     <h3 className="s3 text-text-neutral mb-2">이번주</h3>
-                    {weeklyAllTasks.map(task => (
+                    {weeklyTasks.map(task => (
                       <AllTaskItem
                         key={task.id}
                         task={task}
@@ -839,10 +606,10 @@ const handleCloseExpiredSheet = () => {
                   </div>
                 )}
 
-                {futureAllTasks.length > 0 && (
+                {futureTasks.length > 0 && (
                   <div className="mb-6">
                     <h3 className="s3 text-text-neutral mb-2">이후 할일</h3>
-                    {futureAllTasks.map(task => (
+                    {futureTasks.map(task => (
                       <AllTaskItem
                         key={task.id}
                         task={task}
@@ -884,16 +651,16 @@ const handleCloseExpiredSheet = () => {
       </footer>
 
       {/* 할 일 상세 바텀 시트 */}
-      <TaskDetailSheet
-        isOpen={isDetailSheetOpen}
-        onClose={handleCloseDetailSheet}
-        task={detailTask || { title: '', dueDate: '', dueTime: '' }}
-        onDelete={handleDeleteTask}
-        onStart={handleStartTask}
-      />
+      {detailTask && (
+        <TaskDetailSheet
+          isOpen={isDetailSheetOpen}
+          onClose={handleCloseDetailSheet}
+          task={detailTask}
+          onDelete={handleDeleteTask}
+          onStart={handleStartTask}
+        />
+      )}
     </div>
-
-    
   );
 };
 

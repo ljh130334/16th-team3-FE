@@ -1,24 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { parseDateAndTime, calculateRemainingTime } from '@/utils/dateFormat';
+import { Task } from '@/types/task';
 
 type TaskDetailSheetProps = {
   isOpen: boolean;
   onClose: () => void;
-  task: {
-    id?: number;
-    title: string;
-    dueDate?: string;
-    dueDay?: string;
-    dueTime?: string;
-    timeRequired?: string;
-    description?: string;
-    status?: string;
-    dueDateTime?: string;
-    ignoredAlerts?: number;
-  };
+  task: Task;
   onDelete?: (taskId: number) => void;
   onStart?: (taskId: number) => void;
 };
@@ -38,27 +28,27 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   const [isUrgent, setIsUrgent] = useState(false);
   
   // 남은 시간 계산 함수
-  const calculateRemainingTimeLocal = () => {
+  const calculateRemainingTimeLocal = useCallback(() => {
     if (!task.dueDate) return '';
     
-    // dueDateTime이 있으면 사용, 없으면 dueDate와 dueTime에서 계산
-    let dueDateTime;
-    if (task.dueDateTime) {
-      dueDateTime = new Date(task.dueDateTime);
+    // dueDatetime이 있으면 사용, 없으면 dueDate와 dueTime에서 계산
+    let dueDatetime;
+    if (task.dueDatetime) {
+      dueDatetime = new Date(task.dueDatetime);
     } else if (task.dueDate && task.dueTime) {
-      dueDateTime = parseDateAndTime(task.dueDate, task.dueTime || '');
+      dueDatetime = parseDateAndTime(task.dueDate, task.dueTime || '');
     } else {
       return '';
     }
     
     const now = new Date();
-    const diffMs = dueDateTime.getTime() - now.getTime();
+    const diffMs = dueDatetime.getTime() - now.getTime();
     
     // 1시간 이내인지 체크 또는 ignoredAlerts가 3 이상인지 확인
     setIsUrgent(diffMs <= 60 * 60 * 1000 && diffMs > 0 || (task.ignoredAlerts || 0) >= 3);
     
-    return calculateRemainingTime(dueDateTime);
-  };
+    return calculateRemainingTime(dueDatetime);
+  }, [task]);
   
   // 남은 시간 업데이트
   useEffect(() => {
@@ -71,7 +61,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
       
       return () => clearInterval(interval);
     }
-  }, [isOpen, task]);
+  }, [isOpen, calculateRemainingTimeLocal]);
   
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -100,8 +90,6 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   };
 
   const handleStartTask = () => {
-    console.log('태스크 시작:', task);
-    
     // task.id가 있고 onStart 함수가 제공된 경우 태스크 상태 변경
     if (task.id && onStart) {
       onStart(task.id);
@@ -118,13 +106,11 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   };
 
   const handleEditTitle = () => {
-    console.log('할일 이름 바꾸기:', task.title);
     setShowMenu(false);
     // 이름 변경 로직 추가
   };
 
   const handleDelete = () => {
-    console.log('삭제하기:', task);
     if (onDelete && task.id) {
       onDelete(task.id);
     }
@@ -132,7 +118,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
     onClose();
   };
 
-  const formatDueDateTime = () => {
+  const formatDueDatetime = () => {
     if (!task.dueDate) return '-';
     
     // Date 객체로 변환해서 새롭게 포맷팅
@@ -232,13 +218,13 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
             >
                 <span className="l6 text-text-inverse">고독한 운동러 이일여</span>
             </Button>
-            </div>
+          </div>
           
           <div>
             <div className="flex justify-between items-center py-2.5 pt-0">
               <div className="b2 text-text-alternative">마감일</div>
               <div className="flex items-center">
-                <span className="b2 text-text-neutral mr-3">{formatDueDateTime()}</span>
+                <span className="b2 text-text-neutral mr-3">{formatDueDatetime()}</span>
               </div>
             </div>
           </div>
@@ -266,7 +252,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               <div className="b2 text-text-alternative">첫 알림</div>
               <div className="flex items-center">
                 <span className="s2 text-text-neutral mr-3">
-                  {task.dueDate ? formatDueDateTime().replace(task.dueTime?.replace('까지', '') || '', '오후 07:30') : '-'}
+                  {task.dueDate ? formatDueDatetime().replace(task.dueTime?.replace('까지', '') || '', '오후 07:30') : '-'}
                 </span>
               </div>
             </div>

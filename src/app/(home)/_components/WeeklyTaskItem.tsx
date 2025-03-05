@@ -1,19 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
+import { Task } from '@/types/task';
 
 type WeeklyTaskItemProps = {
-  task: {
-    id: number;
-    title: string;
-    dueDate: string;
-    dueDay: string;
-    dueTime: string;
-    timeRequired: string;
-    dDayCount: number;
-    description?: string;
-    dueDateTime?: string;
-  };
-  onClick: (task: any) => void;
+  task: Task;
+  onClick: (task: Task) => void;
   onDelete: (taskId: number) => void;
 };
 
@@ -95,7 +86,7 @@ const WeeklyTaskItem: React.FC<WeeklyTaskItemProps> = ({ task, onClick, onDelete
             {truncatedTitle}
           </div>
         </div>
-        <button className="mt-1 px-2" onClick={handleMoreClick}>
+        <button ref={buttonRef} className="mt-1 px-2" onClick={handleMoreClick}>
           <Image 
             src="/icons/home/dots-vertical.svg" 
             alt="More" 

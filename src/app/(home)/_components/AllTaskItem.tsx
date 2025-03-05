@@ -1,21 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { Task } from '@/types/task';
 
 type AllTaskItemProps = {
-  task: {
-    id: number;
-    title: string;
-    dueDate: string;
-    dueDay: string;
-    dueTime: string;
-    timeRequired: string;
-    dDayCount: number;
-    description?: string;
-    type?: 'today' | 'weekly' | 'future';
-    dueDateTime?: string;
-  };
-  onClick: (task: any) => void;
+  task: Task;
+  onClick: (task: Task) => void;
   onDelete: (taskId: number) => void;
 };
 
@@ -140,7 +130,7 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({ task, onClick, onDelete }) =>
             {truncatedTitle}
           </div>
         </div>
-        <button className="mt-1 px-2" onClick={handleMoreClick}>
+        <button ref={buttonRef} className="mt-1 px-2" onClick={handleMoreClick}>
           <Image 
             src="/icons/home/dots-vertical.svg" 
             alt="More" 

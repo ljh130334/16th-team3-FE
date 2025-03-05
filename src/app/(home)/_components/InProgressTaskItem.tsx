@@ -1,23 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { parseDateAndTime, calculateRemainingTime } from '@/utils/dateFormat';
+import { Task } from '@/types/task';
 
 interface InProgressTaskItemProps {
-  task: {
-    id: number;
-    title: string;
-    dueDate: string;
-    dueTime: string;
-    timeRequired: string;
-    startedAt?: string;
-    dueDateTime?: string;
-  };
+  task: Task;
   onContinue: (taskId: number) => void;
-  isReentry?: boolean; // 홈화면 재진입 여부를 확인하는 props
-  onShowDetails?: (task: any) => void; // 상세 정보 표시 콜백 추가
+  isReentry?: boolean;
+  onShowDetails?: (task: Task) => void;
 }
 
 const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({ 
@@ -34,19 +27,19 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
   const [showBottomSheet, setShowBottomSheet] = useState(false);
 
   // 남은 시간 계산 함수 개선
-  const calculateRemainingTimeLocal = () => {
+  const calculateRemainingTimeLocal = useCallback(() => {
     // startedAt이 없어도 계산할 수 있도록 수정
     const now = new Date().getTime();
     
-    // dueDateTime이 있으면 사용, 없으면 dueDate와 dueTime에서 계산
-    let dueDateTime;
-    if (task.dueDateTime) {
-      dueDateTime = new Date(task.dueDateTime);
+    // dueDatetime이 있으면 사용, 없으면 dueDate와 dueTime에서 계산
+    let dueDatetime;
+    if (task.dueDatetime) {
+      dueDatetime = new Date(task.dueDatetime);
     } else {
-      dueDateTime = parseDateAndTime(task.dueDate, task.dueTime);
+      dueDatetime = parseDateAndTime(task.dueDate, task.dueTime);
     }
     
-    const timeLeft = dueDateTime.getTime() - now;
+    const timeLeft = dueDatetime.getTime() - now;
     
     // 남은 시간(ms) 저장
     setTimeLeftMs(timeLeft);
@@ -54,8 +47,8 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
     // 1시간 이내인지 체크
     setIsUrgent(timeLeft <= 60 * 60 * 1000 && timeLeft > 0);
     
-    return calculateRemainingTime(dueDateTime);
-  };
+    return calculateRemainingTime(dueDatetime);
+  }, [task]);
 
   useEffect(() => {
     const toggleInterval = setInterval(() => {
@@ -76,7 +69,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
     const timeInterval = setInterval(updateRemainingTime, 1000);
     
     return () => clearInterval(timeInterval);
-  }, [task]);
+  }, [calculateRemainingTimeLocal]);
 
   // 홈화면 재진입 시 자동으로 바텀시트 표시
   useEffect(() => {
@@ -280,9 +273,9 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
   
   // 이전 자릿수 값 저장을 위한 ref
   const prevDigitsRef = useRef({
-    h1: h1, h2: h2,
-    m1: m1, m2: m2,
-    s1: s1, s2: s2
+    h1, h2,
+    m1, m2,
+    s1, s2
   });
   
   // 변경된 값 감지
@@ -298,7 +291,7 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
     prevDigitsRef.current = {
       h1, h2, m1, m2, s1, s2
     };
-  }, [timeString]);
+  }, [timeString, h1, h2, m1, m2, s1, s2]);
 
   if (isUrgent) {
     return (
