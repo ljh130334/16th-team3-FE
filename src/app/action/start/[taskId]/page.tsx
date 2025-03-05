@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { fetchTask } from '@/lib/task';
 import { TaskResponse } from '@/types/task';
-import ActionStartPageClient from './ActionStartPageClient';
+import ActionStartPageClient from '@/app/action/start/[taskId]/ActionStartPageClient';
 
 declare global {
   interface Window {

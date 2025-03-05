@@ -9,6 +9,8 @@ import ScheduleCard from './_component/ScheduleCard';
 import ActionStartDrawer from './_component/ActionStartDrawer';
 import ActionStartHeader from './_component/ActionStartHeader';
 import { TaskResponse } from '@/types/task';
+import { formatKoreanDateTime } from '@/utils/dateFormat';
+import { useCountdown } from '@/hooks/useCount';
 
 declare global {
   interface Window {
@@ -30,6 +32,7 @@ export default function ActionStartPageClient({ initialTask }: Props) {
     initialData: initialTask,
   });
 
+  const timeLeft = useCountdown(data?.dueDatetime || '');
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
       try {
@@ -67,13 +70,16 @@ export default function ActionStartPageClient({ initialTask }: Props) {
 
       <div className="flex flex-col gap-4 px-5">
         <ActionCard title={data?.triggerAction} />
-        <ScheduleCard title={data?.name} dueDate={data?.dueDatetime} />
+        <ScheduleCard
+          title={data?.name}
+          dueDate={formatKoreanDateTime(data?.dueDatetime)}
+        />
       </div>
 
       <ActionStartDrawer
         onTakePicture={handleTakePicture}
         smallActionTitle={data?.triggerAction}
-        timerTime="04 : 59 : 24"
+        timerTime={timeLeft}
       />
     </div>
   );
