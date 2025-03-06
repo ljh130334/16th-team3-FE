@@ -13,20 +13,19 @@ import TimerBadge from './TimerBadge';
 interface ActionStartDrawerProps {
   onTakePicture: () => void;
   smallActionTitle: string;
-  timerTime: string;
+  dueDate: string;
 }
 
 export default function ActionStartDrawer({
   onTakePicture,
   smallActionTitle,
-  timerTime,
+  dueDate,
 }: ActionStartDrawerProps) {
   const router = useRouter();
-
   return (
     <div className="relative mt-auto flex flex-col items-center px-5 py-6">
       <div className="fixed bottom-0 left-0 right-0 h-[245px] bg-component-gray-secondary blur-[75px]" />
-      <TimerBadge time={timerTime} />
+      <TimerBadge dueDate={dueDate} />
       <Drawer>
         <DrawerTrigger asChild>
           <Button variant="primary" className="relative mb-4 w-full">

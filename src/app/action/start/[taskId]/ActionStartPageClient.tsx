@@ -1,24 +1,15 @@
-// src/app/action/start/[taskId]/ActionStartPageClient.tsx
 'use client';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTask } from '@/hooks/useTask';
+import { TaskResponse } from '@/types/task';
+import { formatKoreanDateTime } from '@/utils/dateFormat';
+
 import ActionCard from './_component/ActionCard';
 import ScheduleCard from './_component/ScheduleCard';
 import ActionStartDrawer from './_component/ActionStartDrawer';
 import ActionStartHeader from './_component/ActionStartHeader';
-import { TaskResponse } from '@/types/task';
-import { formatKoreanDateTime } from '@/utils/dateFormat';
-import { useCountdown } from '@/hooks/useCount';
-
-declare global {
-  interface Window {
-    ReactNativeWebView: {
-      postMessage(message: string): void;
-    };
-  }
-}
 
 interface Props {
   initialTask: TaskResponse;
@@ -27,12 +18,10 @@ interface Props {
 export default function ActionStartPageClient({ initialTask }: Props) {
   const router = useRouter();
 
-  // tanStack Query 훅에 initialData 옵션을 전달 (hook에서 옵션 확장을 지원해야 합니다)
   const { data, error, isLoading } = useTask(initialTask.id.toString(), {
     initialData: initialTask,
   });
 
-  const timeLeft = useCountdown(data?.dueDatetime || '');
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
       try {
@@ -67,7 +56,6 @@ export default function ActionStartPageClient({ initialTask }: Props) {
   return (
     <div className="flex h-screen flex-col gap-4 bg-background-primary">
       <ActionStartHeader />
-
       <div className="flex flex-col gap-4 px-5">
         <ActionCard title={data?.triggerAction} />
         <ScheduleCard
@@ -79,7 +67,7 @@ export default function ActionStartPageClient({ initialTask }: Props) {
       <ActionStartDrawer
         onTakePicture={handleTakePicture}
         smallActionTitle={data?.triggerAction}
-        timerTime={timeLeft}
+        dueDate={data?.dueDatetime}
       />
     </div>
   );
