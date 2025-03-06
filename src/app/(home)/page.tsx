@@ -10,30 +10,32 @@ import AllTaskItem from '@/app/(home)/_components/AllTaskItem';
 import InProgressTaskItem from '@/app/(home)/_components/InProgressTaskItem';
 import { Task } from '@/types/task';
 import { 
-  useAllTasks, 
-  useTodayTasks, 
-  useInProgressTasks, 
-  useWeeklyTasks, 
-  useFutureTasks,
+  useHomeData,
   useStartTask,
   useResetAlerts
 } from '@/hooks/useTasks';
 
 const HomePage = () => {
-  // React Query 훅 사용
-  const { data: allTasks = [], isLoading: isLoadingAll } = useAllTasks();
-  const { data: todayTasks = [], isLoading: isLoadingToday } = useTodayTasks();
-  const { data: inProgressTasks = [], isLoading: isLoadingInProgress } = useInProgressTasks();
-  const { data: weeklyTasks = [], isLoading: isLoadingWeekly } = useWeeklyTasks();
-  const { data: futureTasks = [], isLoading: isLoadingFuture } = useFutureTasks();
+  // 1. 홈 API를 통해 모든 데이터 한번에 가져오기
+  const { 
+    data: homeData,
+    isLoading: isLoadingHome 
+  } = useHomeData();
   
-  // StartTask 뮤테이션 훅
+  // 2. 데이터 구조 분해
+  const todayTasks = homeData?.todayTasks || [];
+  const weeklyTasks = homeData?.weeklyTasks || [];
+  const allTasks = homeData?.allTasks || [];
+  const inProgressTasks = homeData?.inProgressTasks || [];
+  const futureTasks = homeData?.futureTasks || [];
+  
+  // 3. StartTask 뮤테이션 훅
   const { mutate: startTaskMutation } = useStartTask();
   
-  // Reset Alerts 훅
+  // 4. Reset Alerts 훅
   const resetAlerts = useResetAlerts();
 
-  // 화면 분기 처리를 위한 상태
+  // 5. 화면 분기 처리를 위한 상태
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isDetailSheetOpen, setIsDetailSheetOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
@@ -44,7 +46,7 @@ const HomePage = () => {
   const [expiredTask, setExpiredTask] = useState<Task | null>(null);
   const [isReentry, setIsReentry] = useState(false);
 
-  // 다른 페이지에서 돌아올 때 재진입으로 간주
+  // 6. 다른 페이지에서 돌아올 때 재진입으로 간주
   useEffect(() => {
     const handleRouteChange = (url: string) => {
       // 다른 페이지에서 홈으로 돌아오는 경우 재진입으로 처리
@@ -62,7 +64,7 @@ const HomePage = () => {
     };
   }, []);
 
-  // 세션 스토리지를 사용해 더 확실한 재진입 감지
+  // 7. 세션 스토리지를 사용해 더 확실한 재진입 감지
   useEffect(() => {
     const isFirstVisit = sessionStorage.getItem('visited');
     
@@ -81,15 +83,16 @@ const HomePage = () => {
     }
   }, []);
 
+  // 8. 회고 페이지로 이동
   const handleGoToReflection = (taskId: number) => {
     router.push(`/reflection?taskId=${taskId}`);
     setShowExpiredTaskSheet(false);
   };
 
-  // 앱 진입 시 마감 지난 태스크 확인
+  // 9. 앱 진입 시 마감 지난 태스크 확인
   useEffect(() => {
     // 로딩 중이 아닐 때만 실행
-    if (!isLoadingAll && allTasks.length > 0) {
+    if (!isLoadingHome && allTasks.length > 0) {
       const now = new Date(); 
       
       // 마감 지난 태스크 찾기
@@ -106,8 +109,9 @@ const HomePage = () => {
         setShowExpiredTaskSheet(true);
       }
     }
-  }, [allTasks, isLoadingAll]);
+  }, [allTasks, isLoadingHome]);
 
+  // 10. 이벤트 핸들러 함수들
   const handleCloseExpiredSheet = () => {
     setShowExpiredTaskSheet(false);
   };
@@ -117,7 +121,7 @@ const HomePage = () => {
     setIsDetailSheetOpen(true);
   };
 
-  // 첫 방문 시 툴팁 표시 관련 로직
+  // 11. 툴팁 표시 관련 로직
   useEffect(() => {
     const hasVisited = localStorage.getItem('hasVisitedBefore');
     if (hasVisited) {
@@ -127,7 +131,7 @@ const HomePage = () => {
     }
   }, []);
 
-  // 진행 중인 작업 계속하기
+  // 12. 진행 중인 작업 계속하기
   const handleContinueTask = (taskId: number) => {
     // 해당 태스크 찾기
     const taskToContinue = inProgressTasks.find(task => task.id === taskId);
@@ -138,16 +142,17 @@ const HomePage = () => {
     }
   };
 
-  // 마감이 임박한 순으로 정렬된 이번주 할 일 (최대 2개)
+  // 13. 마감이 임박한 순으로 정렬된 이번주 할 일 (최대 2개)
   const topWeeklyTasks = [...weeklyTasks]
     .sort((a, b) => new Date(a.dueDatetime).getTime() - new Date(b.dueDatetime).getTime())
     .slice(0, 2);
 
-  // 마감이 임박한 순으로 정렬된 전체 할 일 (최대 2개)
+  // 14. 마감이 임박한 순으로 정렬된 전체 할 일 (최대 2개)
   const topAllTasks = [...allTasks]
     .sort((a, b) => new Date(a.dueDatetime).getTime() - new Date(b.dueDatetime).getTime())
     .slice(0, 2);
 
+  // 15. 이벤트 핸들러 함수들
   const handleDeleteTask = (taskId: number) => {
     // 삭제 API 연결 필요
     
@@ -182,13 +187,13 @@ const HomePage = () => {
     router.push('/create');
   };
 
-  // 탭 전환 처리
+  // 16. 탭 전환 처리
   const handleTabChange = (tab: 'today' | 'all') => {
     setActiveTab(tab);
   };
 
-  // 로딩 상태 처리
-  if (isLoadingAll || isLoadingToday || isLoadingInProgress || isLoadingWeekly || isLoadingFuture) {
+  // 17. 로딩 상태 처리
+  if (isLoadingHome) {
     return (
       <div className="flex flex-col min-h-screen bg-background-primary items-center justify-center">
         <p className="text-text-normal">로딩 중...</p>
@@ -196,7 +201,7 @@ const HomePage = () => {
     );
   }
 
-  // 화면 분기 처리
+  // 18. 화면 분기 처리
   // 1. 오늘 할 일이 없고, 진행 중인 일도 없는 경우 (완전 빈 화면)
   const isTotallyEmpty = todayTasks.length === 0 && weeklyTasks.length === 0 && allTasks.length === 0 && inProgressTasks.length === 0;
   

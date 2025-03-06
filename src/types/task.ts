@@ -48,7 +48,8 @@ export interface TaskResponse {
   persona: {
     id: number;
     name: string;
-    personalImageUrl: string;
+    personaImageUrl: string;
+    personalImageUrl?: string;
     taskKeywordsCombination: {
       taskType: {
         id: number;
@@ -82,7 +83,10 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
         type: 'future',
         status: 'pending',
         ignoredAlerts: 0,
-        persona: response.persona,
+        persona: response.persona ? {
+          ...response.persona,
+          personalImageUrl: response.persona.personalImageUrl || response.persona.personaImageUrl || ''
+        } : undefined,
         triggerAction: response.triggerAction,
         triggerActionAlarmTime: response.triggerActionAlarmTime,
         estimatedTime: response.estimatedTime,
@@ -126,12 +130,12 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
     
     // 상태 변환
     let status: TaskStatus = 'pending';
-    if (response.status === 'INPROGRESS') {
-      status = 'inProgress';
+    if (response.status === 'INPROGRESS' || response.status === 'FOCUSED') {
+    status = 'inProgress';
     } else if (response.status === 'COMPLETED') {
-      status = 'completed';
+    status = 'completed';
     } else if (response.status === 'REFLECTED') {
-      status = 'reflected';
+    status = 'reflected';
     }
     
     // 예상 소요시간 변환 (시간 형식)
@@ -148,6 +152,11 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
       }
     }
     
+    const personaObj = response.persona ? {
+      ...response.persona,
+      personalImageUrl: response.persona.personalImageUrl || response.persona.personaImageUrl || ''
+    } : undefined;
+    
     return {
       id: response.id,
       title: response.name,
@@ -162,7 +171,7 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
       status,
       ignoredAlerts: 0,
       startedAt: status === 'inProgress' ? new Date().toISOString() : undefined,
-      persona: response.persona,
+      persona: personaObj,
       triggerAction: response.triggerAction,
       triggerActionAlarmTime: response.triggerActionAlarmTime,
       estimatedTime: response.estimatedTime,

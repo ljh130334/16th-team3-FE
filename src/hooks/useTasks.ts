@@ -12,9 +12,24 @@ import {
   deleteTask,
   fetchTodayTasksApi,
   fetchCurrentWeekTasksApi,
-  fetchAllTodosApi
+  fetchAllTodosApi,
+  fetchHomeData
 } from '@/services/taskService';
 import { Task } from '@/types/task';
+
+// 홈 화면 데이터 조회 훅
+export const useHomeData = () => {
+  return useQuery<{
+    todayTasks: Task[];
+    weeklyTasks: Task[];
+    allTasks: Task[];
+    inProgressTasks: Task[];
+    futureTasks: Task[];
+  }, Error>({
+    queryKey: ['tasks', 'home'],
+    queryFn: fetchHomeData,
+  });
+};
 
 // 모든 할일 조회 훅
 export const useAllTasks = () => {
