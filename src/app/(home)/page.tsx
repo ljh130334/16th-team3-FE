@@ -12,7 +12,8 @@ import { Task } from '@/types/task';
 import { 
   useHomeData,
   useStartTask,
-  useResetAlerts
+  useResetAlerts,
+  useDeleteTask
 } from '@/hooks/useTasks';
 
 const HomePage = () => {
@@ -31,6 +32,7 @@ const HomePage = () => {
   
   // 3. StartTask 뮤테이션 훅
   const { mutate: startTaskMutation } = useStartTask();
+  const { mutate: deleteTaskMutation } = useDeleteTask();
   
   // 4. Reset Alerts 훅
   const resetAlerts = useResetAlerts();
@@ -154,7 +156,7 @@ const HomePage = () => {
 
   // 15. 이벤트 핸들러 함수들
   const handleDeleteTask = (taskId: number) => {
-    // 삭제 API 연결 필요
+    deleteTaskMutation(taskId);
     
     // TaskDetailSheet이 열려있는 경우 닫기
     if (isDetailSheetOpen && detailTask && detailTask.id === taskId) {

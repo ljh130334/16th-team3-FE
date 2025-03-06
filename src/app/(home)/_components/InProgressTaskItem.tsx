@@ -25,10 +25,11 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
   const [isUrgent, setIsUrgent] = useState(false);
   const [timeLeftMs, setTimeLeftMs] = useState(0);
   const [showBottomSheet, setShowBottomSheet] = useState(false);
+  const [isExpired, setIsExpired] = useState(false);
 
   // 남은 시간 계산 함수 개선
   const calculateRemainingTimeLocal = useCallback(() => {
-    // startedAt이 없어도 계산할 수 있도록 수정
+    // 현재 시간 기준으로 계산
     const now = new Date().getTime();
     
     // dueDatetime이 있으면 사용, 없으면 dueDate와 dueTime에서 계산
@@ -43,6 +44,9 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
     
     // 남은 시간(ms) 저장
     setTimeLeftMs(timeLeft);
+    
+    // 마감 지났는지 확인
+    setIsExpired(timeLeft < 0);
     
     // 1시간 이내인지 체크
     setIsUrgent(timeLeft <= 60 * 60 * 1000 && timeLeft > 0);
@@ -131,6 +135,19 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
     return isToday() ? `오늘 ${task.dueTime}` : task.dueTime;
   };
 
+  // 마감 지난 경우 강조 표시
+  const getTimeDisplay = () => {
+    if (isExpired) {
+      // 마감 지난 경우 빨간색 텍스트나 경고 표시 추가 가능
+      return (
+        <span className="text-red-500">{remainingTime}</span>
+      );
+    }
+    return (
+      <TimeDisplay time={remainingTime} />
+    );
+  };
+
   // 일반 진행 중 컴포넌트
   if (!isUrgent) {
     return (
@@ -160,7 +177,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
             className="w-full bg-component-accent-primary text-text-strong rounded-[12px] p-3.5 text-center l2"
           >
             {showRemaining ? (
-              <TimeDisplay time={remainingTime} />
+              getTimeDisplay()
             ) : (
               '이어서 몰입'
             )}
@@ -173,7 +190,9 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
             <div className="w-full bg-component-gray-secondary rounded-t-[28px] p-4 pt-10 flex flex-col items-center">
               <h2 className="t3 text-text-strong text-center">{task.title}를</h2>
               <p className="t3 text-text-strong text-center mb-2">하던 중이었어요. 이어서 몰입할까요?</p>
-              <p className="b3 text-text-neutral text-center mb-7">마감까지 {remainingTime}</p>
+              <p className={`b3 ${isExpired ? 'text-red-500' : 'text-text-neutral'} text-center mb-7`}>
+                {isExpired ? '마감 시간이 지났습니다' : `마감까지 ${remainingTime}`}
+              </p>
               <button
                 className="w-full bg-component-accent-primary text-white rounded-[16px] py-4 mb-3 l2"
                 onClick={handleContinueToFocus}
@@ -220,7 +239,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
           className="w-full z-10 text-text-inverse rounded-[12px] p-3.5 text-center l2"
         >
           {showRemaining ? (
-            <TimeDisplay time={remainingTime} />
+            getTimeDisplay()
           ) : (
             '이어서 몰입'
           )}
@@ -233,7 +252,9 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
           <div className="w-full bg-component-gray-secondary rounded-t-[28px] p-4 pt-10 flex flex-col items-center">
             <h2 className="t3 text-text-strong text-center">{task.title}</h2>
             <p className="t3 text-text-strong text-center mb-2">이어서 몰입할까요?</p>
-            <p className="b3 text-text-neutral text-center mb-7">마감까지 {remainingTime}</p>
+            <p className={`b3 ${isExpired ? 'text-red-500' : 'text-text-neutral'} text-center mb-7`}>
+              {isExpired ? '마감 시간이 지났습니다' : `마감까지 ${remainingTime}`}
+            </p>
             <button
               className="w-full bg-component-accent-primary text-white rounded-[16px] py-4 mb-3 l2"
               onClick={handleContinueToFocus}

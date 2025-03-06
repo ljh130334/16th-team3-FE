@@ -112,7 +112,7 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
     const hour12 = hours % 12 || 12;
     const dueTime = `${amPm} ${hour12}시까지`;
     
-    // D-Day 계산
+    // D-Day 계산 및 마감 지난 경우 D+1 형식으로 표시
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const dueDay0 = new Date(dueDate);
@@ -130,15 +130,15 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
     
     // 상태 변환
     let status: TaskStatus = 'pending';
-    if (response.status === 'INPROGRESS' || response.status === 'FOCUSED') {
-    status = 'inProgress';
+    if (response.status === 'FOCUSED') {
+      status = 'inProgress';
     } else if (response.status === 'COMPLETED') {
-    status = 'completed';
+      status = 'completed';
     } else if (response.status === 'REFLECTED') {
-    status = 'reflected';
+      status = 'reflected';
     }
     
-    // 예상 소요시간 변환 (시간 형식)
+    // 예상 소요시간 변환
     let timeRequired = '1시간 소요';
     if (response.estimatedTime) {
       const hours = Math.floor(response.estimatedTime / 60);

@@ -23,8 +23,8 @@ const fetchWithError = async <T>(url: string, options?: RequestInit): Promise<T>
   return response.json();
 };
 
-function fixPersonaImageUrl(task: TaskResponse): Task {
-  // 이미 convertApiResponseToTask 내에서 처리되므로 그대로 전달
+// 태스크 변환 함수
+function convertTask(task: TaskResponse): Task {
   return convertApiResponseToTask(task);
 }
 
@@ -41,27 +41,27 @@ export const fetchHomeData = async (): Promise<{
     
     console.log('Home API 응답 데이터:', data);
     
-    // 각 배열이 없는 경우 빈 배열로 처리
+    // 각 배열이 없는 경우 빈 배열로, 있는 경우 변환 처리
     const todayTasks = Array.isArray(data?.todayTasks) 
-      ? data.todayTasks.map((task: TaskResponse) => fixPersonaImageUrl(task)) 
+      ? data.todayTasks.map((task: TaskResponse) => convertTask(task)) 
       : [];
       
     const weeklyTasks = Array.isArray(data?.weeklyTasks) 
-      ? data.weeklyTasks.map((task: TaskResponse) => fixPersonaImageUrl(task)) 
+      ? data.weeklyTasks.map((task: TaskResponse) => convertTask(task)) 
       : [];
       
     const allTasks = Array.isArray(data?.allTasks) 
-      ? data.allTasks.map((task: TaskResponse) => fixPersonaImageUrl(task)) 
+      ? data.allTasks.map((task: TaskResponse) => convertTask(task)) 
       : [];
       
     // inProgressTasks가 응답에 없으면 allTasks에서 필터링
     const inProgressTasks = Array.isArray(data?.inProgressTasks)
-      ? data.inProgressTasks.map((task: TaskResponse) => fixPersonaImageUrl(task))
+      ? data.inProgressTasks.map((task: TaskResponse) => convertTask(task))
       : allTasks.filter(task => task.status === 'inProgress');
       
     // futureTasks가 응답에 없으면 allTasks에서 필터링
     const futureTasks = Array.isArray(data?.futureTasks)
-      ? data.futureTasks.map((task: TaskResponse) => fixPersonaImageUrl(task))
+      ? data.futureTasks.map((task: TaskResponse) => convertTask(task))
       : allTasks.filter(task => task.type === 'future');
     
     return {
@@ -98,8 +98,16 @@ export const fetchTaskById = async (taskId: number): Promise<Task> => {
 
 // 오늘 할일 조회 API
 export const fetchTodayTasksApi = async (): Promise<Task[]> => {
-  const data: TaskResponse[] = await fetchWithError('/api/tasks/today');
-  return data.map((task: TaskResponse) => convertApiResponseToTask(task));
+  try {
+    // v1 API 경로로 요청
+    const data: TaskResponse[] = await fetchWithError('/v1/tasks/today');
+    console.log('오늘 할일 API 응답:', data);
+    return data.map((task: TaskResponse) => convertApiResponseToTask(task));
+  } catch (error) {
+    console.error('오늘 할일 API 호출 오류:', error);
+    // 오류 발생 시 빈 배열 반환
+    return [];
+  }
 };
 
 // 이번주 할일 조회 API
@@ -114,7 +122,7 @@ export const fetchAllTodosApi = async (): Promise<Task[]> => {
   return data.map((task: TaskResponse) => convertApiResponseToTask(task));
 };
 
-// 오늘 할일 필터링 (클라이언트 필터링 방식)
+// 오늘 할일 필터링
 export const fetchTodayTasks = async (): Promise<Task[]> => {
   const allTasks = await fetchAllTasks();
   return allTasks.filter(task => task.type === 'today' && task.status !== 'inProgress');
@@ -145,7 +153,7 @@ export const startTask = async (taskId: number): Promise<Task> => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ status: 'INPROGRESS', startedAt: new Date().toISOString() }),
+    body: JSON.stringify({ status: 'FOCUSED', startedAt: new Date().toISOString() }),
   };
   
   const data: TaskResponse = await fetchWithError(`/api/tasks/${taskId}/status`, options);
@@ -182,12 +190,12 @@ export const reflectTask = async (taskId: number): Promise<Task> => {
 
 // 할일 삭제 기능
 export const deleteTask = async (taskId: number): Promise<void> => {
-  const options = {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    const options = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+    
+    await fetchWithError(`/api/tasks/${taskId}`, options);
   };
-  
-  await fetchWithError(`/api/tasks/${taskId}`, options);
-};

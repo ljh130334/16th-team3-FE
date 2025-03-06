@@ -49,7 +49,20 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({ task, onClick, onDelete }) =>
   };
 
   const renderDayChip = () => {
-    const dDayText = task.dDayCount > 99 ? 'D-99+' : `D-${task.dDayCount}`;
+    // D-Day 계산 - 음수인 경우 D+로 표시
+    let dDayText;
+    
+    if (task.dDayCount > 0) {
+      // 미래 날짜 (D-Day)
+      dDayText = task.dDayCount > 99 ? 'D-99+' : `D-${task.dDayCount}`;
+    } else if (task.dDayCount < 0) {
+      // 지난 날짜 (D+Day) - 음수값을 양수로 변환
+      const daysPassed = Math.abs(task.dDayCount);
+      dDayText = daysPassed > 99 ? 'D+99+' : `D+${daysPassed}`;
+    } else {
+      // 오늘인 경우
+      dDayText = 'D-DAY';
+    }
   
     if (task.type === 'today') {
       return (
