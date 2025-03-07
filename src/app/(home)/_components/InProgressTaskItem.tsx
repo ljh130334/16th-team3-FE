@@ -174,7 +174,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
           
           <button 
             onClick={handleContinueClick}
-            className="w-full bg-component-accent-primary text-text-strong rounded-[12px] p-3.5 text-center l2"
+            className="w-full bg-component-accent-primary text-text-strong rounded-[12px] p-3.5 text-center l1 h-[52px] flex items-center justify-center"
           >
             {showRemaining ? (
               getTimeDisplay()
