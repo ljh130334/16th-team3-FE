@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { parseDateAndTime, calculateRemainingTime } from '@/utils/dateFormat';
 import { Task } from '@/types/task';
+import { useTask } from '@/hooks/useTasks';
 
 type TaskDetailSheetProps = {
   isOpen: boolean;
@@ -26,6 +27,8 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [remainingTime, setRemainingTime] = useState('');
   const [isUrgent, setIsUrgent] = useState(false);
+  
+  // const { data: taskDetail, isLoading } = useTask(task.id);
   
   // 남은 시간 계산 함수
   const calculateRemainingTimeLocal = useCallback(() => {
@@ -82,11 +85,12 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   if (!isOpen) return null;
 
   // 닉네임 문자열 처리 (9자 초과시 말줄임표)
-  const formatNickname = (title: string) => {
-    if (title.length > 9) {
-      return title.substring(0, 9) + '...';
+  const formatNickname = (name: string) => {
+    if (!name) return '';
+    if (name.length > 9) {
+      return name.substring(0, 9) + '...';
     }
-    return title;
+    return name;
   };
 
   const handleStartTask = () => {
@@ -125,20 +129,32 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
     const dueDate = new Date(task.dueDate);
     const month = dueDate.getMonth() + 1;
     const day = dueDate.getDate();
-    
-    // 요일을 직접 계산
-    const days = ['일', '월', '화', '수', '목', '금', '토'];
-    const dayOfWeek = days[dueDate.getDay()];
+    const dayOfWeek = task.dueDay || '';
     
     // 시간 처리
     let timeDisplay = task.dueTime || '';
     timeDisplay = timeDisplay.replace('까지', '');
     
-    return `${month}월 ${day}일 (${dayOfWeek}), ${timeDisplay}`;
+    return `${month}월 ${day}일 ${dayOfWeek}, ${timeDisplay}`;
   };
 
   // 진행 중인 태스크인지 확인
   const isInProgress = task.status === 'inProgress';
+  
+  const personaName = task.persona?.name || '페르소나 없음';
+  const personaTriggerAction = task.triggerAction || '노트북 켜기';
+  
+  // 이미지 URL 처리
+  const personaImageUrl = '/icons/home/happy-character.svg';
+  
+  // if (task.persona?.personalImageUrl) {
+  //   const imageUrl = task.persona.personalImageUrl;
+  //   if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://') || imageUrl.startsWith('/')) {
+  //     personaImageUrl = imageUrl;
+  //   } else {
+  //     personaImageUrl = `/${imageUrl}`;
+  //   }
+  // }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end">
@@ -197,13 +213,13 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
         
         <div className="px-5">
           <p className="b3 text-text-neutral text-center mb-5">
-            '발등에 불떨어진 소설가' {formatNickname('일이삼사오육칠팔구...')}님!<br />
+            '{task.persona?.taskKeywordsCombination?.taskType?.name || '일반'} {task.persona?.taskKeywordsCombination?.taskMode?.name || '모드'}' {formatNickname(personaName)}님!<br />
             미루지 말고 여유있게 시작해볼까요?
           </p>
           
           <div className="flex justify-center items-center mb-[27px]">
             <Image
-              src="/icons/home/happy-character.svg"
+              src={personaImageUrl}
               alt="Character"
               width={90}
               height={90}
@@ -216,7 +232,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
                 size="sm"
                 className="text-text-inverse z-10 rounded-[8px] w-auto h-auto py-[5px] px-[7px] mb-6"
             >
-                <span className="l6 text-text-inverse">고독한 운동러 이일여</span>
+                <span className="l6 text-text-inverse">{personaName}</span>
             </Button>
           </div>
           
@@ -233,7 +249,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
             <div className="flex justify-between items-center py-2.5">
               <div className="b2 text-text-alternative">작은 행동</div>
               <div className="flex items-center">
-                <span className="b2 text-text-neutral mr-3">노트북 켜기</span>
+                <span className="b2 text-text-neutral mr-3">{personaTriggerAction}</span>
               </div>
             </div>
           </div>
@@ -252,7 +268,11 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               <div className="b2 text-text-alternative">첫 알림</div>
               <div className="flex items-center">
                 <span className="s2 text-text-neutral mr-3">
-                  {task.dueDate ? formatDueDatetime().replace(task.dueTime?.replace('까지', '') || '', '오후 07:30') : '-'}
+                  {task.triggerActionAlarmTime ? new Date(task.triggerActionAlarmTime).toLocaleTimeString('ko-KR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                  }) : '-'}
                 </span>
               </div>
             </div>
