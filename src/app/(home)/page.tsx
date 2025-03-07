@@ -635,15 +635,15 @@ const HomePage = () => {
       <footer className="fixed bottom-8 left-0 right-0 bg-none z-10">
         <div className="p-5 flex justify-end">
           {showTooltip && (
-            <div className="b3 text-text-normal absolute bottom-24 right-4 bg-component-gray-tertiary rounded-[12px] px-4 py-3 shadow-lg">
+            <div className="b3 text-text-strong absolute bottom-24 right-4 bg-component-accent-primary rounded-[12px] px-4 py-3 shadow-lg">
               지금 바로 할 일을 추가해보세요!
-              <div className="absolute -bottom-2 right-12 w-4 h-4 bg-component-gray-tertiary rotate-45"></div>
+              <div className="absolute -bottom-2 right-12 w-4 h-4 bg-component-accent-primary rotate-45"></div>
             </div>
           )}
           <Button 
             variant="point" 
             size="md"
-            className="l2 text-text-inverse flex items-center gap-2 rounded-full py-[16.5px]"
+            className="l2 text-text-inverse flex items-center gap-2 rounded-full py-[16.5px] w-[130px] h-[52px]"
             onClick={handleAddTask}
           >
             <Image
@@ -652,7 +652,7 @@ const HomePage = () => {
               width={16}
               height={16}
             />
-            할일
+            할일 추가
           </Button>
         </div>
       </footer>
