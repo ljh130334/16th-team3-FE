@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { parseDateAndTime, calculateRemainingTime } from '@/utils/dateFormat';
+import { TaskStatus } from '@/types/task';
 
 type TaskItemProps = {
   title: string;
@@ -17,6 +18,7 @@ type TaskItemProps = {
   timeRequired: string;
   resetAlerts?: (taskId: number) => void;
   dueDatetime?: string;
+  status?: TaskStatus;
 };
 
 const TaskItem: React.FC<TaskItemProps> = ({
@@ -31,44 +33,59 @@ const TaskItem: React.FC<TaskItemProps> = ({
   ignoredAlerts = 0, // 기본값은 0
   resetAlerts = () => {},
   dueDatetime,
+  status,
 }) => {
   const router = useRouter();
   const [showUrgentBottomSheet, setShowUrgentBottomSheet] = useState(false);
   const [remainingTime, setRemainingTime] = useState('');
-  const isUrgent = ignoredAlerts >= 3;
+  const [isUrgent, setIsUrgent] = useState(false);
+  
+  // 진행 중인 태스크인지 확인
+  const isInProgress = status === 'inProgress';
 
   // 남은 시간 계산 함수
   const calculateRemainingTimeLocal = useCallback(() => {
-    // dueDatetime이 있으면 사용, 없으면 dueDate와 dueTime에서 계산
     let dueDateObj;
     if (dueDatetime) {
       dueDateObj = new Date(dueDatetime);
     } else {
       dueDateObj = parseDateAndTime(dueDate, dueTime);
     }
-
+  
+    // 남은 시간 계산
+    const now = new Date();
+    const diffMs = dueDateObj.getTime() - now.getTime();
+    
+    // isUrgent 상태 업데이트 (1시간 이내거나 ignoredAlerts가 3이상이거나 status가 procrastinating인 경우)
+    const urgent = 
+      (diffMs <= 60 * 60 * 1000 && diffMs > 0) || 
+      ignoredAlerts >= 3 || 
+      status === 'procrastinating';
+      
+    setIsUrgent(urgent);
+  
     return calculateRemainingTime(dueDateObj);
-  }, [dueDate, dueTime, dueDatetime]);
+  }, [dueDate, dueTime, dueDatetime, ignoredAlerts, status]);
 
   // 1초마다 남은 시간 업데이트
   useEffect(() => {
     setRemainingTime(calculateRemainingTimeLocal());
-
+  
     const interval = setInterval(() => {
       setRemainingTime(calculateRemainingTimeLocal());
     }, 1000);
-
+  
     return () => clearInterval(interval);
   }, [calculateRemainingTimeLocal]);
 
   const handleButtonClick = (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    if (isUrgent) {
-      // 알림을 3회 이상 무시한 경우 바텀시트 표시
+    if (isInProgress) {
+      router.push(`/focus?taskId=${taskId}`);
+    } else if (isUrgent) {
       setShowUrgentBottomSheet(true);
     } else {
-      // 그렇지 않은 경우 일반적인 미리 시작 처리
       onPreviewStart();
     }
   };
@@ -145,11 +162,17 @@ const TaskItem: React.FC<TaskItemProps> = ({
             className={`l4 rounded-[10px] px-[12px] py-[9.5px] ${
               isUrgent
                 ? 'bg-hologram text-text-inverse'
-                : 'bg-component-accent-primary text-text-strong'
+                : isInProgress
+                  ? 'bg-component-accent-tertiary text-text-strong'
+                  : 'bg-component-accent-primary text-text-strong'
             }`}
             onClick={handleButtonClick}
           >
-            {isUrgent ? '지금 시작' : '미리 시작'}
+            {isInProgress 
+              ? '이어서 몰입' 
+              : isUrgent 
+                ? '지금 시작' 
+                : '미리 시작'}
           </button>
         </div>
       </div>

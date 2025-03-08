@@ -35,7 +35,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   // 남은 시간 계산 함수
   const calculateRemainingTimeLocal = useCallback(() => {
     if (!task.dueDate) return '';
-
+  
     // dueDatetime이 있으면 사용, 없으면 dueDate와 dueTime에서 계산
     let dueDatetime;
     if (task.dueDatetime) {
@@ -45,16 +45,17 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
     } else {
       return '';
     }
-
+  
     const now = new Date();
     const diffMs = dueDatetime.getTime() - now.getTime();
-
-    // 1시간 이내인지 체크 또는 ignoredAlerts가 3 이상인지 확인
+  
+    // 1시간 이내인지 체크 또는 ignoredAlerts가 3 이상인지 확인 또는 status가 procrastinating인지 확인
     setIsUrgent(
       (diffMs <= 60 * 60 * 1000 && diffMs > 0) ||
-        (task.ignoredAlerts || 0) >= 3,
+        (task.ignoredAlerts || 0) >= 3 ||
+        task.status === 'procrastinating',
     );
-
+  
     return calculateRemainingTime(dueDatetime);
   }, [task]);
 
@@ -164,7 +165,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   // }
 
   // 미리 시작 상태일 때만 화살표 표시 (지금 시작 또는 이어서 몰입일 때는 표시 안함)
-  const showArrow = !isUrgent && !isInProgress;
+  const showArrow = !isInProgress;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-black bg-opacity-50">
@@ -306,7 +307,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
             <div className="flex justify-between items-center py-2.5">
               <div className="b2 text-text-alternative">첫 알림</div>
               <div className="flex items-center">
-                <span className="s2 text-text-neutral mr-[19px]">
+                <span className={`s2 text-text-neutral ${isInProgress ? 'mr-[12px]' : 'mr-[19px]'}`}>
                 {task.triggerActionAlarmTime ? 
                   `${new Date(task.triggerActionAlarmTime).getMonth() + 1}월 ${new Date(task.triggerActionAlarmTime).getDate()}일 (${['일', '월', '화', '수', '목', '금', '토'][new Date(task.triggerActionAlarmTime).getDay()]}), ${new Date(task.triggerActionAlarmTime).toLocaleTimeString('ko-KR', {
                     hour: '2-digit',

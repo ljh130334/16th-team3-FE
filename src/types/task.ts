@@ -1,4 +1,4 @@
-export type TaskStatus = 'pending' | 'inProgress' | 'completed' | 'reflected';
+export type TaskStatus = 'pending' | 'inProgress' | 'completed' | 'reflected' | 'procrastinating';
 export type TaskType = 'today' | 'weekly' | 'future';
 
 export interface Task {
@@ -141,6 +141,8 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
       status = 'completed';
     } else if (response.status === 'REFLECTED') {
       status = 'reflected';
+    } else if (response.status === 'PROCRASTINATING') {
+      status = 'procrastinating';
     }
 
     // 예상 소요시간 변환

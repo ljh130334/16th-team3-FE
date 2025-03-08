@@ -47,7 +47,7 @@ const HomePage = () => {
       const taskDueDate = task.dueDatetime ? new Date(task.dueDatetime) : new Date(task.dueDate);
       const taskDate = new Date(taskDueDate);
       taskDate.setHours(0, 0, 0, 0);
-      return taskDate.getTime() === today.getTime();
+      return taskDate.getTime() === today.getTime() && task.status !== 'inProgress';
     });
   }, [homeData?.todayTasks]);
   const weeklyTasks = useMemo(() => homeData?.weeklyTasks || [], [homeData?.weeklyTasks]);
@@ -393,6 +393,7 @@ const HomePage = () => {
                       ignoredAlerts={task.ignoredAlerts}
                       resetAlerts={resetAlerts}
                       dueDatetime={task.dueDatetime}
+                      status={task.status}
                     />
                   ))}
                 </div>
@@ -468,6 +469,7 @@ const HomePage = () => {
                       ignoredAlerts={task.ignoredAlerts}
                       resetAlerts={resetAlerts}
                       dueDatetime={task.dueDatetime}
+                      status={task.status}
                     />
                   ))}
                 </div>
@@ -526,6 +528,7 @@ const HomePage = () => {
                       ignoredAlerts={task.ignoredAlerts}
                       resetAlerts={resetAlerts}
                       dueDatetime={task.dueDatetime}
+                      status={task.status}
                     />
                   ))}
                 </div>
@@ -587,6 +590,7 @@ const HomePage = () => {
                       ignoredAlerts={task.ignoredAlerts}
                       resetAlerts={resetAlerts}
                       dueDatetime={task.dueDatetime}
+                      status={task.status}
                     />
                   ))}
                 </div>

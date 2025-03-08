@@ -343,7 +343,7 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
       {hasChangedH1 ? (
         <AnimatePresence mode="popLayout">
           <motion.span
-            key={`h1-${h1}-${Date.now()}`}
+            key={`h1-${h1}`}
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -10, opacity: 0 }}
@@ -359,7 +359,7 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
       {hasChangedH2 ? (
         <AnimatePresence mode="popLayout">
           <motion.span
-            key={`h2-${h2}-${Date.now()}`}
+            key={`h2-${h2}`}
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -10, opacity: 0 }}
@@ -377,7 +377,7 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
       {hasChangedM1 ? (
         <AnimatePresence mode="popLayout">
           <motion.span
-            key={`m1-${m1}-${Date.now()}`}
+            key={`m1-${m1}`}
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -10, opacity: 0 }}
@@ -393,7 +393,7 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
       {hasChangedM2 ? (
         <AnimatePresence mode="popLayout">
           <motion.span
-            key={`m2-${m2}-${Date.now()}`}
+            key={`m2-${m2}`}
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -10, opacity: 0 }}
@@ -411,7 +411,7 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
       {hasChangedS1 ? (
         <AnimatePresence mode="popLayout">
           <motion.span
-            key={`s1-${s1}-${Date.now()}`}
+            key={`s1-${s1}`}
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -10, opacity: 0 }}
@@ -427,7 +427,7 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
       {hasChangedS2 ? (
         <AnimatePresence mode="popLayout">
           <motion.span
-            key={`s2-${s2}-${Date.now()}`}
+            key={`s2-${s2}`}
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -10, opacity: 0 }}
