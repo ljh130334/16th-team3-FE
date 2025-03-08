@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTask } from '@/hooks/useTask';
 import { TaskResponse } from '@/types/task';
+import { useTaskProgressStore } from '@/store/useTaskStore';
 import { formatKoreanDateTime } from '@/utils/dateFormat';
 
 import ActionCard from './_component/ActionCard';
@@ -17,6 +18,7 @@ interface Props {
 
 export default function ActionStartPageClient({ initialTask }: Props) {
   const router = useRouter();
+  const { currentTask, setCurrentTask } = useTaskProgressStore();
 
   const { data, error, isLoading } = useTask(initialTask.id.toString(), {
     initialData: initialTask,
@@ -40,6 +42,12 @@ export default function ActionStartPageClient({ initialTask }: Props) {
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
   }, [router]);
+
+  useEffect(() => {
+    if (data) {
+      setCurrentTask(data);
+    }
+  }, [data, setCurrentTask]);
 
   const handleTakePicture = () => {
     try {

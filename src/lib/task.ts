@@ -11,3 +11,35 @@ export async function fetchTask(taskId: string): Promise<TaskResponse> {
   }
   return response.json();
 }
+
+export interface HoldOffRequestBody {
+  remindInterval: number;
+  remindCount: number;
+  remindBaseTime: string;
+}
+
+interface PatchTaskParams {
+  taskId: string | number;
+  data: HoldOffRequestBody;
+}
+
+export const patchTaskHoldOff = async ({
+  taskId,
+  data,
+}: PatchTaskParams): Promise<any> => {
+  const response = await fetch(`/v1/tasks/${taskId}/hold-off`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      // 필요한 경우 인증 토큰 등의 헤더 추가
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    // 에러 처리: 필요 시 response의 에러 메시지를 파싱
+    throw new Error('Failed to update task');
+  }
+
+  return response.json();
+};
