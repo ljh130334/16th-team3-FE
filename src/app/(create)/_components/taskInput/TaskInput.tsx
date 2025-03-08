@@ -40,9 +40,11 @@ const TaskInput = ({ context, lastStep, onNext, onEdit }: TaskInputProps) => {
 
   const [task, setTask] = useState<string>('');
   const [deadlineDate, setDeadlineDate] = useState<Date | undefined>(undefined);
-  const [deadlineTime, setDeadlineTime] = useState<TimePickerType | undefined>(
-    undefined,
-  );
+  const [deadlineTime, setDeadlineTime] = useState<TimePickerType>({
+    meridiem: '오전',
+    hour: '01',
+    minute: '00',
+  });
   const [isFocused, setIsFocused] = useState(true);
 
   const isInvalid =
@@ -117,6 +119,7 @@ const TaskInput = ({ context, lastStep, onNext, onEdit }: TaskInputProps) => {
 
           {deadlineDate !== undefined && (
             <TimeSelectedComponent
+              lastStep={lastStep}
               deadlineTime={deadlineTime}
               deadlineDate={deadlineDate}
               handleTimeChange={handleTimeChange}
