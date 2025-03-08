@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { parseDateAndTime, calculateRemainingTime } from '@/utils/dateFormat';
@@ -14,7 +14,7 @@ type TaskItemProps = {
   ignoredAlerts?: number;
   timeRequired: string;
   resetAlerts?: (taskId: number) => void;
-  dueDateTime?: string;
+  dueDatetime?: string;
 };
 
 const TaskItem: React.FC<TaskItemProps> = ({ 
@@ -28,7 +28,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
   onPreviewStart = () => {},
   ignoredAlerts = 0, // 기본값은 0
   resetAlerts = () => {},
-  dueDateTime
+  dueDatetime
 }) => {
   const router = useRouter();
   const [showUrgentBottomSheet, setShowUrgentBottomSheet] = useState(false);
@@ -36,17 +36,17 @@ const TaskItem: React.FC<TaskItemProps> = ({
   const isUrgent = ignoredAlerts >= 3;
   
   // 남은 시간 계산 함수
-  const calculateRemainingTimeLocal = () => {
-    // dueDateTime이 있으면 사용, 없으면 dueDate와 dueTime에서 계산
+  const calculateRemainingTimeLocal = useCallback(() => {
+    // dueDatetime이 있으면 사용, 없으면 dueDate와 dueTime에서 계산
     let dueDateObj;
-    if (dueDateTime) {
-      dueDateObj = new Date(dueDateTime);
+    if (dueDatetime) {
+      dueDateObj = new Date(dueDatetime);
     } else {
       dueDateObj = parseDateAndTime(dueDate, dueTime);
     }
     
     return calculateRemainingTime(dueDateObj);
-  };
+  }, [dueDate, dueTime, dueDatetime]);
   
   // 1초마다 남은 시간 업데이트
   useEffect(() => {
@@ -57,7 +57,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
     }, 1000);
     
     return () => clearInterval(interval);
-  }, [dueDate, dueTime, dueDateTime]);
+  }, [calculateRemainingTimeLocal]);
   
   const handleButtonClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -82,7 +82,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
   };
 
   // 오늘 날짜 확인
-  const isToday = () => {
+  const isToday = useCallback(() => {
     const today = new Date();
     const taskDate = new Date(dueDate);
     
@@ -91,10 +91,10 @@ const TaskItem: React.FC<TaskItemProps> = ({
       today.getMonth() === taskDate.getMonth() &&
       today.getFullYear() === taskDate.getFullYear()
     );
-  };
+  }, [dueDate]);
   
   // 시간 표시 형식 수정
-  const formatDueTime = () => {
+  const formatDueTime = useCallback(() => {
     // 자정인 경우
     if (dueTime.includes('자정')) {
       return '오늘 자정까지';
@@ -109,7 +109,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
     
     // 그 외 경우 (예: "3시간 소요")
     return dueTime;
-  };
+  }, [dueTime]);
 
   return (
     <>
