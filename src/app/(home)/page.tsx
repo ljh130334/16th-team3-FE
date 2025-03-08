@@ -37,7 +37,19 @@ const HomePage = () => {
   }, [refetch]);
   
   // 2. 데이터 구조 분해
-  const todayTasks = useMemo(() => homeData?.todayTasks || [], [homeData?.todayTasks]);
+  const todayTasks = useMemo(() => {
+    const tasks = homeData?.todayTasks || [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tasks.filter(task => {
+      const taskDueDate = task.dueDatetime ? new Date(task.dueDatetime) : new Date(task.dueDate);
+      const taskDate = new Date(taskDueDate);
+      taskDate.setHours(0, 0, 0, 0);
+      return taskDate.getTime() === today.getTime();
+    });
+  }, [homeData?.todayTasks]);
   const weeklyTasks = useMemo(() => homeData?.weeklyTasks || [], [homeData?.weeklyTasks]);
   const allTasks = useMemo(() => homeData?.allTasks || [], [homeData?.allTasks]);
   const inProgressTasks = useMemo(() => homeData?.inProgressTasks || [], [homeData?.inProgressTasks]);

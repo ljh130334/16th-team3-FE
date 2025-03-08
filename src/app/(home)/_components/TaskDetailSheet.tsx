@@ -156,6 +156,9 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   //   }
   // }
 
+  // 미리 시작 상태일 때만 화살표 표시 (지금 시작 또는 이어서 몰입일 때는 표시 안함)
+  const showArrow = !isUrgent && !isInProgress;
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end">
       <div className="bg-[#1F2024] rounded-t-[20px] w-full animate-slide-up">
@@ -241,7 +244,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               <div className="b2 text-text-alternative">마감일</div>
               <div className="flex items-center">
                 <span className="b2 text-text-neutral mr-3">{formatDueDatetime()}</span>
-                {!isUrgent && (
+                {showArrow && (
                   <Image
                     src="/icons/home/arrow-right.svg"
                     alt="Edit"
@@ -258,7 +261,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               <div className="b2 text-text-alternative">작은 행동</div>
               <div className="flex items-center">
                 <span className="b2 text-text-neutral mr-3">{personaTriggerAction}</span>
-                {!isUrgent && (
+                {showArrow && (
                   <Image
                     src="/icons/home/arrow-right.svg"
                     alt="Edit"
@@ -275,7 +278,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               <div className="b2 text-text-alternative">예상 소요시간</div>
               <div className="flex items-center">
                 <span className="b2 text-text-neutral mr-3">{task.timeRequired || '-'}</span>
-                {!isUrgent && (
+                {showArrow && (
                   <Image
                     src="/icons/home/arrow-right.svg"
                     alt="Edit"
