@@ -255,7 +255,6 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
             <div className="flex items-center justify-between py-2.5 pt-0">
               <div className="b2 text-text-alternative">마감일</div>
               <div className="flex items-center">
-<<<<<<< HEAD:src/app/(home)/_components/TaskDetailSheet.tsx
                 <span className="b2 text-text-neutral mr-3">{formatDueDatetime()}</span>
                 {showArrow && (
                   <Image
@@ -315,10 +314,6 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
                     hour12: true
                   })}`
                 : '-'}
-=======
-                <span className="b2 mr-3 text-text-neutral">
-                  {formatDueDatetime()}
->>>>>>> main:src/app/home-page/_components/TaskDetailSheet.tsx
                 </span>
               </div>
             </div>
