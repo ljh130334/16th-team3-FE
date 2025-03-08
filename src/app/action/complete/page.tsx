@@ -2,15 +2,17 @@
 
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-
 import { Badge } from '@/components/component/Badge';
+import { useTaskProgressStore } from '@/store/useTaskStore';
+
 import Header from './_component/Header';
 import PhotoCard from './_component/PhotoCard';
 import CharacterMotivation from './_component/CharacterMotivation';
 import StartButton from './_component/StartButton';
-
+import { formatKoreanDateTime } from '@/utils/dateFormat';
 export default function Complete() {
   const [capturedImage, setCapturedImage] = useState<string>('');
+  const currentTask = useTaskProgressStore((state) => state.currentTask);
 
   useEffect(() => {
     setCapturedImage(localStorage.getItem('capturedImage') || '');
@@ -22,8 +24,8 @@ export default function Complete() {
 
       <PhotoCard
         capturedImage={capturedImage || ''}
-        actionText="책상에서 피그마 프로그램 켜기"
-        time="2월 12일 (목) 오후 08:03"
+        actionText={currentTask?.triggerAction || ''}
+        time={formatKoreanDateTime(currentTask?.dueDatetime || '')}
       />
 
       {/* 인증 사진 사각박스 */}
