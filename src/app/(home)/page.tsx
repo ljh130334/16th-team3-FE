@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -24,11 +24,11 @@ const HomePage = () => {
   } = useHomeData();
   
   // 2. 데이터 구조 분해
-  const todayTasks = homeData?.todayTasks || [];
-  const weeklyTasks = homeData?.weeklyTasks || [];
-  const allTasks = homeData?.allTasks || [];
-  const inProgressTasks = homeData?.inProgressTasks || [];
-  const futureTasks = homeData?.futureTasks || [];
+  const todayTasks = useMemo(() => homeData?.todayTasks || [], [homeData?.todayTasks]);
+  const weeklyTasks = useMemo(() => homeData?.weeklyTasks || [], [homeData?.weeklyTasks]);
+  const allTasks = useMemo(() => homeData?.allTasks || [], [homeData?.allTasks]);
+  const inProgressTasks = useMemo(() => homeData?.inProgressTasks || [], [homeData?.inProgressTasks]);
+  const futureTasks = useMemo(() => homeData?.futureTasks || [], [homeData?.futureTasks]);
   
   // 3. StartTask 뮤테이션 훅
   const { mutate: startTaskMutation } = useStartTask();
@@ -91,27 +91,25 @@ const HomePage = () => {
     setShowExpiredTaskSheet(false);
   };
 
-  // 9. 앱 진입 시 마감 지난 태스크 확인
-  useEffect(() => {
-    // 로딩 중이 아닐 때만 실행
+  const expiredTasks = useMemo(() => {
     if (!isLoadingHome && allTasks.length > 0) {
-      const now = new Date(); 
-      
-      // 마감 지난 태스크 찾기
-      const expiredTasks = allTasks.filter(task => {
+      const now = new Date();
+      return allTasks.filter(task => {
         const dueDate = new Date(task.dueDatetime);
-        
-        // 마감일이 현재 시간보다 이전이고, 회고를 완료하지 않은 태스크
         return dueDate.getTime() < now.getTime() && task.status !== 'reflected';
       });
-      
-      // 마감 지난 태스크가 있으면 첫 번째 태스크로 바텀시트 표시
-      if (expiredTasks.length > 0) {
-        setExpiredTask(expiredTasks[0]);
-        setShowExpiredTaskSheet(true);
-      }
     }
+    return [];
   }, [allTasks, isLoadingHome]);
+
+  // 9. 앱 진입 시 마감 지난 태스크 확인
+  useEffect(() => {
+    // 마감 지난 태스크가 있으면 첫 번째 태스크로 바텀시트 표시
+    if (expiredTasks.length > 0) {
+      setExpiredTask(expiredTasks[0]);
+      setShowExpiredTaskSheet(true);
+    }
+  }, [expiredTasks]);
 
   // 10. 이벤트 핸들러 함수들
   const handleCloseExpiredSheet = () => {
@@ -145,14 +143,19 @@ const HomePage = () => {
   };
 
   // 13. 마감이 임박한 순으로 정렬된 이번주 할 일 (최대 2개)
-  const topWeeklyTasks = [...weeklyTasks]
-    .sort((a, b) => new Date(a.dueDatetime).getTime() - new Date(b.dueDatetime).getTime())
-    .slice(0, 2);
+  const topWeeklyTasks = useMemo(() => {
+    return [...weeklyTasks]
+      .sort((a, b) => new Date(a.dueDatetime).getTime() - new Date(b.dueDatetime).getTime())
+      .slice(0, 2);
+  }, [weeklyTasks]);
+  
 
   // 14. 마감이 임박한 순으로 정렬된 전체 할 일 (최대 2개)
-  const topAllTasks = [...allTasks]
-    .sort((a, b) => new Date(a.dueDatetime).getTime() - new Date(b.dueDatetime).getTime())
-    .slice(0, 2);
+  const topAllTasks = useMemo(() => {
+    return [...allTasks]
+      .sort((a, b) => new Date(a.dueDatetime).getTime() - new Date(b.dueDatetime).getTime())
+      .slice(0, 2);
+  }, [allTasks]);
 
   // 15. 이벤트 핸들러 함수들
   const handleDeleteTask = (taskId: number) => {
