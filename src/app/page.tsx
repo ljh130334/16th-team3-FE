@@ -8,7 +8,7 @@ export default function Home() {
       {/* 1. 홈 화면 섹션 */}
       <section>
         <h2 className="mb-4 text-lg font-bold">홈</h2>
-        <Link href="/home">
+        <Link href="/home-page">
           <Button variant="hologram" className="w-full">
             홈 화면
           </Button>
