@@ -9,7 +9,7 @@ import ActionStartPageClient from './ActionStartPageClient';
 export default async function Start({
   params,
 }: {
-  params: { taskId: string };
+  params: Promise<{ taskId: string }>;
 }) {
   const { taskId } = await params;
   const task: TaskResponse = await fetchTask(taskId);

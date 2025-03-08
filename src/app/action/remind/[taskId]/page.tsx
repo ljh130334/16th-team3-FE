@@ -1,8 +1,12 @@
 import Image from 'next/image';
 import ActionRemindPageClient from './ActionRemindPageClient';
 
-export default function Remind({ params }: { params: { taskId: string } }) {
-  const taskId = params.taskId;
+export default async function Remind({
+  params,
+}: {
+  params: Promise<{ taskId: string }>;
+}) {
+  const { taskId } = await params;
 
   return (
     <div className="flex h-screen flex-col bg-background-primary">
