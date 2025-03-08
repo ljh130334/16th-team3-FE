@@ -99,3 +99,66 @@ export function formatDateWithDay(isoString: string): string {
       return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')} 남음`;
     }
   }
+
+/**
+ * "2025-03-05T16:00:00" → "3월 5일 (수) 오후 04:00"
+ *
+ * @param isoString - ISO 형식의 날짜/시간 문자열
+ * @returns "M월 d일 (요일) 오전/오후 hh:mm" 형태의 문자열
+ */
+export function formatKoreanDateTime(isoString: string): string {
+  const date = new Date(isoString);
+
+  // 요일 표기를 위한 배열
+  const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+  const dayOfWeek = dayNames[date.getDay()];
+
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+  const ampm = hours < 12 ? '오전' : '오후';
+
+  // 12시간제로 변환
+  if (hours === 0) {
+    hours = 12;
+  } else if (hours > 12) {
+    hours -= 12;
+  }
+
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+
+  // 분이 한 자리 수일 때 앞에 0을 붙임
+  const minuteStr = minutes < 10 ? `0${minutes}` : minutes;
+
+  return `${month}월 ${day}일 (${dayOfWeek}) ${ampm} ${hours}:${minuteStr}`;
+}
+
+/**
+ * 주어진 ISO 시간(미래 시각)으로부터 현재까지 남은 시간을
+ * "HH시간 MM분 SS초" 형식으로 반환합니다.
+ *
+ * @param isoString ISO 8601 형식의 날짜/시간 문자열 (예: "2025-03-05T16:00:00")
+ * @returns 남은 시간 "HH시간 MM분 SS초" (만약 이미 시간이 지났다면 "00시간 00분 00초")
+ */
+export function getRemainingTime(isoString: string): string {
+  const now = new Date();
+  const target = new Date(isoString);
+
+  let diff = target.getTime() - now.getTime();
+
+  // 이미 시간이 지났다면 0으로 처리
+  if (diff < 0) {
+    diff = 0;
+  }
+
+  const totalSeconds = Math.floor(diff / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  const hh = String(hours).padStart(2, '0');
+  const mm = String(minutes).padStart(2, '0');
+  const ss = String(seconds).padStart(2, '0');
+
+  return `${hh}:${mm}:${ss}`;
+}
