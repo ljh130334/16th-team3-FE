@@ -68,7 +68,7 @@ export default function ActionStartPageClient({ initialTask }: Props) {
         <ActionCard title={data?.triggerAction} />
         <ScheduleCard
           title={data?.name}
-          dueDate={formatKoreanDateTime(data?.dueDatetime)}
+          dueDate={formatKoreanDateTime(data?.dueDatetime ?? '')}
         />
       </div>
 

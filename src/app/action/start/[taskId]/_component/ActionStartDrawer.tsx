@@ -12,8 +12,8 @@ import TimerBadge from './TimerBadge';
 
 interface ActionStartDrawerProps {
   onTakePicture: () => void;
-  smallActionTitle: string;
-  dueDate: string;
+  smallActionTitle?: string;
+  dueDate?: string;
 }
 
 export default function ActionStartDrawer({
