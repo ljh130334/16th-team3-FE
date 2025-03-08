@@ -83,35 +83,40 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
         type: 'future',
         status: 'pending',
         ignoredAlerts: 0,
-        persona: response.persona ? {
-          ...response.persona,
-          personalImageUrl: response.persona.personalImageUrl || response.persona.personaImageUrl || ''
-        } : undefined,
+        persona: response.persona
+          ? {
+              ...response.persona,
+              personalImageUrl:
+                response.persona.personalImageUrl ||
+                response.persona.personaImageUrl ||
+                '',
+            }
+          : undefined,
         triggerAction: response.triggerAction,
         triggerActionAlarmTime: response.triggerActionAlarmTime,
         estimatedTime: response.estimatedTime,
-        createdAt: response.createdAt
+        createdAt: response.createdAt,
       };
     }
-    
+
     // dueDatetime에서 날짜 및 요일 계산
     const dueDate = new Date(response.dueDatetime);
     const year = dueDate.getFullYear();
     const month = String(dueDate.getMonth() + 1).padStart(2, '0');
     const day = String(dueDate.getDate()).padStart(2, '0');
     const formattedDate = `${year}-${month}-${day}`;
-    
+
     // 요일 계산
     const days = ['일', '월', '화', '수', '목', '금', '토'];
     const dayOfWeek = days[dueDate.getDay()];
     const dueDay = `(${dayOfWeek})`;
-    
+
     // 시간 형식 변환 (예: "오후 6시까지")
     const hours = dueDate.getHours();
     const amPm = hours >= 12 ? '오후' : '오전';
     const hour12 = hours % 12 || 12;
     const dueTime = `${amPm} ${hour12}시까지`;
-    
+
     // D-Day 계산 및 마감 지난 경우 D+1 형식으로 표시
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -119,7 +124,7 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
     dueDay0.setHours(0, 0, 0, 0);
     const diffTime = dueDay0.getTime() - today.getTime();
     const dDayCount = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     // 태스크 타입 결정 (오늘, 이번주, 이후)
     let type: TaskType = 'future';
     if (dDayCount === 0) {
@@ -127,7 +132,7 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
     } else if (dDayCount > 0 && dDayCount <= 7) {
       type = 'weekly';
     }
-    
+
     // 상태 변환
     let status: TaskStatus = 'pending';
     if (response.status === 'FOCUSED') {
@@ -137,7 +142,7 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
     } else if (response.status === 'REFLECTED') {
       status = 'reflected';
     }
-    
+
     // 예상 소요시간 변환
     let timeRequired = '1시간 소요';
     if (response.estimatedTime) {
@@ -151,12 +156,17 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
         timeRequired = `${minutes}분 소요`;
       }
     }
-    
-    const personaObj = response.persona ? {
-      ...response.persona,
-      personalImageUrl: response.persona.personalImageUrl || response.persona.personaImageUrl || ''
-    } : undefined;
-    
+
+    const personaObj = response.persona
+      ? {
+          ...response.persona,
+          personalImageUrl:
+            response.persona.personalImageUrl ||
+            response.persona.personaImageUrl ||
+            '',
+        }
+      : undefined;
+
     return {
       id: response.id,
       title: response.name,
@@ -175,7 +185,7 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
       triggerAction: response.triggerAction,
       triggerActionAlarmTime: response.triggerActionAlarmTime,
       estimatedTime: response.estimatedTime,
-      createdAt: response.createdAt
+      createdAt: response.createdAt,
     };
   } catch (error) {
     console.error('태스크 변환 중 오류 발생:', error);
@@ -192,7 +202,7 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
       description: '',
       type: 'future',
       status: 'pending',
-      ignoredAlerts: 0
+      ignoredAlerts: 0,
     };
   }
 }

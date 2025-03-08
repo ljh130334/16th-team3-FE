@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -17,9 +19,9 @@ type TaskItemProps = {
   dueDatetime?: string;
 };
 
-const TaskItem: React.FC<TaskItemProps> = ({ 
-  title, 
-  dueTime, 
+const TaskItem: React.FC<TaskItemProps> = ({
+  title,
+  dueTime,
   dueDate,
   taskId,
   onClick,
@@ -28,13 +30,13 @@ const TaskItem: React.FC<TaskItemProps> = ({
   onPreviewStart = () => {},
   ignoredAlerts = 0, // 기본값은 0
   resetAlerts = () => {},
-  dueDatetime
+  dueDatetime,
 }) => {
   const router = useRouter();
   const [showUrgentBottomSheet, setShowUrgentBottomSheet] = useState(false);
   const [remainingTime, setRemainingTime] = useState('');
   const isUrgent = ignoredAlerts >= 3;
-  
+
   // 남은 시간 계산 함수
   const calculateRemainingTimeLocal = useCallback(() => {
     // dueDatetime이 있으면 사용, 없으면 dueDate와 dueTime에서 계산
@@ -44,24 +46,24 @@ const TaskItem: React.FC<TaskItemProps> = ({
     } else {
       dueDateObj = parseDateAndTime(dueDate, dueTime);
     }
-    
+
     return calculateRemainingTime(dueDateObj);
   }, [dueDate, dueTime, dueDatetime]);
-  
+
   // 1초마다 남은 시간 업데이트
   useEffect(() => {
     setRemainingTime(calculateRemainingTimeLocal());
-    
+
     const interval = setInterval(() => {
       setRemainingTime(calculateRemainingTimeLocal());
     }, 1000);
-    
+
     return () => clearInterval(interval);
   }, [calculateRemainingTimeLocal]);
-  
+
   const handleButtonClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    
+
     if (isUrgent) {
       // 알림을 3회 이상 무시한 경우 바텀시트 표시
       setShowUrgentBottomSheet(true);
@@ -70,11 +72,11 @@ const TaskItem: React.FC<TaskItemProps> = ({
       onPreviewStart();
     }
   };
-  
+
   const handleCloseUrgentSheet = () => {
     setShowUrgentBottomSheet(false);
   };
-  
+
   const handleStart = () => {
     resetAlerts(taskId);
     router.push(`/focus?taskId=${taskId}`);
@@ -85,62 +87,64 @@ const TaskItem: React.FC<TaskItemProps> = ({
   const isToday = useCallback(() => {
     const today = new Date();
     const taskDate = new Date(dueDate);
-    
+
     return (
       today.getDate() === taskDate.getDate() &&
       today.getMonth() === taskDate.getMonth() &&
       today.getFullYear() === taskDate.getFullYear()
     );
   }, [dueDate]);
-  
+
   // 시간 표시 형식 수정
   const formatDueTime = useCallback(() => {
     // 자정인 경우
     if (dueTime.includes('자정')) {
       return '오늘 자정까지';
     }
-    
+
     // 시간 텍스트에 "오후" 또는 "오전"이 포함되어 있는지 확인
     if (dueTime.includes('오후') || dueTime.includes('오전')) {
       // "까지"가 없으면 추가
-      const formattedTime = dueTime.includes('까지') ? dueTime : `${dueTime}까지`;
+      const formattedTime = dueTime.includes('까지')
+        ? dueTime
+        : `${dueTime}까지`;
       return `오늘 ${formattedTime}`;
     }
-    
+
     // 그 외 경우 (예: "3시간 소요")
     return dueTime;
   }, [dueTime]);
 
   return (
     <>
-      <div 
-        className="bg-component-gray-secondary rounded-[20px] p-4 mb-4"
+      <div
+        className="mb-4 rounded-[20px] bg-component-gray-secondary p-4"
         onClick={onClick}
       >
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <div>
             <div className="c3 flex items-center text-text-primary">
               <span className="flex items-center">
                 <span>{formatDueTime()}</span>
-                <span className="c3 text-text-neutral mx-1">•</span>
+                <span className="c3 mx-1 text-text-neutral">•</span>
                 <Image
                   src="/icons/home/clock.svg"
                   alt="Character"
                   width={14}
                   height={14}
-                  className="mr-[4px] mb-[2px]"
-                  />
-                <span className="c3 text-text-neutral">{timeRequired || '1시간 소요'}</span>
+                  className="mb-[2px] mr-[4px]"
+                />
+                <span className="c3 text-text-neutral">
+                  {timeRequired || '1시간 소요'}
+                </span>
               </span>
             </div>
-            <div className="s2 mt-[3px] text-text-strong">
-              {title}
-            </div>
+            <div className="s2 mt-[3px] text-text-strong">{title}</div>
           </div>
-          <button 
+          <button
             className={`l4 rounded-[10px] px-[12px] py-[9.5px] ${
-              isUrgent 
-                ? 'bg-hologram text-text-inverse' 
+              isUrgent
+                ? 'bg-hologram text-text-inverse'
                 : 'bg-component-accent-primary text-text-strong'
             }`}
             onClick={handleButtonClick}
@@ -149,22 +153,26 @@ const TaskItem: React.FC<TaskItemProps> = ({
           </button>
         </div>
       </div>
-      
+
       {showUrgentBottomSheet && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
-          <div className="w-full bg-component-gray-secondary rounded-t-[28px] p-4 pt-10 flex flex-col items-center">
-            <h2 className="t3 text-text-strong text-center">{title}</h2>
-            <p className="t3 text-text-strong text-center mb-2">더 늦기 전에 바로 시작할까요?</p>
-            <p className="b3 text-text-neutral text-center mb-7">마감까지 {remainingTime}</p>
+          <div className="flex w-full flex-col items-center rounded-t-[28px] bg-component-gray-secondary p-4 pt-10">
+            <h2 className="t3 text-center text-text-strong">{title}</h2>
+            <p className="t3 mb-2 text-center text-text-strong">
+              더 늦기 전에 바로 시작할까요?
+            </p>
+            <p className="b3 mb-7 text-center text-text-neutral">
+              마감까지 {remainingTime}
+            </p>
             <button
-              className="w-full bg-component-accent-primary text-white rounded-xl py-4 mb-3 l2"
+              className="l2 mb-3 w-full rounded-xl bg-component-accent-primary py-4 text-white"
               onClick={handleStart}
             >
               지금 시작
             </button>
-            
+
             <button
-              className="w-full text-text-neutral py-4 l2"
+              className="l2 w-full py-4 text-text-neutral"
               onClick={handleCloseUrgentSheet}
             >
               닫기

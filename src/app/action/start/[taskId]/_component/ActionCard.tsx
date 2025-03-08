@@ -1,7 +1,7 @@
 import { Badge } from '@/components/component/Badge';
 
 interface ActionCardProps {
-  title: string;
+  title?: string;
   isCompleted?: boolean;
   onClick?: () => void;
   variant?: 'gradient1' | 'gradient2';

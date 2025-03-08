@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -19,7 +21,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   onClose,
   task,
   onDelete,
-  onStart
+  onStart,
 }) => {
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
@@ -27,13 +29,13 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [remainingTime, setRemainingTime] = useState('');
   const [isUrgent, setIsUrgent] = useState(false);
-  
+
   // const { data: taskDetail, isLoading } = useTask(task.id);
-  
+
   // 남은 시간 계산 함수
   const calculateRemainingTimeLocal = useCallback(() => {
     if (!task.dueDate) return '';
-    
+
     // dueDatetime이 있으면 사용, 없으면 dueDate와 dueTime에서 계산
     let dueDatetime;
     if (task.dueDatetime) {
@@ -43,34 +45,39 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
     } else {
       return '';
     }
-    
+
     const now = new Date();
     const diffMs = dueDatetime.getTime() - now.getTime();
-    
+
     // 1시간 이내인지 체크 또는 ignoredAlerts가 3 이상인지 확인
-    setIsUrgent(diffMs <= 60 * 60 * 1000 && diffMs > 0 || (task.ignoredAlerts || 0) >= 3);
-    
+    setIsUrgent(
+      (diffMs <= 60 * 60 * 1000 && diffMs > 0) ||
+        (task.ignoredAlerts || 0) >= 3,
+    );
+
     return calculateRemainingTime(dueDatetime);
   }, [task]);
-  
+
   // 남은 시간 업데이트
   useEffect(() => {
     if (isOpen) {
       setRemainingTime(calculateRemainingTimeLocal());
-      
+
       const interval = setInterval(() => {
         setRemainingTime(calculateRemainingTimeLocal());
       }, 1000);
-      
+
       return () => clearInterval(interval);
     }
   }, [isOpen, calculateRemainingTimeLocal]);
-  
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        menuRef.current && !menuRef.current.contains(event.target as Node) &&
-        buttonRef.current && !buttonRef.current.contains(event.target as Node)
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
       ) {
         setShowMenu(false);
       }
@@ -81,7 +88,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-  
+
   if (!isOpen) return null;
 
   // 닉네임 문자열 처리 (9자 초과시 말줄임표)
@@ -98,7 +105,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
     if (task.id && onStart) {
       onStart(task.id);
     }
-    
+
     // 몰입 화면으로 이동
     router.push(`/focus${task.id ? `?taskId=${task.id}` : ''}`);
     onClose();
@@ -124,29 +131,29 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 
   const formatDueDatetime = () => {
     if (!task.dueDate) return '-';
-    
+
     // Date 객체로 변환해서 새롭게 포맷팅
     const dueDate = new Date(task.dueDate);
     const month = dueDate.getMonth() + 1;
     const day = dueDate.getDate();
     const dayOfWeek = task.dueDay || '';
-    
+
     // 시간 처리
     let timeDisplay = task.dueTime || '';
     timeDisplay = timeDisplay.replace('까지', '');
-    
+
     return `${month}월 ${day}일 ${dayOfWeek}, ${timeDisplay}`;
   };
 
   // 진행 중인 태스크인지 확인
   const isInProgress = task.status === 'inProgress';
-  
+
   const personaName = task.persona?.name || '페르소나 없음';
   const personaTriggerAction = task.triggerAction || '노트북 켜기';
-  
+
   // 이미지 URL 처리
   const personaImageUrl = '/icons/home/happy-character.svg';
-  
+
   // if (task.persona?.personalImageUrl) {
   //   const imageUrl = task.persona.personalImageUrl;
   //   if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://') || imageUrl.startsWith('/')) {
@@ -160,14 +167,18 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   const showArrow = !isUrgent && !isInProgress;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end">
-      <div className="bg-[#1F2024] rounded-t-[20px] w-full animate-slide-up">
-        <div className="flex justify-between items-center px-5 pt-10 mb-5 relative">
+    <div className="fixed inset-0 z-50 flex items-end bg-black bg-opacity-50">
+      <div className="animate-slide-up w-full rounded-t-[20px] bg-[#1F2024]">
+        <div className="relative mb-5 flex items-center justify-between px-5 pt-10">
           <div className="absolute inset-x-0 text-center">
             <h3 className="t3 text-text-normal">{task.title}</h3>
           </div>
           <div className="w-6"></div>
-          <button ref={buttonRef} className="px-2 z-10" onClick={handleMoreClick}>
+          <button
+            ref={buttonRef}
+            className="z-10 px-2"
+            onClick={handleMoreClick}
+          >
             <Image
               src="/icons/home/dots-vertical.svg"
               alt="More"
@@ -175,52 +186,53 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               height={18}
             />
           </button>
-          
+
           {showMenu && (
-            <div 
+            <div
               ref={menuRef}
-              className="absolute right-[20px] top-[70px] bg-component-gray-tertiary rounded-[16px] drop-shadow-lg z-10 w-[190px]"
+              className="absolute right-[20px] top-[70px] z-10 w-[190px] rounded-[16px] bg-component-gray-tertiary drop-shadow-lg"
             >
-              <div className="c2 p-5 pb-0 text-text-alternative">
-                설정
-              </div>
-              <div 
-                className="l3 px-5 py-3 flex justify-between items-center text-text-red"
+              <div className="c2 p-5 pb-0 text-text-alternative">설정</div>
+              <div
+                className="l3 flex items-center justify-between px-5 py-3 text-text-red"
                 onClick={handleDelete}
               >
                 삭제하기
-                <Image 
-                  src="/icons/home/trashcan.svg" 
-                  alt="Delete" 
-                  width={16} 
+                <Image
+                  src="/icons/home/trashcan.svg"
+                  alt="Delete"
+                  width={16}
                   height={16}
-                  className="ml-2" 
+                  className="ml-2"
                 />
               </div>
-              <div 
-                className="l3 px-5 pt-3 pb-[22px] flex justify-between items-center text-text-normal"
+              <div
+                className="l3 flex items-center justify-between px-5 pb-[22px] pt-3 text-text-normal"
                 onClick={handleEditTitle}
               >
                 할일 이름 바꾸기
-                <Image 
-                  src="/icons/home/edit.svg" 
-                  alt="Edit" 
-                  width={16} 
+                <Image
+                  src="/icons/home/edit.svg"
+                  alt="Edit"
+                  width={16}
                   height={16}
-                  className="ml-2" 
+                  className="ml-2"
                 />
               </div>
             </div>
           )}
         </div>
-        
+
         <div className="px-5">
-          <p className="b3 text-text-neutral text-center mb-5">
-            '{task.persona?.taskKeywordsCombination?.taskType?.name || '일반'} {task.persona?.taskKeywordsCombination?.taskMode?.name || '모드'}' {formatNickname(personaName)}님!<br />
+          <p className="b3 mb-5 text-center text-text-neutral">
+            '{task.persona?.taskKeywordsCombination?.taskType?.name || '일반'}{' '}
+            {task.persona?.taskKeywordsCombination?.taskMode?.name || '모드'}'{' '}
+            {formatNickname(personaName)}님!
+            <br />
             미루지 말고 여유있게 시작해볼까요?
           </p>
-          
-          <div className="flex justify-center items-center mb-[27px]">
+
+          <div className="mb-[27px] flex items-center justify-center">
             <Image
               src={personaImageUrl}
               alt="Character"
@@ -228,21 +240,22 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               height={90}
             />
           </div>
-          
+
           <div className="flex justify-center">
-           <Button 
-                variant="hologram" 
-                size="sm"
-                className="text-text-inverse z-10 rounded-[8px] w-auto h-auto py-[5px] px-[7px] mb-6"
+            <Button
+              variant="hologram"
+              size="sm"
+              className="z-10 mb-6 h-auto w-auto rounded-[8px] px-[7px] py-[5px] text-text-inverse"
             >
-                <span className="l6 text-text-inverse">{personaName}</span>
+              <span className="l6 text-text-inverse">{personaName}</span>
             </Button>
           </div>
-          
+
           <div>
-            <div className="flex justify-between items-center py-2.5 pt-0">
+            <div className="flex items-center justify-between py-2.5 pt-0">
               <div className="b2 text-text-alternative">마감일</div>
               <div className="flex items-center">
+<<<<<<< HEAD:src/app/(home)/_components/TaskDetailSheet.tsx
                 <span className="b2 text-text-neutral mr-3">{formatDueDatetime()}</span>
                 {showArrow && (
                   <Image
@@ -302,25 +315,75 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
                     hour12: true
                   })}`
                 : '-'}
+=======
+                <span className="b2 mr-3 text-text-neutral">
+                  {formatDueDatetime()}
+>>>>>>> main:src/app/home-page/_components/TaskDetailSheet.tsx
                 </span>
               </div>
             </div>
           </div>
-          
+
+          <div>
+            <div className="flex items-center justify-between py-2.5">
+              <div className="b2 text-text-alternative">작은 행동</div>
+              <div className="flex items-center">
+                <span className="b2 mr-3 text-text-neutral">
+                  {personaTriggerAction}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between py-2.5">
+              <div className="b2 text-text-alternative">예상 소요시간</div>
+              <div className="flex items-center">
+                <span className="b2 mr-3 text-text-neutral">
+                  {task.timeRequired || '-'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between py-2.5">
+              <div className="b2 text-text-alternative">첫 알림</div>
+              <div className="flex items-center">
+                <span className="s2 mr-3 text-text-neutral">
+                  {task.triggerActionAlarmTime
+                    ? new Date(task.triggerActionAlarmTime).toLocaleTimeString(
+                        'ko-KR',
+                        {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: true,
+                        },
+                      )
+                    : '-'}
+                </span>
+              </div>
+            </div>
+          </div>
+
           <div className="mt-6">
-            <Button 
-              variant={isUrgent ? "hologram" : "primary"}
+            <Button
+              variant={isUrgent ? 'hologram' : 'primary'}
               size="default"
-              className={`l2 w-full z-10 ${isUrgent ? 'text-text-inverse' : 'text-text-strong'} rounded-[20px] py-4`}
+              className={`l2 z-10 w-full ${isUrgent ? 'text-text-inverse' : 'text-text-strong'} rounded-[20px] py-4`}
               onClick={handleStartTask}
             >
-              {isInProgress ? '이어서 몰입' : isUrgent ? '지금 시작' : '미리 시작'}
+              {isInProgress
+                ? '이어서 몰입'
+                : isUrgent
+                  ? '지금 시작'
+                  : '미리 시작'}
             </Button>
           </div>
-          
+
           <div className="mb-10">
             <div
-              className="b2 flex justify-center w-full text-text-neutral py-4 bg-none"
+              className="b2 flex w-full justify-center bg-none py-4 text-text-neutral"
               onClick={onClose}
             >
               닫기
@@ -329,7 +392,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
         </div>
 
         <div className="w-full py-3">
-          <div className="w-16 h-1 mx-auto bg-[#373A45] rounded-full"></div>
+          <div className="mx-auto h-1 w-16 rounded-full bg-[#373A45]"></div>
         </div>
       </div>
     </div>

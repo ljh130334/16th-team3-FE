@@ -1,6 +1,6 @@
 interface ScheduleCardProps {
-  title: string;
-  dueDate: string;
+  title?: string;
+  dueDate?: string;
 }
 
 export default function ScheduleCard({ title, dueDate }: ScheduleCardProps) {
