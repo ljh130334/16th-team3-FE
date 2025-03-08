@@ -319,48 +319,6 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
             </div>
           </div>
 
-          <div>
-            <div className="flex items-center justify-between py-2.5">
-              <div className="b2 text-text-alternative">작은 행동</div>
-              <div className="flex items-center">
-                <span className="b2 mr-3 text-text-neutral">
-                  {personaTriggerAction}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between py-2.5">
-              <div className="b2 text-text-alternative">예상 소요시간</div>
-              <div className="flex items-center">
-                <span className="b2 mr-3 text-text-neutral">
-                  {task.timeRequired || '-'}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between py-2.5">
-              <div className="b2 text-text-alternative">첫 알림</div>
-              <div className="flex items-center">
-                <span className="s2 mr-3 text-text-neutral">
-                  {task.triggerActionAlarmTime
-                    ? new Date(task.triggerActionAlarmTime).toLocaleTimeString(
-                        'ko-KR',
-                        {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          hour12: true,
-                        },
-                      )
-                    : '-'}
-                </span>
-              </div>
-            </div>
-          </div>
-
           <div className="mt-6">
             <Button
               variant={isUrgent ? 'hologram' : 'primary'}
