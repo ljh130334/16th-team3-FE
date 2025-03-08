@@ -83,17 +83,19 @@ export function formatDateWithDay(isoString: string): string {
     
     if (timeLeft <= 0) return '00:00:00 남음';
     
-    if (timeLeft <= 24 * 60 * 60 * 1000) {
-      const h = Math.floor(timeLeft / (1000 * 60 * 60));
-      const m = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-      const s = Math.floor((timeLeft % (1000 * 60)) / 1000);
-      
-      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')} 남음`;
-    } else {
+    // 24시간(1일) 이상인 경우 일, 시간, 분 형식으로 표시
+    if (timeLeft >= 24 * 60 * 60 * 1000) {
       const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
       const h = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const m = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
       
       return `${days}일 ${h}시간 ${m}분 남음`;
+    } else {
+      // 24시간 미만인 경우 시:분:초 형식으로 표시
+      const h = Math.floor(timeLeft / (1000 * 60 * 60));
+      const m = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((timeLeft % (1000 * 60)) / 1000);
+      
+      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')} 남음`;
     }
   }

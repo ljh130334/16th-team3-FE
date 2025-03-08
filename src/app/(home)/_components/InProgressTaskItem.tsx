@@ -277,27 +277,30 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 
 // 시간 표시 컴포넌트
 const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: boolean }) => {
+  const prevDigitsRef = useRef({
+    h1: '', h2: '',
+    m1: '', m2: '',
+    s1: '', s2: ''
+  });
+
+  // 일 형식(예: "2일 5시간 30분 남음")인지 확인
+  const isDayFormat = time.includes('일') && time.includes('시간');
+  
+  // 시:분:초 형식 처리
   const splitTime = time.split(' ');
   const timeString = splitTime[0] || '00:00:00';
   const timeParts = timeString.split(':');
   const suffix = splitTime.slice(1).join(' ');
   
   // 각 시간 단위를 개별 숫자로 분리해서 관리
-  const hours = timeParts[0] || '00';
-  const minutes = timeParts[1] || '00';
-  const seconds = timeParts[2] || '00';
+  const hours = !isDayFormat ? (timeParts[0] || '00') : '00';
+  const minutes = !isDayFormat ? (timeParts[1] || '00') : '00';
+  const seconds = !isDayFormat ? (timeParts[2] || '00') : '00';
   
   // 각 자릿수 분리
   const [h1, h2] = hours.split('');
   const [m1, m2] = minutes.split('');
   const [s1, s2] = seconds.split('');
-  
-  // 이전 자릿수 값 저장을 위한 ref
-  const prevDigitsRef = useRef({
-    h1, h2,
-    m1, m2,
-    s1, s2
-  });
   
   // 변경된 값 감지
   const hasChangedH1 = h1 !== prevDigitsRef.current.h1;
@@ -309,10 +312,21 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
   
   // 이전 값 저장
   useEffect(() => {
-    prevDigitsRef.current = {
-      h1, h2, m1, m2, s1, s2
-    };
-  }, [timeString, h1, h2, m1, m2, s1, s2]);
+    if (!isDayFormat) {
+      prevDigitsRef.current = {
+        h1, h2, m1, m2, s1, s2
+      };
+    }
+  }, [timeString, h1, h2, m1, m2, s1, s2, isDayFormat]);
+
+  // 일 형식이거나 긴급한 경우 간단한 표시 반환
+  if (isDayFormat) {
+    return (
+      <span className="inline-flex items-center justify-center">
+        {time}
+      </span>
+    );
+  }
 
   if (isUrgent) {
     return (
@@ -323,6 +337,7 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
     );
   }
 
+  // 일반적인 시:분:초 애니메이션 표시
   return (
     <span className="inline-flex items-center justify-center">
       {hasChangedH1 ? (
