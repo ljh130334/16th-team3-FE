@@ -1,45 +1,34 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { Button } from '@/components/ui/button';
+import { Task } from '@/types/task';
 
-type AllTaskItemProps = {
-  task: {
-    id: number;
-    title: string;
-    dueDate: string;
-    dueDay: string;
-    dueTime: string;
-    timeRequired: string;
-    dDayCount: number;
-    description?: string;
-    type?: 'today' | 'weekly' | 'future';
-    dueDateTime?: string;
-  };
-  onClick: (task: any) => void;
+type WeeklyTaskItemProps = {
+  task: Task;
+  onClick: (task: Task) => void;
   onDelete: (taskId: number) => void;
 };
 
-const AllTaskItem: React.FC<AllTaskItemProps> = ({ task, onClick, onDelete }) => {
+const WeeklyTaskItem: React.FC<WeeklyTaskItemProps> = ({ task, onClick, onDelete }) => {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const truncatedTitle = task.title.length > 16 ? task.title.substring(0, 16) + '...' : task.title;
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        menuRef.current && !menuRef.current.contains(event.target as Node) &&
-        buttonRef.current && !buttonRef.current.contains(event.target as Node)
-      ) {
-        setShowMenu(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+      const handleClickOutside = (event: MouseEvent) => {
+        if (
+          menuRef.current && !menuRef.current.contains(event.target as Node) &&
+          buttonRef.current && !buttonRef.current.contains(event.target as Node)
+        ) {
+          setShowMenu(false);
+        }
+      };
+  
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }, []);
 
   const handleMoreClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -58,60 +47,15 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({ task, onClick, onDelete }) =>
     }
   };
 
-  const renderDayChip = () => {
-    const dDayText = task.dDayCount > 99 ? 'D-99+' : `D-${task.dDayCount}`;
-  
-    if (task.type === 'today') {
-      return (
-        <Button 
-            variant="hologram" 
-            size="sm"
-            className="text-text-inverse z-10 rounded-[6px] px-[15px] py-[3px] h-auto"
-        >
-            <span className="c2">D-DAY</span>
-        </Button>
-      );
-    } else if (task.type === 'weekly') {
-      return (
-        <div className="bg-component-accent-secondary text-text-primary rounded-[6px] px-[15px] py-[0px]">
-          <span className="c2">{dDayText}</span>
-        </div>
-      );
-    } else {
-      return (
-        <div className="bg-component-gray-tertiary text-text-neutral rounded-[6px] px-[15px] py-[0px]">
-          <span className="c2">{dDayText}</span>
-        </div>
-      );
-    }
-  };  
-
   // 날짜 및 시간 표시 형식 수정
   const formatDateTime = () => {
     const month = task.dueDate.substring(5, 7);
     const day = task.dueDate.substring(8, 10);
     
-    // 오늘 날짜와 비교
-    const today = new Date();
-    const taskDate = new Date(task.dueDate);
-    const isToday = 
-      today.getDate() === taskDate.getDate() &&
-      today.getMonth() === taskDate.getMonth() &&
-      today.getFullYear() === taskDate.getFullYear();
-    
     // 시간 형식 처리
     let timeDisplay = task.dueTime;
-    if (task.dueTime.includes('자정')) {
-      timeDisplay = isToday ? '오늘 자정까지' : '자정까지';
-    } else if (task.dueTime.includes('오후') || task.dueTime.includes('오전')) {
-      // "오후 n시까지" 또는 "오전 n시까지" 형식인지 확인
-      if (!task.dueTime.includes('까지')) {
-        timeDisplay = `${task.dueTime}까지`;
-      }
-      
-      if (isToday) {
-        timeDisplay = `오늘 ${timeDisplay}`;
-      }
+    if (!timeDisplay.includes('까지') && (timeDisplay.includes('오후') || timeDisplay.includes('오전'))) {
+      timeDisplay = `${timeDisplay}까지`;
     }
     
     return `${month}월 ${day}일 ${task.dueDay} ${timeDisplay}`;
@@ -122,7 +66,9 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({ task, onClick, onDelete }) =>
       <div className="flex justify-between items-start">
         <div className="flex-1">
           <div className="flex items-center mb-2">
-            {renderDayChip()}
+            <div className="bg-component-accent-secondary text-text-primary rounded-[6px] px-[15px] py-[0px]">
+              <span className="c2">D-{task.dDayCount}</span>
+            </div>
           </div>
           <div className="c3 flex items-center text-text-primary">
             <span>{formatDateTime()}</span>
@@ -140,7 +86,7 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({ task, onClick, onDelete }) =>
             {truncatedTitle}
           </div>
         </div>
-        <button className="mt-1 px-2" onClick={handleMoreClick}>
+        <button ref={buttonRef} className="mt-1 px-2" onClick={handleMoreClick}>
           <Image 
             src="/icons/home/dots-vertical.svg" 
             alt="More" 
@@ -177,4 +123,4 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({ task, onClick, onDelete }) =>
   );
 };
 
-export default AllTaskItem;
+export default WeeklyTaskItem;
