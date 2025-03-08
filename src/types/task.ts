@@ -44,14 +44,7 @@ export interface TaskResponse {
   triggerAction: string;
   triggerActionAlarmTime: string;
   estimatedTime: number;
-  status:
-    | 'BEFORE'
-    | 'WARMING_UP'
-    | 'PROCRASTINATING'
-    | 'HOLDING_OFF'
-    | 'FOCUSED'
-    | 'COMPLETE'
-    | 'FAIL';
+  status: string;
   persona: {
     id: number;
     name: string;
