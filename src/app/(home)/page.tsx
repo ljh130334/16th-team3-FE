@@ -8,6 +8,7 @@ import TaskItem from '@/app/(home)/_components/TaskItem';
 import TaskDetailSheet from '@/app/(home)/_components/TaskDetailSheet';
 import AllTaskItem from '@/app/(home)/_components/AllTaskItem';
 import InProgressTaskItem from '@/app/(home)/_components/InProgressTaskItem';
+import CreateTaskSheet from '@/app/(home)/_components/CreateTaskSheet';
 import { Task } from '@/types/task';
 import { 
   useHomeData,
@@ -20,8 +21,20 @@ const HomePage = () => {
   // 1. 홈 API를 통해 모든 데이터 한번에 가져오기
   const { 
     data: homeData,
-    isLoading: isLoadingHome 
+    isLoading: isLoadingHome,
+    refetch 
   } = useHomeData();
+
+  useEffect(() => {
+    const handleFocus = () => {
+      refetch();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [refetch]);
   
   // 2. 데이터 구조 분해
   const todayTasks = useMemo(() => homeData?.todayTasks || [], [homeData?.todayTasks]);
@@ -30,6 +43,8 @@ const HomePage = () => {
   const inProgressTasks = useMemo(() => homeData?.inProgressTasks || [], [homeData?.inProgressTasks]);
   const futureTasks = useMemo(() => homeData?.futureTasks || [], [homeData?.futureTasks]);
   
+  const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
+
   // 3. StartTask 뮤테이션 훅
   const { mutate: startTaskMutation } = useStartTask();
   const { mutate: deleteTaskMutation } = useDeleteTask();
@@ -189,7 +204,12 @@ const HomePage = () => {
   };
 
   const handleAddTask = () => {
-    router.push('/create');
+    setIsCreateSheetOpen(true);
+  };
+
+  const handleCloseCreateSheet = () => {
+    setIsCreateSheetOpen(false);
+    refetch();
   };
 
   // 16. 탭 전환 처리
@@ -670,6 +690,11 @@ const HomePage = () => {
           onStart={handleStartTask}
         />
       )}
+      
+      <CreateTaskSheet
+        isOpen={isCreateSheetOpen}
+        onClose={handleCloseCreateSheet}
+      />
     </div>
   );
 };

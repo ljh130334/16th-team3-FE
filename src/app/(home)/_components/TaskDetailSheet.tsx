@@ -241,6 +241,14 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               <div className="b2 text-text-alternative">마감일</div>
               <div className="flex items-center">
                 <span className="b2 text-text-neutral mr-3">{formatDueDatetime()}</span>
+                {!isUrgent && (
+                  <Image
+                    src="/icons/home/arrow-right.svg"
+                    alt="Edit"
+                    width={7}
+                    height={12}
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -250,6 +258,14 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               <div className="b2 text-text-alternative">작은 행동</div>
               <div className="flex items-center">
                 <span className="b2 text-text-neutral mr-3">{personaTriggerAction}</span>
+                {!isUrgent && (
+                  <Image
+                    src="/icons/home/arrow-right.svg"
+                    alt="Edit"
+                    width={7}
+                    height={12}
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -259,6 +275,14 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               <div className="b2 text-text-alternative">예상 소요시간</div>
               <div className="flex items-center">
                 <span className="b2 text-text-neutral mr-3">{task.timeRequired || '-'}</span>
+                {!isUrgent && (
+                  <Image
+                    src="/icons/home/arrow-right.svg"
+                    alt="Edit"
+                    width={7}
+                    height={12}
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -267,12 +291,14 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
             <div className="flex justify-between items-center py-2.5">
               <div className="b2 text-text-alternative">첫 알림</div>
               <div className="flex items-center">
-                <span className="s2 text-text-neutral mr-3">
-                  {task.triggerActionAlarmTime ? new Date(task.triggerActionAlarmTime).toLocaleTimeString('ko-KR', {
+                <span className="s2 text-text-neutral mr-[19px]">
+                {task.triggerActionAlarmTime ? 
+                  `${new Date(task.triggerActionAlarmTime).getMonth() + 1}월 ${new Date(task.triggerActionAlarmTime).getDate()}일 (${['일', '월', '화', '수', '목', '금', '토'][new Date(task.triggerActionAlarmTime).getDay()]}), ${new Date(task.triggerActionAlarmTime).toLocaleTimeString('ko-KR', {
                     hour: '2-digit',
                     minute: '2-digit',
                     hour12: true
-                  }) : '-'}
+                  })}`
+                : '-'}
                 </span>
               </div>
             </div>
