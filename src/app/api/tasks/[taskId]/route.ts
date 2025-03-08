@@ -1,3 +1,4 @@
+import { NextApiRequest } from 'next';
 import { NextRequest, NextResponse } from 'next/server';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -5,9 +6,9 @@ const AUTH_TOKEN = process.env.NEXT_PUBLIC_TEST_TOKEN_1! + process.env.NEXT_PUBL
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { taskId: string } }
+  { params }: { params: Promise<{ taskId: string }> }
 ) {
-  const taskId = params.taskId;
+  const {taskId} = await params;
 
   try {
     const response = await fetch(`${API_BASE_URL}/v1/tasks/${taskId}`, {
@@ -44,9 +45,9 @@ export async function GET(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { taskId: string } }
+    { params }: { params: Promise<{ taskId: string }> }
   ) {
-    const taskId = params.taskId;
+    const {taskId} = await params;
   
     try {
       console.log(`할일 삭제 요청: ${taskId}`);

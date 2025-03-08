@@ -5,9 +5,9 @@ const AUTH_TOKEN = process.env.NEXT_PUBLIC_TEST_TOKEN_1! + process.env.NEXT_PUBL
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { taskId: string } }
+  { params }: { params: Promise<{ taskId: string }> }
 ) {
-  const taskId = params.taskId;
+  const {taskId} = await params;
 
   try {
     const body = await request.json();

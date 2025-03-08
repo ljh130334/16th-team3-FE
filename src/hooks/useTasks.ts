@@ -44,7 +44,7 @@ export const useTask = (taskId: number) => {
   return useQuery<Task, Error>({
     queryKey: ['tasks', taskId],
     queryFn: () => fetchTaskById(taskId),
-    enabled: !!taskId, // taskId가 유효한 경우에만 쿼리 실행
+    enabled: !!taskId,
   });
 };
 
