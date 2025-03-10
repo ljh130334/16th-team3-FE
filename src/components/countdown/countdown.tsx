@@ -3,9 +3,10 @@ import { useCurrentTime } from '@/provider/CurrentTimeProvider';
 
 interface CountdownProps {
   deadline: string; // ISO 문자열
+  className?: string;
 }
 
-export default function Countdown({ deadline }: CountdownProps) {
+export default function Countdown({ deadline, className }: CountdownProps) {
   const { currentTime } = useCurrentTime();
   console.log(deadline);
   const deadlineTimestamp = new Date(deadline).getTime();
@@ -17,8 +18,8 @@ export default function Countdown({ deadline }: CountdownProps) {
 
   console.log(seconds);
   return (
-    <span>
-      {hours} : {minutes < 10 ? `0${minutes}` : minutes} :{' '}
+    <span className={className}>
+      {hours}:{minutes < 10 ? `0${minutes}` : minutes}:
       {seconds < 10 ? `0${seconds}` : seconds}
     </span>
   );
