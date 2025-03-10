@@ -61,8 +61,8 @@ export const fetchHomeData = async (): Promise<{
       
     // futureTasks가 응답에 없으면 allTasks에서 필터링
     const futureTasks = Array.isArray(data?.futureTasks)
-      ? data.futureTasks.map((task: TaskResponse) => convertTask(task))
-      : allTasks.filter(task => task.type === 'future');
+    ? data.futureTasks.map((task: TaskResponse) => convertTask(task))
+    : allTasks.filter(task => task.type === 'future');
     
     return {
       todayTasks,

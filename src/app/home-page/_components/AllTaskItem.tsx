@@ -49,22 +49,78 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({ task, onClick, onDelete }) =>
   };
 
   const renderDayChip = () => {
-    // D-Day 계산 - 음수인 경우 D+로 표시
-    let dDayText;
+    // D-Day 계산 - dDayCount가 없는 경우 직접 계산
+    let dDayCount = task.dDayCount;
+    if (dDayCount === undefined) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const dueDate = task.dueDatetime 
+        ? new Date(task.dueDatetime)
+        : (task.dueDate ? new Date(task.dueDate) : null);
+      
+      if (dueDate) {
+        const dueDay = new Date(dueDate);
+        dueDay.setHours(0, 0, 0, 0);
+        
+        // 날짜 차이를 일 단위로 계산
+        const diffTime = dueDay.getTime() - today.getTime();
+        dDayCount = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      } else {
+        // 날짜 정보가 없는 경우 기본값 설정
+        dDayCount = 0;
+      }
+    }
     
-    if (task.dDayCount > 0) {
+    let dDayText;
+    if (dDayCount > 0) {
       // 미래 날짜 (D-Day)
-      dDayText = task.dDayCount > 99 ? 'D-99+' : `D-${task.dDayCount}`;
-    } else if (task.dDayCount < 0) {
+      dDayText = dDayCount > 99 ? 'D-99+' : `D-${dDayCount}`;
+    } else if (dDayCount < 0) {
       // 지난 날짜 (D+Day) - 음수값을 양수로 변환
-      const daysPassed = Math.abs(task.dDayCount);
+      const daysPassed = Math.abs(dDayCount);
       dDayText = daysPassed > 99 ? 'D+99+' : `D+${daysPassed}`;
     } else {
       // 오늘인 경우
       dDayText = 'D-DAY';
     }
+    
+    // 타입이 없는 경우 날짜 기반으로 타입 추론
+    let taskType = task.type;
+    if (!taskType) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const dueDate = task.dueDatetime 
+        ? new Date(task.dueDatetime)
+        : (task.dueDate ? new Date(task.dueDate) : null);
+      
+      if (dueDate) {
+        const dueDay = new Date(dueDate);
+        dueDay.setHours(0, 0, 0, 0);
+        
+        if (dueDay.getTime() === today.getTime()) {
+          taskType = 'today';
+        } else {
+          // 월요일~일요일 주간 범위 계산
+          const dayOfWeek = today.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
+          const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+          
+          const mondayOfThisWeek = new Date(today);
+          mondayOfThisWeek.setDate(today.getDate() - daysFromMonday);
+          
+          const sundayOfThisWeek = new Date(mondayOfThisWeek);
+          sundayOfThisWeek.setDate(mondayOfThisWeek.getDate() + 6);
+          sundayOfThisWeek.setHours(23, 59, 59, 999);
+          
+          if (dueDay > today && dueDay <= sundayOfThisWeek) {
+            taskType = 'weekly';
+          }
+        }
+      }
+    }
   
-    if (task.type === 'today') {
+    if (taskType === 'today') {
       return (
         <Button 
             variant="hologram" 
@@ -74,7 +130,7 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({ task, onClick, onDelete }) =>
             <span className="c2">D-DAY</span>
         </Button>
       );
-    } else if (task.type === 'weekly') {
+    } else if (taskType === 'weekly') {
       return (
         <div className="bg-component-accent-secondary text-text-primary rounded-[6px] px-[15px] py-[0px]">
           <span className="c2">{dDayText}</span>
@@ -87,37 +143,74 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({ task, onClick, onDelete }) =>
         </div>
       );
     }
-  };  
+  };
 
   // 날짜 및 시간 표시 형식 수정
   const formatDateTime = () => {
-    const month = task.dueDate.substring(5, 7);
-    const day = task.dueDate.substring(8, 10);
+    // dueDatetime에서 날짜와 시간 정보 추출
+    let dueDate = task.dueDate;
+    let dueTime = task.dueTime;
+    let dueDay = task.dueDay;
+    
+    // dueDatetime이 있고 dueDate가 없는 경우 변환
+    if (task.dueDatetime && !dueDate) {
+      const date = new Date(task.dueDatetime);
+      // YYYY-MM-DD 형식으로 변환
+      dueDate = date.toISOString().split('T')[0];
+      
+      // 요일 설정 (없는 경우)
+      if (!dueDay) {
+        const days = ['일', '월', '화', '수', '목', '금', '토'];
+        dueDay = `(${days[date.getDay()]})`;
+      }
+      
+      // 시간 설정 (없는 경우)
+      if (!dueTime) {
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        const ampm = hours >= 12 ? '오후' : '오전';
+        const hour12 = hours % 12 || 12;
+        dueTime = `${ampm} ${hour12}시${minutes > 0 ? ` ${minutes}분` : ''}까지`;
+      }
+    }
+    
+    if (!dueDate) {
+      if (task.dueDatetime) {
+        const date = new Date(task.dueDatetime);
+        return `${date.getMonth() + 1}월 ${date.getDate()}일 ${dueDay || ''} ${dueTime || ''}`;
+      }
+      return '날짜 정보 없음';
+    }
+    
+    const month = dueDate.substring(5, 7);
+    const day = dueDate.substring(8, 10);
     
     // 오늘 날짜와 비교
     const today = new Date();
-    const taskDate = new Date(task.dueDate);
+    const taskDate = new Date(dueDate);
     const isToday = 
       today.getDate() === taskDate.getDate() &&
       today.getMonth() === taskDate.getMonth() &&
       today.getFullYear() === taskDate.getFullYear();
     
     // 시간 형식 처리
-    let timeDisplay = task.dueTime;
-    if (task.dueTime.includes('자정')) {
-      timeDisplay = isToday ? '오늘 자정까지' : '자정까지';
-    } else if (task.dueTime.includes('오후') || task.dueTime.includes('오전')) {
-      // "오후 n시까지" 또는 "오전 n시까지" 형식인지 확인
-      if (!task.dueTime.includes('까지')) {
-        timeDisplay = `${task.dueTime}까지`;
-      }
-      
-      if (isToday) {
-        timeDisplay = `오늘 ${timeDisplay}`;
+    let timeDisplay = dueTime || '';
+    if (timeDisplay) {
+      if (timeDisplay.includes('자정')) {
+        timeDisplay = isToday ? '오늘 자정까지' : '자정까지';
+      } else if (timeDisplay.includes('오후') || timeDisplay.includes('오전')) {
+        // "오후 n시까지" 또는 "오전 n시까지" 형식인지 확인
+        if (!timeDisplay.includes('까지')) {
+          timeDisplay = `${timeDisplay}까지`;
+        }
+        
+        if (isToday) {
+          timeDisplay = `오늘 ${timeDisplay}`;
+        }
       }
     }
     
-    return `${month}월 ${day}일 ${task.dueDay} ${timeDisplay}`;
+    return `${month}월 ${day}일 ${dueDay || ''} ${timeDisplay}`;
   };
 
   return (
