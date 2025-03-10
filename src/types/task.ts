@@ -143,6 +143,8 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
       status = 'reflected';
     } else if (response.status === 'PROCRASTINATING') {
       status = 'procrastinating';
+    } else if (response.status === 'BEFORE') {
+      status = 'pending';
     }
 
     // 예상 소요시간 변환

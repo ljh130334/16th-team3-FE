@@ -50,7 +50,33 @@ const HomePage = () => {
       return taskDate.getTime() === today.getTime() && task.status !== 'inProgress';
     });
   }, [homeData?.todayTasks]);
-  const weeklyTasks = useMemo(() => homeData?.weeklyTasks || [], [homeData?.weeklyTasks]);
+  // 이번주 할일 정의: 월~일 기준, 오늘 제외한 이번주 남은 날에 마감되는 할일
+  const weeklyTasks = useMemo(() => {
+    const tasks = homeData?.weeklyTasks || [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // 이번주의 월요일 찾기
+    const mondayOfThisWeek = new Date(today);
+    const dayOfWeek = today.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
+    const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // 일요일인 경우 이전 주의 월요일까지 거슬러 올라감
+    mondayOfThisWeek.setDate(today.getDate() - daysFromMonday);
+    
+    // 이번주의 일요일 찾기
+    const sundayOfThisWeek = new Date(mondayOfThisWeek);
+    sundayOfThisWeek.setDate(mondayOfThisWeek.getDate() + 6);
+    
+    return tasks.filter(task => {
+      const taskDueDate = task.dueDatetime ? new Date(task.dueDatetime) : new Date(task.dueDate);
+      const taskDate = new Date(taskDueDate);
+      taskDate.setHours(0, 0, 0, 0);
+      
+      // 오늘을 제외한 이번주 남은 날에 마감되는 할일만 포함
+      return taskDate.getTime() > today.getTime() && 
+             taskDate.getTime() <= sundayOfThisWeek.getTime() &&
+             task.status !== 'inProgress';
+    });
+  }, [homeData?.weeklyTasks]);
   const allTasks = useMemo(() => homeData?.allTasks || [], [homeData?.allTasks]);
   const inProgressTasks = useMemo(() => homeData?.inProgressTasks || [], [homeData?.inProgressTasks]);
   const futureTasks = useMemo(() => homeData?.futureTasks || [], [homeData?.futureTasks]);
@@ -401,7 +427,7 @@ const HomePage = () => {
                 <div>
                   <button
                     className="flex w-full items-center justify-between rounded-[20px] bg-component-gray-secondary px-4 py-4"
-                    onClick={() => router.push('/weekly-tasks')}
+                    onClick={() => router.push('/home-page/weekly-tasks')}
                   >
                     <span className="s2 text-text-neutral">이번주 할일</span>
                     <Image
