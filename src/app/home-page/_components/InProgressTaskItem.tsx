@@ -281,24 +281,24 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
   const timeString = splitTime[0] || '00:00:00';
   const timeParts = timeString.split(':');
   const suffix = splitTime.slice(1).join(' ');
-  
+
   // 각 시간 단위를 개별 숫자로 분리해서 관리
   const hours = timeParts[0] || '00';
   const minutes = timeParts[1] || '00';
   const seconds = timeParts[2] || '00';
-  
+
   // 각 자릿수 분리
   const [h1, h2] = hours.split('');
   const [m1, m2] = minutes.split('');
   const [s1, s2] = seconds.split('');
-  
+
   // 이전 자릿수 값 저장을 위한 ref
   const prevDigitsRef = useRef({
-    h1, h2,
-    m1, m2,
-    s1, s2
+    h1: h1, h2: h2,
+    m1: m1, m2: m2,
+    s1: s1, s2: s2
   });
-  
+
   // 변경된 값 감지
   const hasChangedH1 = h1 !== prevDigitsRef.current.h1;
   const hasChangedH2 = h2 !== prevDigitsRef.current.h2;
@@ -306,7 +306,7 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
   const hasChangedM2 = m2 !== prevDigitsRef.current.m2;
   const hasChangedS1 = s1 !== prevDigitsRef.current.s1;
   const hasChangedS2 = s2 !== prevDigitsRef.current.s2;
-  
+
   // 이전 값 저장
   useEffect(() => {
     prevDigitsRef.current = {
@@ -340,7 +340,7 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
       ) : (
         <span>{h1}</span>
       )}
-      
+
       {hasChangedH2 ? (
         <AnimatePresence mode="popLayout">
           <motion.span
@@ -356,9 +356,9 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
       ) : (
         <span>{h2}</span>
       )}
-      
+
       <span>:</span>
-      
+
       {hasChangedM1 ? (
         <AnimatePresence mode="popLayout">
           <motion.span
@@ -374,7 +374,7 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
       ) : (
         <span>{m1}</span>
       )}
-      
+
       {hasChangedM2 ? (
         <AnimatePresence mode="popLayout">
           <motion.span
@@ -390,9 +390,9 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
       ) : (
         <span>{m2}</span>
       )}
-      
+
       <span>:</span>
-      
+
       {hasChangedS1 ? (
         <AnimatePresence mode="popLayout">
           <motion.span
@@ -408,7 +408,7 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
       ) : (
         <span>{s1}</span>
       )}
-      
+
       {hasChangedS2 ? (
         <AnimatePresence mode="popLayout">
           <motion.span
@@ -424,7 +424,7 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
       ) : (
         <span>{s2}</span>
       )}
-      
+
       {suffix && <span className="ml-1">{suffix}</span>}
     </span>
   );

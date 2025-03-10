@@ -8,6 +8,7 @@ import TaskItem from '@/app/home-page/_components/TaskItem';
 import TaskDetailSheet from '@/app/home-page/_components/TaskDetailSheet';
 import AllTaskItem from '@/app/home-page/_components/AllTaskItem';
 import InProgressTaskItem from '@/app/home-page/_components/InProgressTaskItem';
+import CreateTaskSheet from '@/app/home-page/_components/CreateTaskSheet';
 import { Task } from '@/types/task';
 import {
   useHomeData,
@@ -18,29 +19,43 @@ import {
 
 const HomePage = () => {
   // 1. 홈 API를 통해 모든 데이터 한번에 가져오기
-  const { data: homeData, isLoading: isLoadingHome } = useHomeData();
+  const { 
+    data: homeData,
+    isLoading: isLoadingHome,
+    refetch 
+  } = useHomeData();
 
+  useEffect(() => {
+    const handleFocus = () => {
+      refetch();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [refetch]);
+  
   // 2. 데이터 구조 분해
-  const todayTasks = useMemo(
-    () => homeData?.todayTasks || [],
-    [homeData?.todayTasks],
-  );
-  const weeklyTasks = useMemo(
-    () => homeData?.weeklyTasks || [],
-    [homeData?.weeklyTasks],
-  );
-  const allTasks = useMemo(
-    () => homeData?.allTasks || [],
-    [homeData?.allTasks],
-  );
-  const inProgressTasks = useMemo(
-    () => homeData?.inProgressTasks || [],
-    [homeData?.inProgressTasks],
-  );
-  const futureTasks = useMemo(
-    () => homeData?.futureTasks || [],
-    [homeData?.futureTasks],
-  );
+  const todayTasks = useMemo(() => {
+    const tasks = homeData?.todayTasks || [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tasks.filter(task => {
+      const taskDueDate = task.dueDatetime ? new Date(task.dueDatetime) : new Date(task.dueDate);
+      const taskDate = new Date(taskDueDate);
+      taskDate.setHours(0, 0, 0, 0);
+      return taskDate.getTime() === today.getTime() && task.status !== 'inProgress';
+    });
+  }, [homeData?.todayTasks]);
+  const weeklyTasks = useMemo(() => homeData?.weeklyTasks || [], [homeData?.weeklyTasks]);
+  const allTasks = useMemo(() => homeData?.allTasks || [], [homeData?.allTasks]);
+  const inProgressTasks = useMemo(() => homeData?.inProgressTasks || [], [homeData?.inProgressTasks]);
+  const futureTasks = useMemo(() => homeData?.futureTasks || [], [homeData?.futureTasks]);
+  
+  const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
 
   // 3. StartTask 뮤테이션 훅
   const { mutate: startTaskMutation } = useStartTask();
@@ -210,7 +225,12 @@ const HomePage = () => {
   };
 
   const handleAddTask = () => {
-    router.push('/create');
+    setIsCreateSheetOpen(true);
+  };
+
+  const handleCloseCreateSheet = () => {
+    setIsCreateSheetOpen(false);
+    refetch();
   };
 
   // 16. 탭 전환 처리
@@ -373,6 +393,7 @@ const HomePage = () => {
                       ignoredAlerts={task.ignoredAlerts}
                       resetAlerts={resetAlerts}
                       dueDatetime={task.dueDatetime}
+                      status={task.status}
                     />
                   ))}
                 </div>
@@ -448,6 +469,7 @@ const HomePage = () => {
                       ignoredAlerts={task.ignoredAlerts}
                       resetAlerts={resetAlerts}
                       dueDatetime={task.dueDatetime}
+                      status={task.status}
                     />
                   ))}
                 </div>
@@ -506,6 +528,7 @@ const HomePage = () => {
                       ignoredAlerts={task.ignoredAlerts}
                       resetAlerts={resetAlerts}
                       dueDatetime={task.dueDatetime}
+                      status={task.status}
                     />
                   ))}
                 </div>
@@ -567,6 +590,7 @@ const HomePage = () => {
                       ignoredAlerts={task.ignoredAlerts}
                       resetAlerts={resetAlerts}
                       dueDatetime={task.dueDatetime}
+                      status={task.status}
                     />
                   ))}
                 </div>
@@ -755,6 +779,11 @@ const HomePage = () => {
           onStart={handleStartTask}
         />
       )}
+      
+      <CreateTaskSheet
+        isOpen={isCreateSheetOpen}
+        onClose={handleCloseCreateSheet}
+      />
     </div>
   );
 };
