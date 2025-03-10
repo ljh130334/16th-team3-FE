@@ -61,7 +61,7 @@ export default function ActionStartDrawer({
       </Drawer>
       <button
         className="relative mb-[30px] text-gray-neutral"
-        onClick={() => router.push('/action/remind')}
+        onClick={() => router.push('/action/remind/203')}
       >
         나중에 할래요
       </button>

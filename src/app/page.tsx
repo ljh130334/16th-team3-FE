@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-
+import { useState } from 'react';
 export default function Home() {
   return (
     <div className="flex flex-col gap-8 p-4">
@@ -36,17 +36,17 @@ export default function Home() {
       <section>
         <h2 className="mb-4 text-lg font-bold">작은행동</h2>
         <div className="flex flex-col gap-2">
-          <Link href="/action/start/203">
+          <Link href="/action/start/220">
             <Button variant="hologram" className="w-full">
               작은행동 시작하기
             </Button>
           </Link>
-          <Link href="/action/remind/203">
+          <Link href="/action/remind/220">
             <Button variant="hologram" className="w-full">
               리마인더 설정
             </Button>
           </Link>
-          <Link href="/action/push/203">
+          <Link href="/action/push/220">
             <Button variant="hologram" className="w-full">
               푸시알림 수신 페이지
             </Button>

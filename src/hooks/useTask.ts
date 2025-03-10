@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-query';
 import { fetchTask, HoldOffRequestBody, patchTaskHoldOff } from '@/lib/task';
 import { TaskResponse } from '@/types/task';
+import { useRouter } from 'next/navigation';
 
 export const useTask = (
   taskId: string,
@@ -38,7 +39,11 @@ export const usePatchTaskHoldOff = (): UseMutationResult<
   Error,
   PatchParams
 > => {
+  const router = useRouter();
   return useMutation<any, Error, PatchParams>({
     mutationFn: ({ taskId, data }) => patchTaskHoldOff({ taskId, data }),
+    onSuccess: () => {
+      router.push('/home-page');
+    },
   });
 };

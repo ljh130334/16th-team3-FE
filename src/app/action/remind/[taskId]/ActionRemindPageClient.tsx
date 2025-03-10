@@ -1,29 +1,40 @@
 'use client';
 
 import { useState } from 'react';
-import { usePatchTaskHoldOff, useTaskDueDatetime } from '@/hooks/useTask';
+import {
+  usePatchTaskHoldOff,
+  useTask,
+  useTaskDueDatetime,
+} from '@/hooks/useTask';
+import { useRemindMutation } from '@/hooks/useRemind';
 
 import Header from './_component/Header';
 import TimesList from './_component/TimesList';
 import TaskDetails from './_component/TaskDetails';
 import CompleteButton from './_component/CompleteButton';
 import CountSelector from './_component/CountSelector';
+import { TaskResponse } from '@/types/task';
 
-export default function ActionRemindPageClient({ taskId }: { taskId: string }) {
+export default function ActionRemindPageClient({
+  initialTask,
+}: {
+  initialTask: TaskResponse;
+}) {
   const [reminderCount, setReminderCount] = useState(1);
   const [selectedInterval, setSelectedInterval] = useState(15);
-  const { mutate, error, data } = usePatchTaskHoldOff();
-  const { data: dueDatetime } = useTaskDueDatetime(taskId);
-
-  console.log(dueDatetime);
+  const { mutate } = usePatchTaskHoldOff();
+  // const { data: dueDatetime } = useTaskDueDatetime(initialTask.id.toString());
+  const { data, error, isLoading } = useTask(initialTask.id.toString(), {
+    initialData: initialTask,
+  });
 
   const handlePatch = () => {
     mutate({
-      taskId,
+      taskId: '220',
       data: {
         remindInterval: 15,
         remindCount: 1,
-        remindBaseTime: '2025-03-07T13:22:09.920Z',
+        remindBaseTime: '2025-03-07 13:22:09',
       },
     });
   };

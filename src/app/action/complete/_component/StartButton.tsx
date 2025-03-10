@@ -15,7 +15,7 @@ export default function StartButton() {
       <Button
         variant="primary"
         className="relative mb-4 w-full"
-        onClick={() => router.push('/action/start/209')}
+        onClick={() => router.push('/')}
       >
         뒤로가기
       </Button>

@@ -17,7 +17,7 @@ export default function CompleteButton({ onClick }: { onClick: () => void }) {
       <Button
         variant="primary"
         className="relative mb-4 w-full"
-        onClick={() => router.push('/action/push/209')}
+        onClick={() => router.push('/action/push/220')}
       >
         푸쉬알림가기
       </Button>

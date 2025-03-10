@@ -17,7 +17,7 @@ import EstimatedTimeInput from '../_components/estimatedTimeInput/EstimatedTimeI
 import BufferTime from '../_components/bufferTime/BufferTime';
 import TaskTypeInput from '../_components/taskTypeInput/TaskTypeInput';
 import { useMutation } from '@tanstack/react-query';
-
+import { useRouter } from 'next/navigation';
 type FormState = {
   task?: string;
   deadlineDate?: Date;
@@ -75,6 +75,7 @@ const ScheduledTaskCreate = () => {
 
   const { isMounted } = useMount();
 
+  const router = useRouter();
   const { mutate: createScheduledTaskMutation } = useMutation({
     mutationFn: async (data: ScheduledTaskType) => {
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/tasks/scheduled`, {
@@ -85,6 +86,9 @@ const ScheduledTaskCreate = () => {
         },
         body: JSON.stringify(data),
       });
+    },
+    onSuccess: () => {
+      router.push('/home-page');
     },
   });
 
