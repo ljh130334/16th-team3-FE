@@ -9,6 +9,7 @@ import TaskDetailSheet from '@/app/home-page/_components/TaskDetailSheet';
 import AllTaskItem from '@/app/home-page/_components/AllTaskItem';
 import InProgressTaskItem from '@/app/home-page/_components/InProgressTaskItem';
 import CreateTaskSheet from '@/app/home-page/_components/CreateTaskSheet';
+import { parseDateAndTime } from '@/utils/dateFormat';
 import { Task } from '@/types/task';
 import {
   useHomeData,
@@ -104,18 +105,18 @@ const HomePage = () => {
   // 6. 다른 페이지에서 돌아올 때 재진입으로 간주
   useEffect(() => {
     const handleRouteChange = (url: string) => {
-      // 다른 페이지에서 홈으로 돌아오는 경우 재진입으로 처리
       if (url === '/' || url === '/home') {
         setIsReentry(true);
+        // 타임아웃 시간을 늘려서 바텀시트가 표시될 시간 확보
         setTimeout(() => {
           setIsReentry(false);
-        }, 0);
+        }, 1000);
       }
     };
     window.addEventListener('popstate', () =>
       handleRouteChange(window.location.pathname),
     );
-
+  
     return () => {
       window.removeEventListener('popstate', () =>
         handleRouteChange(window.location.pathname),
@@ -126,17 +127,13 @@ const HomePage = () => {
   // 7. 세션 스토리지를 사용해 더 확실한 재진입 감지
   useEffect(() => {
     const isFirstVisit = sessionStorage.getItem('visited');
-
     if (isFirstVisit) {
-      // 이미 방문한 적이 있으면 재진입으로 간주
       setIsReentry(true);
-
-      // 일정 시간 후 재진입 상태 초기화
+      // 바텀시트 표시 후 상태 초기화 시간 조정
       setTimeout(() => {
         setIsReentry(false);
       }, 5000);
     } else {
-      // 첫 방문 시 세션 스토리지에 표시
       sessionStorage.setItem('visited', 'true');
       setIsReentry(false);
     }
@@ -152,12 +149,34 @@ const HomePage = () => {
     if (!isLoadingHome && allTasks.length > 0) {
       const now = new Date();
       return allTasks.filter((task) => {
-        const dueDate = new Date(task.dueDatetime);
-        return dueDate.getTime() < now.getTime() && task.status !== 'reflected';
+        let dueDate;
+        
+        if (task.dueDatetime) {
+          dueDate = new Date(task.dueDatetime);
+        }
+        else if (task.dueDate) {
+          dueDate = parseDateAndTime(task.dueDate, task.dueTime || '오후 11시 59분');
+        } 
+        else {
+          return false;
+        }
+        return dueDate.getTime() < now.getTime() && 
+               task.status !== 'reflected' && 
+               task.status !== 'completed';
       });
     }
     return [];
   }, [allTasks, isLoadingHome]);
+
+  // 앱 재진입과 만료된 작업 확인 연결
+  useEffect(() => {
+    // 재진입 상태이고, 만료된 작업이 있을 때 바텀시트 표시
+    if (isReentry && expiredTasks.length > 0) {
+      console.log('재진입 감지 및 만료된 작업 발견:', expiredTasks);
+      setExpiredTask(expiredTasks[0]);
+      setShowExpiredTaskSheet(true);
+    }
+  }, [isReentry, expiredTasks]);
 
   // 9. 앱 진입 시 마감 지난 태스크 확인
   useEffect(() => {
