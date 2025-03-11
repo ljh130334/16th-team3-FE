@@ -1,5 +1,3 @@
-// 이번주 할일 GET 처리
-
 import { NextRequest, NextResponse } from 'next/server';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -7,7 +5,24 @@ const AUTH_TOKEN = process.env.NEXT_PUBLIC_TEST_TOKEN_1! + process.env.NEXT_PUBL
 
 export async function GET(request: NextRequest) {
   try {
-    const response = await fetch(`${API_BASE_URL}/v1/tasks/current-week`, {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
+    const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    
+    const mondayOfThisWeek = new Date(today);
+    mondayOfThisWeek.setDate(today.getDate() - daysFromMonday);
+    mondayOfThisWeek.setHours(0, 0, 0, 0);
+    
+    const sundayOfThisWeek = new Date(mondayOfThisWeek);
+    sundayOfThisWeek.setDate(mondayOfThisWeek.getDate() + 6);
+    sundayOfThisWeek.setHours(23, 59, 59, 999);
+    
+    // URL에 쿼리 파라미터 추가
+    const url = new URL(`${API_BASE_URL}/v1/tasks/current-week`);
+    url.searchParams.append('startDate', mondayOfThisWeek.toISOString());
+    url.searchParams.append('endDate', sundayOfThisWeek.toISOString());
+    
+    const response = await fetch(url.toString(), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

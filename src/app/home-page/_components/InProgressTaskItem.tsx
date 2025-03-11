@@ -251,7 +251,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
           <div className="w-full bg-component-gray-secondary rounded-t-[28px] p-4 pt-10 flex flex-col items-center">
             <h2 className="t3 text-text-strong text-center">{task.title}</h2>
-            <p className="t3 text-text-strong text-center mb-2">이어서 몰입할까요?</p>
+            <p className="t3 text-text-strong text-center mb-2">하던 중이었어요. 이어서 몰입할까요?</p>
             <p className={`b3 ${isExpired ? 'text-red-500' : 'text-text-neutral'} text-center mb-7`}>
               {isExpired ? '마감 시간이 지났습니다' : `마감까지 ${remainingTime}`}
             </p>
@@ -275,8 +275,17 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
   );
 };
 
-// 시간 표시 컴포넌트
-const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: boolean }) => {
+// 일 포맷 시간 표시 컴포넌트 (n일 n시간 n분 형식)
+const DayFormatTimeDisplay = ({ time }: { time: string }) => {
+  return (
+    <span className="inline-flex items-center justify-center">
+      {time}
+    </span>
+  );
+};
+
+// 시:분:초 포맷 시간 표시 컴포넌트
+const HMSFormatTimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: boolean }) => {
   const splitTime = time.split(' ');
   const timeString = splitTime[0] || '00:00:00';
   const timeParts = timeString.split(':');
@@ -428,6 +437,14 @@ const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: bool
       {suffix && <span className="ml-1">{suffix}</span>}
     </span>
   );
+};
+
+const TimeDisplay = ({ time, isUrgent = false }: { time: string, isUrgent?: boolean }) => {
+  if (time.includes('일')) {
+    return <DayFormatTimeDisplay time={time} />;
+  } else {
+    return <HMSFormatTimeDisplay time={time} isUrgent={isUrgent} />;
+  }
 };
 
 export default InProgressTaskItem;

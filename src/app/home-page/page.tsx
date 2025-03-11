@@ -9,6 +9,7 @@ import TaskDetailSheet from '@/app/home-page/_components/TaskDetailSheet';
 import AllTaskItem from '@/app/home-page/_components/AllTaskItem';
 import InProgressTaskItem from '@/app/home-page/_components/InProgressTaskItem';
 import CreateTaskSheet from '@/app/home-page/_components/CreateTaskSheet';
+import { parseDateAndTime } from '@/utils/dateFormat';
 import { Task } from '@/types/task';
 import {
   useHomeData,
@@ -50,7 +51,33 @@ const HomePage = () => {
       return taskDate.getTime() === today.getTime() && task.status !== 'inProgress';
     });
   }, [homeData?.todayTasks]);
-  const weeklyTasks = useMemo(() => homeData?.weeklyTasks || [], [homeData?.weeklyTasks]);
+  // 이번주 할일 정의: 월~일 기준, 오늘 제외한 이번주 남은 날에 마감되는 할일
+  const weeklyTasks = useMemo(() => {
+    const tasks = homeData?.weeklyTasks || [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // 이번주의 월요일 찾기
+    const mondayOfThisWeek = new Date(today);
+    const dayOfWeek = today.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
+    const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // 일요일인 경우 이전 주의 월요일까지 거슬러 올라감
+    mondayOfThisWeek.setDate(today.getDate() - daysFromMonday);
+    
+    // 이번주의 일요일 찾기
+    const sundayOfThisWeek = new Date(mondayOfThisWeek);
+    sundayOfThisWeek.setDate(mondayOfThisWeek.getDate() + 6);
+    
+    return tasks.filter(task => {
+      const taskDueDate = task.dueDatetime ? new Date(task.dueDatetime) : new Date(task.dueDate);
+      const taskDate = new Date(taskDueDate);
+      taskDate.setHours(0, 0, 0, 0);
+      
+      // 오늘을 제외한 이번주 남은 날에 마감되는 할일만 포함
+      return taskDate.getTime() > today.getTime() && 
+             taskDate.getTime() <= sundayOfThisWeek.getTime() &&
+             task.status !== 'inProgress';
+    });
+  }, [homeData?.weeklyTasks]);
   const allTasks = useMemo(() => homeData?.allTasks || [], [homeData?.allTasks]);
   const inProgressTasks = useMemo(() => homeData?.inProgressTasks || [], [homeData?.inProgressTasks]);
   const futureTasks = useMemo(() => homeData?.futureTasks || [], [homeData?.futureTasks]);
@@ -78,18 +105,18 @@ const HomePage = () => {
   // 6. 다른 페이지에서 돌아올 때 재진입으로 간주
   useEffect(() => {
     const handleRouteChange = (url: string) => {
-      // 다른 페이지에서 홈으로 돌아오는 경우 재진입으로 처리
       if (url === '/' || url === '/home') {
         setIsReentry(true);
+        // 타임아웃 시간을 늘려서 바텀시트가 표시될 시간 확보
         setTimeout(() => {
           setIsReentry(false);
-        }, 0);
+        }, 1000);
       }
     };
     window.addEventListener('popstate', () =>
       handleRouteChange(window.location.pathname),
     );
-
+  
     return () => {
       window.removeEventListener('popstate', () =>
         handleRouteChange(window.location.pathname),
@@ -100,17 +127,13 @@ const HomePage = () => {
   // 7. 세션 스토리지를 사용해 더 확실한 재진입 감지
   useEffect(() => {
     const isFirstVisit = sessionStorage.getItem('visited');
-
     if (isFirstVisit) {
-      // 이미 방문한 적이 있으면 재진입으로 간주
       setIsReentry(true);
-
-      // 일정 시간 후 재진입 상태 초기화
+      // 바텀시트 표시 후 상태 초기화 시간 조정
       setTimeout(() => {
         setIsReentry(false);
       }, 5000);
     } else {
-      // 첫 방문 시 세션 스토리지에 표시
       sessionStorage.setItem('visited', 'true');
       setIsReentry(false);
     }
@@ -126,12 +149,34 @@ const HomePage = () => {
     if (!isLoadingHome && allTasks.length > 0) {
       const now = new Date();
       return allTasks.filter((task) => {
-        const dueDate = new Date(task.dueDatetime);
-        return dueDate.getTime() < now.getTime() && task.status !== 'reflected';
+        let dueDate;
+        
+        if (task.dueDatetime) {
+          dueDate = new Date(task.dueDatetime);
+        }
+        else if (task.dueDate) {
+          dueDate = parseDateAndTime(task.dueDate, task.dueTime || '오후 11시 59분');
+        } 
+        else {
+          return false;
+        }
+        return dueDate.getTime() < now.getTime() && 
+               task.status !== 'reflected' && 
+               task.status !== 'completed';
       });
     }
     return [];
   }, [allTasks, isLoadingHome]);
+
+  // 앱 재진입과 만료된 작업 확인 연결
+  useEffect(() => {
+    // 재진입 상태이고, 만료된 작업이 있을 때 바텀시트 표시
+    if (isReentry && expiredTasks.length > 0) {
+      console.log('재진입 감지 및 만료된 작업 발견:', expiredTasks);
+      setExpiredTask(expiredTasks[0]);
+      setShowExpiredTaskSheet(true);
+    }
+  }, [isReentry, expiredTasks]);
 
   // 9. 앱 진입 시 마감 지난 태스크 확인
   useEffect(() => {
@@ -401,7 +446,7 @@ const HomePage = () => {
                 <div>
                   <button
                     className="flex w-full items-center justify-between rounded-[20px] bg-component-gray-secondary px-4 py-4"
-                    onClick={() => router.push('/weekly-tasks')}
+                    onClick={() => router.push('/home-page/weekly-tasks')}
                   >
                     <span className="s2 text-text-neutral">이번주 할일</span>
                     <Image
