@@ -51,6 +51,11 @@ export default function Home() {
               푸시알림 수신 페이지
             </Button>
           </Link>
+          <Link href="/immersion/272">
+            <Button variant="hologram" className="w-full">
+              몰입 페이지
+            </Button>
+          </Link>
         </div>
       </section>
     </div>
