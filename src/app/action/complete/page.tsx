@@ -2,14 +2,15 @@
 
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { Badge } from '@/components/component/Badge';
+import { formatKoreanDateTime } from '@/utils/dateFormat';
 import { useTaskProgressStore } from '@/store/useTaskStore';
 
 import Header from './_component/Header';
 import PhotoCard from './_component/PhotoCard';
 import CharacterMotivation from './_component/CharacterMotivation';
 import StartButton from './_component/StartButton';
-import { formatKoreanDateTime } from '@/utils/dateFormat';
+import { Badge } from '@/components/component/Badge';
+
 export default function Complete() {
   const [capturedImage, setCapturedImage] = useState<string>('');
   const currentTask = useTaskProgressStore((state) => state.currentTask);
@@ -39,7 +40,7 @@ export default function Complete() {
           <Badge>작은 행동</Badge>
         </div>
       </div>
-      <StartButton />
+      <StartButton currentTaskId={currentTask?.id?.toString() ?? ''} />
     </div>
   );
 }
