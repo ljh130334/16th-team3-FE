@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { TaskResponse } from '@/types/task';
-import { useTask } from '@/hooks/useTask';
+import { usePatchTaskStatus, useTask } from '@/hooks/useTask';
 import Countdown from '@/components/countdown/countdown';
 
 interface Props {
@@ -18,6 +18,8 @@ export default function ImmersionPageClient({ initialTask }: Props) {
   const { data, error, isLoading } = useTask(initialTask.id.toString(), {
     initialData: initialTask,
   });
+
+  const { mutate: patchTaskStatus } = usePatchTaskStatus();
 
   return (
     <div className="flex h-screen flex-col bg-background-primary">
@@ -46,7 +48,12 @@ export default function ImmersionPageClient({ initialTask }: Props) {
         <Button
           variant="primary"
           className="relative mb-4 w-full"
-          onClick={() => router.push(`/immersion/complete/${data?.id}`)}
+          onClick={() =>
+            patchTaskStatus({
+              taskId: data?.id?.toString() ?? '',
+              status: 'COMPLETE',
+            })
+          }
         >
           다했어요!
         </Button>
