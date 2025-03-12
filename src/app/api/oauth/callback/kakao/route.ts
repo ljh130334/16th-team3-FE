@@ -15,16 +15,20 @@ export async function POST(req: NextRequest) {
     const deviceId = '0f365b39-c33d-39be-bdfc-74aaf55'; // ! TODO: 기기 id 동적 처리
     const deviceType = 'IOS'; // ! TODO: 기기 타입 동적 처리
 
-    const oauthResponse = await fetch('https://app.spurt.site/v1/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        authCode,
-        provider: 'KAKAO',
-        deviceId,
-        deviceType,
-      }),
-    });
+    // * AccessToken을 headers에 담아서 보내는 요청이 아니어서 fetch를 사용함.
+    const oauthResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/v1/auth/login`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          authCode,
+          provider: 'KAKAO',
+          deviceId,
+          deviceType,
+        }),
+      },
+    );
 
     if (!oauthResponse.ok) {
       const errorData = await oauthResponse.json();
@@ -37,6 +41,7 @@ export async function POST(req: NextRequest) {
     const data = await oauthResponse.json();
     const accessToken = data.jwtTokenDto.accessToken;
     const refreshToken = data.jwtTokenDto.refreshToken;
+    const userData = data.memberInfo;
 
     if (!accessToken || !refreshToken) {
       return NextResponse.json(
@@ -47,11 +52,11 @@ export async function POST(req: NextRequest) {
 
     const nextResponse = NextResponse.json({
       success: true,
-      message: 'Tokens stored in cookies',
+      userData: userData,
     });
 
     nextResponse.cookies.set('accessToken', accessToken, {
-      httpOnly: true,
+      httpOnly: false,
       secure: true,
       sameSite: 'none',
       path: '/',

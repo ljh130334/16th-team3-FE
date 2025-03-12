@@ -73,6 +73,7 @@ const ScheduledTaskCreate = () => {
       ? funnel.historySteps[funnel.historySteps.length - 2].step
       : undefined;
 
+  const router = useRouter();
   const { isMounted } = useMount();
 
   const router = useRouter();
@@ -88,7 +89,10 @@ const ScheduledTaskCreate = () => {
       });
     },
     onSuccess: () => {
-      router.push('/home-page');
+      router.push(`/home-page?dialog=success&task=${funnel.context.task}`);
+    },
+    onError: (error) => {
+      console.error('Error creating scheduled task:', error);
     },
   });
 
@@ -126,6 +130,8 @@ const ScheduledTaskCreate = () => {
         estimatedMinute: funnel.context.estimatedMinute,
         estimatedDay: funnel.context.estimatedDay,
       } as BufferTimeType);
+    } else {
+      router.push('/home-page');
     }
   };
 
