@@ -122,6 +122,10 @@ const HomePageContent = () => {
   const searchParams = useSearchParams();
   const [taskName, setTaskName] = useState('');
 
+  const handleNavigateToMyPage = () => {
+    router.push("/my-page");
+  };
+
   // 6. 다른 페이지에서 돌아올 때 재진입으로 간주
   useEffect(() => {
     const handleRouteChange = (url: string) => {
@@ -407,13 +411,14 @@ const HomePageContent = () => {
               priority
               className="w-[50px]"
             />
-            <Image
-              src="/icons/home/mypage.svg"
-              alt="My Page"
-              width={20}
-              height={20}
-              className="h-[19px] w-[20px]"
+            <button onClick={handleNavigateToMyPage}>
+            <Image 
+              src="/icons/home/mypage.svg" 
+              alt="마이페이지" 
+              width={20} 
+              height={20} 
             />
+          </button>
           </div>
           <div className="px-[20px] py-[11px]">
             <div className="flex space-x-4">
