@@ -73,7 +73,6 @@ const ScheduledTaskCreate = () => {
       ? funnel.historySteps[funnel.historySteps.length - 2].step
       : undefined;
 
-  const router = useRouter();
   const { isMounted } = useMount();
 
   const router = useRouter();
