@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
 import ActionCard from './ActionCard';
-
+import { TaskResponse } from '@/types/task';
 const PushScreenState = {
   INITIAL: 'initial',
   SECOND_CHANCE: 'second',
@@ -19,8 +19,12 @@ type PushScreenStateType =
 
 export default function PushActionDrawer({
   screenState,
+  task,
+  onTakePicture,
 }: {
   screenState: PushScreenStateType;
+  task: TaskResponse;
+  onTakePicture: () => void;
 }) {
   return (
     <Drawer>
@@ -54,9 +58,13 @@ export default function PushActionDrawer({
           <ActionCard
             variant="drawer"
             badgeText="작은 행동"
-            actionText="책상에서 피그마 프로그램 켜기"
+            actionText={task.triggerAction}
           />
-          <Button variant="primary" className="relative mb-4 mt-7 w-full">
+          <Button
+            variant="primary"
+            className="relative mb-4 mt-7 w-full"
+            onClick={onTakePicture}
+          >
             사진찍기
           </Button>
         </div>

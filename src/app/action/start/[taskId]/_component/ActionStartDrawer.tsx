@@ -9,17 +9,20 @@ import {
 import { Button } from '@/components/ui/button';
 import ActionCard from './ActionCard';
 import TimerBadge from './TimerBadge';
+import Link from 'next/link';
 
 interface ActionStartDrawerProps {
   onTakePicture: () => void;
   smallActionTitle?: string;
   dueDate?: string;
+  taskId?: string;
 }
 
 export default function ActionStartDrawer({
   onTakePicture,
   smallActionTitle,
   dueDate,
+  taskId,
 }: ActionStartDrawerProps) {
   const router = useRouter();
   return (
@@ -59,12 +62,12 @@ export default function ActionStartDrawer({
           </div>
         </DrawerContent>
       </Drawer>
-      <button
+      <Link
+        href={`/action/remind/${taskId}`}
         className="relative mb-[30px] text-gray-neutral"
-        onClick={() => router.push('/action/remind')}
       >
         나중에 할래요
-      </button>
+      </Link>
     </div>
   );
 }

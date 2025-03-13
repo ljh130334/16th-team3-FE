@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { usePatchTaskHoldOff, useTaskDueDatetime } from '@/hooks/useTask';
+import { usePatchTaskHoldOff, useTask } from '@/hooks/useTask';
+import { TaskResponse } from '@/types/task';
 
 import Header from './_component/Header';
 import TimesList from './_component/TimesList';
@@ -9,70 +10,97 @@ import TaskDetails from './_component/TaskDetails';
 import CompleteButton from './_component/CompleteButton';
 import CountSelector from './_component/CountSelector';
 
-export default function ActionRemindPageClient({ taskId }: { taskId: string }) {
-  const [reminderCount, setReminderCount] = useState(1);
-  const [selectedInterval, setSelectedInterval] = useState(15);
-  const { mutate, error, data } = usePatchTaskHoldOff();
-  const { data: dueDatetime } = useTaskDueDatetime(taskId);
+const REMINDER_LIMITS = {
+  MIN: 1,
+  MAX: 3,
+} as const;
 
-  console.log(dueDatetime);
+const DEFAULT_VALUES = {
+  INTERVAL: 15,
+  COUNT: 1,
+} as const;
+
+interface ReminderTime {
+  index: number;
+  time: string;
+}
+
+interface ActionRemindPageClientProps {
+  initialTask: TaskResponse;
+}
+
+const calculateReminderTimes = (
+  count: number,
+  interval: number,
+): ReminderTime[] => {
+  const now = new Date();
+  return Array.from({ length: count }, (_, i) => {
+    const time = new Date(now.getTime() + interval * 60000 * (i + 1));
+    const hours = time.getHours();
+    const minutes = time.getMinutes();
+    const period = hours >= 12 ? '오후' : '오전';
+    const displayHours = hours > 12 ? hours - 12 : hours;
+
+    return {
+      index: i + 1,
+      time: `${period} ${displayHours}:${minutes.toString().padStart(2, '0')}`,
+    };
+  });
+};
+
+// 리마인더 카운트 관리 커스텀 훅
+const useReminderCount = (initialCount: number = DEFAULT_VALUES.COUNT) => {
+  const [count, setCount] = useState(initialCount);
+
+  const handleCountChange = (action: 'increase' | 'decrease') => {
+    setCount((prev) => {
+      if (action === 'increase' && prev < REMINDER_LIMITS.MAX) return prev + 1;
+      if (action === 'decrease' && prev > REMINDER_LIMITS.MIN) return prev - 1;
+      return prev;
+    });
+  };
+
+  return { count, handleCountChange };
+};
+
+export default function ActionRemindPageClient({
+  initialTask,
+}: ActionRemindPageClientProps) {
+  const { count, handleCountChange } = useReminderCount();
+  const [selectedInterval, setSelectedInterval] = useState<number>(
+    DEFAULT_VALUES.INTERVAL,
+  );
+  const { mutate } = usePatchTaskHoldOff();
+  const { data } = useTask(initialTask.id.toString(), {
+    initialData: initialTask,
+  });
 
   const handlePatch = () => {
     mutate({
-      taskId,
+      taskId: data?.id.toString() ?? '',
       data: {
-        remindInterval: 15,
-        remindCount: 1,
-        remindBaseTime: '2025-03-07T13:22:09.920Z',
+        remindInterval: selectedInterval,
+        remindCount: count,
+        remindBaseTime: new Date().toISOString(),
       },
     });
   };
 
-  // 리마인더 시간 계산 함수
-  const calculateReminderTimes = () => {
-    const times = [];
-    const now = new Date();
-
-    for (let i = 0; i < reminderCount; i++) {
-      const time = new Date(now.getTime() + selectedInterval * 60000 * (i + 1));
-      const hours = time.getHours();
-      const minutes = time.getMinutes();
-      const period = hours >= 12 ? '오후' : '오전';
-      const displayHours = hours > 12 ? hours - 12 : hours;
-
-      times.push({
-        index: i + 1,
-        time: `${period} ${displayHours}:${minutes.toString().padStart(2, '0')}`,
-      });
-    }
-    return times;
-  };
-
-  // 리마인더 갯수 조절 함수
-  const handleReminderCount = (action: 'increase' | 'decrease') => {
-    if (action === 'increase' && reminderCount < 3) {
-      setReminderCount((prev) => prev + 1);
-    } else if (action === 'decrease' && reminderCount > 1) {
-      setReminderCount((prev) => prev - 1);
-    }
-  };
-
-  const reminderTimes = calculateReminderTimes();
+  const reminderTimes = calculateReminderTimes(count, selectedInterval);
 
   return (
     <>
-      <Header maxNotificationCount={3} />
-
+      <Header maxNotificationCount={REMINDER_LIMITS.MAX} />
       <TaskDetails
-        taskName="디자인포트폴리오 점검하기"
+        taskName={data?.name ?? ''}
         remainingTime="4시간"
         selectedInterval={selectedInterval}
-        onIntervalChange={(newInterval) => setSelectedInterval(newInterval)}
+        onIntervalChange={setSelectedInterval}
       />
       <CountSelector
-        count={reminderCount}
-        onIncrease={() => handleReminderCount('increase')}
-        onDecrease={() => handleReminderCount('decrease')}
+        count={count}
+        onIncrease={() => handleCountChange('increase')}
+        onDecrease={() => handleCountChange('decrease')}
       />
       <TimesList times={reminderTimes} />
       <CompleteButton onClick={handlePatch} />
