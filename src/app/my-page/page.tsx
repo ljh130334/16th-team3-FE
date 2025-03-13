@@ -7,14 +7,17 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserStore } from "@/store/useUserStore";
 import ProfileImage from "@/components/ProfileImage";
+import { api } from '@/lib/ky';
 
 export default function MyPage() {
   const router = useRouter();
   const { logout, isLoading, loadUserProfile } = useAuth();
   const userData = useUserStore((state) => state.userData);
+  const clearUser = useUserStore((state) => state.clearUser);
   const [appVersion] = useState("V.0.0.1");
   const [pageLoading, setPageLoading] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
 
   useEffect(() => {
     const initPage = async () => {
@@ -42,13 +45,56 @@ export default function MyPage() {
   };
 
   const confirmLogout = async () => {
-    await logout();
-    setShowLogoutModal(false);
-    router.push('/login');
+    try {
+      console.log('로그아웃 함수 호출 시작');
+      await logout();
+      console.log('로그아웃 함수 호출 완료');
+      setShowLogoutModal(false);
+      router.push('/login');
+    } catch (error) {
+      console.error('로그아웃 중 오류 발생:', error);
+      setShowLogoutModal(false);
+    }
   };
 
   const cancelLogout = () => {
     setShowLogoutModal(false);
+  };
+
+  const handleWithdraw = () => {
+    setShowWithdrawModal(true);
+  };
+
+  const confirmWithdraw = async () => {
+    try {
+      console.log('회원 탈퇴 함수 호출 시작');
+      // 회원 탈퇴 API 호출
+      const response = await api.post('v1/auth/withdraw');
+      console.log('회원 탈퇴 성공');
+      
+      // 쿠키 삭제
+      document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; httpOnly; secure; sameSite=none;";
+      
+      // 사용자 정보 초기화
+      clearUser();
+      console.log('회원 탈퇴 함수 호출 완료');
+      
+      setShowWithdrawModal(false);
+      // 로그인 페이지로 리다이렉트
+      router.push('/login');
+    } catch (error) {
+      console.error('회원 탈퇴 중 오류 발생:', error);
+      
+      // API 실패해도 로그아웃 처리는 진행
+      clearUser();
+      setShowWithdrawModal(false);
+      router.push('/login');
+    }
+  };
+
+  const cancelWithdraw = () => {
+    setShowWithdrawModal(false);
   };
 
   const showLoading = pageLoading;
@@ -153,7 +199,10 @@ export default function MyPage() {
 
       {/* 탈퇴하기 */}
       <div className="px-5">
-        <button className="b2 text-gray-normal w-full text-left pt-6 pb-4 text-base">
+        <button 
+          onClick={handleWithdraw}
+          className="b2 text-gray-normal w-full text-left pt-6 pb-4 text-base"
+        >
           탈퇴하기
         </button>
       </div>
@@ -180,6 +229,33 @@ export default function MyPage() {
                   className="l1 flex-1 p-[13.5px] bg-component-accent-primary text-gray-strong rounded-[12px]"
                 >
                   로그아웃
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 탈퇴하기 확인 모달 */}
+      {showWithdrawModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-component-gray-secondary rounded-[24px] w-[90%] max-w-md overflow-hidden">
+            <div className="pt-6 p-4 text-center">
+              <h3 className="t3 text-gray-normal">탈퇴하기</h3>
+              <p className="b3 text-gray-neutral mb-5">정말 탈퇴 하시겠어요?</p>
+              
+              <div className="flex space-x-4">
+                <button
+                  onClick={cancelWithdraw}
+                  className="l1 flex-1 p-[13.5px] bg-component-gray-tertiary text-gray-neutral rounded-[12px]"
+                >
+                  닫기
+                </button>
+                <button
+                  onClick={confirmWithdraw}
+                  className="l1 flex-1 p-[13.5px] bg-component-accent-primary text-gray-strong rounded-[12px]"
+                >
+                  탈퇴하기
                 </button>
               </div>
             </div>

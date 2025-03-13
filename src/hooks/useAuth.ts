@@ -6,11 +6,11 @@ import { api } from '@/lib/ky';
 import { User } from '@/types/user';
 import { useUserStore } from '@/store/useUserStore';
 
-// 인증 컨텍스트 타입 정의
 type AuthContextType = {
   isLoading: boolean;
   isAuthenticated: boolean;
   logout: () => Promise<void>;
+  withdraw: () => Promise<void>;
   loadUserProfile: () => Promise<void>;
 };
 
@@ -18,6 +18,7 @@ const defaultValue: AuthContextType = {
   isLoading: true,
   isAuthenticated: false,
   logout: async () => {},
+  withdraw: async () => {},
   loadUserProfile: async () => {},
 };
 
@@ -49,6 +50,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // 쿠키 및 사용자 정보 초기화 함수
+  const clearAuthData = () => {
+    // 쿠키 삭제
+    document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; httpOnly; secure; sameSite=none;";
+    
+    clearUser();
+  };
+
   // 컴포넌트 마운트 시 사용자 정보 로드 
   useEffect(() => {
     const checkAuth = async () => {
@@ -63,21 +73,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     checkAuth();
   }, []);
-
-  // 로그아웃 함수 - 개선된 버전
+  
   const logout = async () => {
     try {
       // 로그아웃 API 호출
       const response = await api.post('v1/auth/logout');
-      
       console.log('로그아웃 성공');
       
-      // 쿠키 삭제
-      document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; httpOnly; secure; sameSite=none;";
-      
-      // 사용자 정보 초기화
-      clearUser();
+      clearAuthData();
       
       // 로그인 페이지로 리다이렉트
       router.push('/login');
@@ -85,7 +88,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('로그아웃 중 오류 발생:', error);
       
       // API 실패해도 로컬 로그아웃 처리
-      clearUser();
+      clearAuthData();
+      router.push('/login');
+    }
+  };
+
+  const withdraw = async () => {
+    try {
+      // 회원 탈퇴 API 호출
+      const response = await api.post('v1/auth/withdraw');
+      console.log('회원 탈퇴 성공');
+      
+      clearAuthData();
+      
+      // 로그인 페이지로 리다이렉트
+      router.push('/login');
+    } catch (error) {
+      console.error('회원 탈퇴 중 오류 발생:', error);
+      
+      // API 실패해도 로컬 로그아웃
+      clearAuthData();
       router.push('/login');
     }
   };
@@ -97,6 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         isAuthenticated,
         logout,
+        withdraw,
         loadUserProfile
       }
     },

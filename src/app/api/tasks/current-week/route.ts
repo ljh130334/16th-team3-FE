@@ -1,12 +1,21 @@
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-const AUTH_TOKEN = process.env.NEXT_PUBLIC_TEST_TOKEN_1! + process.env.NEXT_PUBLIC_TEST_TOKEN_2!;
 
 export async function GET(request: NextRequest) {
   try {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get('accessToken')?.value;
+    
+    if (!accessToken) {
+      return NextResponse.json(
+        { error: '인증 토큰이 없습니다. 로그인이 필요합니다.' },
+        { status: 401 }
+      );
+    }
+
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
     const today = new Date();
-    const dayOfWeek = today.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
+    const dayOfWeek = today.getDay();
     const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
     
     const mondayOfThisWeek = new Date(today);
@@ -22,11 +31,12 @@ export async function GET(request: NextRequest) {
     url.searchParams.append('startDate', mondayOfThisWeek.toISOString());
     url.searchParams.append('endDate', sundayOfThisWeek.toISOString());
     
+    // 사용자 토큰으로 API 요청
     const response = await fetch(url.toString(), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${AUTH_TOKEN}`
+        'Authorization': `Bearer ${accessToken}`
       },
       next: { 
         revalidate: 60 

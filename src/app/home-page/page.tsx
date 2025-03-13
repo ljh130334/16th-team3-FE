@@ -554,7 +554,7 @@ const HomePageContent = () => {
                   <div>
                     <button
                       className="flex w-full items-center justify-between rounded-[20px] bg-component-gray-secondary px-4 py-4"
-                      onClick={() => router.push('/weekly-tasks')}
+                      onClick={() => router.push('/home-page/weekly-tasks')}
                     >
                       <span className="s2 text-text-neutral">이번주 할일</span>
                       <Image
@@ -597,7 +597,7 @@ const HomePageContent = () => {
                   <div>
                     <button
                       className="flex w-full items-center justify-between rounded-[20px] bg-component-gray-secondary px-4 py-4"
-                      onClick={() => router.push('/weekly-tasks')}
+                      onClick={() => router.push('/home-page/weekly-tasks')}
                     >
                       <span className="s2 text-text-neutral">이번주 할일</span>
                       <Image
@@ -657,7 +657,7 @@ const HomePageContent = () => {
                   <div>
                     <button
                       className="flex w-full items-center justify-between px-4 py-4"
-                      onClick={() => router.push('/weekly-tasks')}
+                      onClick={() => router.push('/home-page/weekly-tasks')}
                     >
                       <span className="s2 text-text-neutral">
                         이번주 할일 더보기
