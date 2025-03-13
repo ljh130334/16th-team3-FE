@@ -15,6 +15,7 @@ const KakaoTalk = () => {
   const loginMutation = async (authCode: string) => {
     const response = await fetch('/api/oauth/callback/kakao', {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ authCode }),
     }).then((res) => res.json());
 
@@ -34,7 +35,7 @@ const KakaoTalk = () => {
 
   return (
     <div>
-      <span>로그인 중...</span>
+      <span>카카오 로그인 중...</span>
     </div>
   );
 };
