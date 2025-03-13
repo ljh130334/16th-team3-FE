@@ -19,7 +19,7 @@ const KakaoTalk = () => {
     }).then((res) => res.json());
 
     if (response.success) {
-      router.push('/');
+      router.push('/home-page');
       setUser(response.userData);
     } else {
       console.error('Failed to login');
