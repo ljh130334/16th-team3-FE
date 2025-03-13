@@ -11,30 +11,57 @@ type AuthContextType = {
   isLoading: boolean;
   isAuthenticated: boolean;
   logout: () => Promise<void>;
+  loadUserProfile: () => Promise<void>;
 };
 
-// 기본값 생성
 const defaultValue: AuthContextType = {
   isLoading: true,
   isAuthenticated: false,
   logout: async () => {},
+  loadUserProfile: async () => {},
 };
 
-// 컨텍스트 생성
 const AuthContext = createContext<AuthContextType>(defaultValue);
 
-// 인증 제공자 컴포넌트
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
+  const userData = useUserStore((state) => state.userData);
+  const setUser = useUserStore((state) => state.setUser);
+  const clearUser = useUserStore((state) => state.clearUser);
   
-  // useUserStore에서 사용자 정보 가져오기
-  const { userData, clearUser } = useUserStore();
   const isAuthenticated = userData && userData.memberId !== -1;
 
-  // 초기 로딩 상태 설정
+  const loadUserProfile = async () => {
+    try {
+      setIsLoading(true);
+      const response = await api.get('v1/members/me').json<User>();
+      console.log('사용자 프로필 로드 성공:', response);
+      
+      setUser(response);
+    } catch (error) {
+      console.error('사용자 정보 로드 중 오류:', error);
+      clearUser();
+      // 인증 오류시 로그인 페이지로 리다이렉트
+      router.push('/login');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 컴포넌트 마운트 시 사용자 정보 로드 
   useEffect(() => {
-    setIsLoading(false);
+    const checkAuth = async () => {
+      try {
+        await loadUserProfile();
+      } catch (error) {
+        console.error('인증 확인 중 오류:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
   // 로그아웃 함수
@@ -56,21 +83,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // createElement를 사용하여 JSX 없이 구현
   return React.createElement(
     AuthContext.Provider,
     {
       value: {
         isLoading,
         isAuthenticated,
-        logout
+        logout,
+        loadUserProfile
       }
     },
     children
   );
 }
 
-// 인증 훅
 export function useAuth(): AuthContextType {
   return useContext(AuthContext);
 }

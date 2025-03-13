@@ -6,64 +6,37 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserStore } from "@/store/useUserStore";
+import ProfileImage from "@/components/ProfileImage";
 
 export default function MyPage() {
   const router = useRouter();
-  const { logout, isLoading } = useAuth();
-  // 선택자 패턴을 사용하여 최신 상태를 가져옵니다
+  const { logout, isLoading, loadUserProfile } = useAuth();
   const userData = useUserStore((state) => state.userData);
   const [appVersion] = useState("V.0.0.1");
-  const [imageError, setImageError] = useState(false);
-  const [componentMounted, setComponentMounted] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
 
-  // 컴포넌트 마운트 시 상태 확인
   useEffect(() => {
-    setComponentMounted(true);
-    console.log('마이페이지 컴포넌트 마운트됨, userData:', userData);
+    const initPage = async () => {
+      // 사용자 데이터가 없으면 로드 시도
+      if (userData.memberId === -1) {
+        try {
+          await loadUserProfile();
+        } catch (error) {
+          console.error("사용자 정보 로드 실패:", error);
+        }
+      }
+      
+      setPageLoading(false);
+    };
+    
+    initPage();
   }, []);
-
-  // userData가 변경될 때 콘솔에 출력
-  useEffect(() => {
-    if (componentMounted) {
-      console.log('userData 변경됨:', userData);
-    }
-  }, [userData, componentMounted]);
   
   const handleGoBack = () => {
     router.push("/home-page");
   };
 
-  const handleImageError = () => {
-    console.log("이미지 로드 실패");
-    setImageError(true);
-  };
-
-  const renderProfileImage = () => {
-    if (imageError || !userData?.profileImageUrl) {
-      return (
-        <Image
-          src="/icons/mypage/default-profile.png"
-          alt="기본 프로필"
-          width={72}
-          height={72}
-          className="rounded-full"
-          onError={() => console.error("기본 이미지도 로드 실패")}
-        />
-      );
-    }
-
-    return (
-      <Image
-        src={userData.profileImageUrl}
-        alt="프로필 이미지"
-        width={72}
-        height={72}
-        className="rounded-full"
-        onError={handleImageError}
-        priority
-      />
-    );
-  };
+  const showLoading = pageLoading;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -81,7 +54,7 @@ export default function MyPage() {
       </div>
 
       {/* 프로필 정보 */}
-      {isLoading || !componentMounted ? (
+      {showLoading ? (
         <div className="flex flex-col items-center justify-center mt-[23px] mb-8">
           <div className="mb-[14px] w-20 h-20 rounded-full bg-gray-200 animate-pulse"></div>
           <div className="h-6 w-24 bg-gray-200 animate-pulse rounded"></div>
@@ -89,7 +62,13 @@ export default function MyPage() {
       ) : (
         <>
           <div className="flex flex-col items-center justify-center mt-[23px] mb-8">
-            <div className="mb-[14px]">{renderProfileImage()}</div>
+            <div className="mb-[14px]">
+              <ProfileImage 
+                imageUrl={userData?.profileImageUrl} 
+                width={72} 
+                height={72}
+              />
+            </div>
             <div className="t3 text-gray-normal">{userData?.nickname || "사용자"}</div>
           </div>
           <div className="flex flex-col items-start justify-start px-5 py-4">
@@ -98,7 +77,6 @@ export default function MyPage() {
         </>
       )}
 
-      {/* 나머지 코드는 동일 */}
       <div className="h-[8px] bg-component-gray-primary"></div>
 
       <div className="px-5">
@@ -164,8 +142,7 @@ export default function MyPage() {
           탈퇴하기
         </button>
       </div>
-
-      {/* 하단 여백 */}
+      
       <div className="h-12"></div>
     </div>
   );
