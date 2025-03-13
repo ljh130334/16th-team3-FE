@@ -42,7 +42,7 @@ const LoginPage = () => {
 
       const oauthResponse = await fetch('/api/oauth/callback/apple', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: JSON.stringify(response),
       });
 
@@ -55,8 +55,14 @@ const LoginPage = () => {
       const oauthData = JSON.parse(responseText);
 
       if (oauthData.success) {
-        router.push('/home-page');
         setUser(oauthData.userData);
+
+        if (oauthData.isNewUser) {
+          router.push('/onboarding');
+          return;
+        }
+
+        router.push('/home-page'); // TODO(prgmr99): Redirect to the home page('/')
       } else {
         console.error('Failed to login');
       }
@@ -113,11 +119,11 @@ const LoginPage = () => {
         >
           <Image
             src="/icons/login/kakao.svg"
-            alt="카카오"
+            alt="kakao"
             width={18}
             height={17}
           />
-          <span className="pt-0.5">카카오로 계속하기 1</span>
+          <span className="pt-0.5">카카오로 계속하기</span>
         </Button>
 
         <Button
@@ -127,11 +133,11 @@ const LoginPage = () => {
         >
           <Image
             src="/icons/login/apple.svg"
-            alt="애플"
+            alt="apple"
             width={15}
             height={19}
           />
-          <span className="pt-1">Apple로 계속하기 1</span>
+          <span className="pt-1">Apple로 계속하기</span>
         </Button>
       </div>
     </div>
