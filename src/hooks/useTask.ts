@@ -30,28 +30,34 @@ export interface StatusParams extends TaskMutationParams {
     | 'COMPLETE';
 }
 
-// 할일 조회
-export const useTask = (
-  taskId: string,
-  options?: Omit<UseQueryOptions<TaskResponse, Error>, 'queryKey' | 'queryFn'>,
-) => {
-  return useQuery<TaskResponse, Error>({
-    queryKey: ['task', taskId],
-    queryFn: () => fetchTask(taskId),
-    ...options,
-  });
-};
+// // 할일 조회
+// export const useTask = (
+//   taskId: string,
+//   accessToken: string,
+//   options?: Omit<UseQueryOptions<TaskResponse, Error>, 'queryKey' | 'queryFn'>,
+// ) => {
+//   return useQuery<TaskResponse, Error>({
+//     queryKey: ['task', taskId],
+//     queryFn: () => fetchTask(taskId, accessToken),
+//     ...options,
+//   });
+// };
 
-// 마감일 조회
-export const useTaskDueDatetime = (taskId: string) => {
-  return useQuery<string, Error>({
-    queryKey: ['taskDueDatetime', taskId],
-    queryFn: async () => {
-      const task = await fetchTask(taskId);
-      return task.dueDatetime;
-    },
-  });
-};
+// // 마감일 조회
+// export const useTaskDueDatetime = (
+//   taskId: string,
+//   accessToken: string,
+//   options?: Omit<UseQueryOptions<string, Error>, 'queryKey' | 'queryFn'>,
+// ) => {
+//   return useQuery<string, Error>({
+//     queryKey: ['taskDueDatetime', taskId],
+//     queryFn: async () => {
+//       const task = await fetchTask(taskId, accessToken);
+//       return task.dueDatetime;
+//     },
+//     ...options,
+//   });
+// };
 
 // 할일 보류 요청
 export const usePatchTaskHoldOff = (): UseMutationResult<
@@ -60,9 +66,13 @@ export const usePatchTaskHoldOff = (): UseMutationResult<
   HoldOffParams
 > => {
   const router = useRouter();
+  console.log('usePatchTaskHoldOff');
   return useMutation<TaskResponse, Error, HoldOffParams>({
-    mutationFn: ({ taskId, data }) => patchTaskHoldOff({ taskId, data }),
-    onSuccess: () => {
+    mutationFn: ({ taskId, data }) => {
+      return patchTaskHoldOff({ taskId, data });
+    },
+    onSuccess: (data) => {
+      console.log('usePatchTaskHoldOff onSuccess', data);
       router.push('/home-page');
     },
   });

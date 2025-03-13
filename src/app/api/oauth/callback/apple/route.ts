@@ -1,13 +1,17 @@
+import { AppleAuthorizationResponse } from '@/types/auth';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { authCode } = body;
+    const body: AppleAuthorizationResponse = await req.json();
+    const {
+      authorization: { code, id_token },
+      user,
+    } = body;
 
-    if (!authCode) {
+    if (!code || !id_token) {
       return NextResponse.json(
-        { error: 'Authorization code is required' },
+        { error: 'Authorization code or id-token is missing' },
         { status: 400 },
       );
     }
@@ -15,15 +19,17 @@ export async function POST(req: NextRequest) {
     const deviceId = '0f365b39-c33d-39be-bdfc-74aaf55'; // ! TODO: 기기 id 동적 처리
     const deviceType = 'IOS'; // ! TODO: 기기 타입 동적 처리
 
-    // * AccessToken을 headers에 담아서 보내는 요청이 아니어서 fetch를 사용함.
     const oauthResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/v1/auth/login`,
+      `${process.env.NEXT_PUBLIC_API_URL}/v1/auth/login/apple`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          authCode,
-          provider: 'KAKAO',
+          authCode: code,
+          nickname: user?.name
+            ? `${user.name.lastName}${user.name.firstName}`
+            : null,
+          email: user?.email ? user.email : null,
           deviceId,
           deviceType,
         }),
@@ -59,7 +65,7 @@ export async function POST(req: NextRequest) {
 
     nextResponse.cookies.set('accessToken', accessToken, {
       httpOnly: false,
-      secure: false, // ! TODO: 앱 심사 받을 때, true로 변경
+      secure: true,
       sameSite: 'none',
       path: '/',
       maxAge: 60 * 60,
@@ -76,9 +82,6 @@ export async function POST(req: NextRequest) {
     return nextResponse;
   } catch (error) {
     console.error('Error in POST /auth:', error);
-    return NextResponse.json(
-      { error: 'Failed to process request' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: error }, { status: 500 });
   }
 }

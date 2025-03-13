@@ -2,6 +2,7 @@ import Image from 'next/image';
 import ActionRemindPageClient from './ActionRemindPageClient';
 import { fetchTask } from '@/lib/task';
 import { TaskResponse } from '@/types/task';
+import { cookies } from 'next/headers';
 
 export default async function Remind({
   params,
@@ -9,7 +10,14 @@ export default async function Remind({
   params: Promise<{ taskId: string }>;
 }) {
   const { taskId } = await params;
-  const task: TaskResponse = await fetchTask(taskId);
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('accessToken')?.value;
+
+  if (!accessToken) {
+    throw new Error('Access token is not found');
+  }
+
+  const task: TaskResponse = await fetchTask(taskId, accessToken);
   return (
     <div className="flex h-screen flex-col bg-background-primary">
       {/* TODO : 헤더 컴포넌트로 변경 예정 */}

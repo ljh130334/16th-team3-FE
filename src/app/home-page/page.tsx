@@ -20,6 +20,7 @@ import {
 
 import CharacterDialog from '../(create)/_components/characterDialog/CharacterDialog';
 import { Drawer } from '@/components/ui/drawer';
+import Loader from '@/components/loader/Loader';
 
 const HomePageContent = () => {
   // 1. 홈 API를 통해 모든 데이터 한번에 가져오기
@@ -354,7 +355,7 @@ const HomePageContent = () => {
   if (isLoadingHome) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background-primary">
-        <p className="text-text-normal">로딩 중...</p>
+        <Loader />
       </div>
     );
   }
@@ -396,10 +397,7 @@ const HomePageContent = () => {
     inProgressTasks.length === 0 && todayTasks.length > 0;
 
   return (
-    <Drawer
-      open={isDialogOpen && taskName !== ''}
-      onClose={() => setIsDialogOpen(false)}
-    >
+    <Drawer open={isDialogOpen && taskName !== ''}>
       <div className="flex min-h-screen flex-col bg-background-primary">
         <header className="fixed left-0 right-0 top-0 z-20 bg-background-primary">
           <div className="flex items-center justify-between px-[20px] py-[15px]">
@@ -901,7 +899,10 @@ const HomePageContent = () => {
           />
         )}
 
-        <CharacterDialog task={taskName} />
+        <CharacterDialog
+          task={taskName}
+          onClick={() => setIsDialogOpen(false)}
+        />
 
         <CreateTaskSheet
           isOpen={isCreateSheetOpen}

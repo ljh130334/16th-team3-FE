@@ -1,7 +1,6 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useTask } from '@/hooks/useTask';
 import { TaskResponse } from '@/types/task';
 import { formatKoreanDateTime } from '@/utils/dateFormat';
 import { useWebViewMessage } from '@/hooks/useWebViewMessage';
@@ -19,26 +18,22 @@ export default function ActionStartPageClient({ initialTask }: Props) {
   const router = useRouter();
   const { handleTakePicture } = useWebViewMessage(router);
 
-  const { data, error, isLoading } = useTask(initialTask.id.toString(), {
-    initialData: initialTask,
-  });
-
   return (
     <div className="flex h-screen flex-col gap-4 bg-background-primary">
       <ActionStartHeader />
       <div className="flex flex-col gap-4 px-5">
-        <ActionCard title={data?.triggerAction} />
+        <ActionCard title={initialTask?.triggerAction} />
         <ScheduleCard
-          title={data?.name}
-          dueDate={formatKoreanDateTime(data?.dueDatetime ?? '')}
+          title={initialTask?.name}
+          dueDate={formatKoreanDateTime(initialTask?.dueDatetime ?? '')}
         />
       </div>
 
       <ActionStartDrawer
         onTakePicture={handleTakePicture}
-        smallActionTitle={data?.triggerAction}
-        dueDate={data?.dueDatetime}
-        taskId={data?.id?.toString()}
+        smallActionTitle={initialTask?.triggerAction}
+        dueDate={initialTask?.dueDatetime}
+        taskId={initialTask?.id?.toString()}
       />
     </div>
   );
