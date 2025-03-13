@@ -32,7 +32,7 @@ const KakaoTalk = () => {
     if (authCode) {
       loginMutation(authCode);
     }
-  }, [authCode, loginMutation]);
+  }, [authCode]);
 
   return (
     <div className="flex h-screen items-center justify-center bg-background-primary px-5 py-12">
