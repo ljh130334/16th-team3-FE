@@ -3,6 +3,7 @@ import { TaskResponse } from '@/types/task';
 import { cookies } from 'next/headers';
 
 import ImmersionPageClient from './ImmersionPageClient';
+import { CurrentTimeProvider } from '@/provider/CurrentTimeProvider';
 
 export default async function Immersion({
   params,
@@ -18,5 +19,9 @@ export default async function Immersion({
     throw new Error('Access token is not found');
   }
   const task: TaskResponse = await fetchTask(taskId, accessToken);
-  return <ImmersionPageClient initialTask={task} />;
+  return (
+    <CurrentTimeProvider>
+      <ImmersionPageClient initialTask={task} />
+    </CurrentTimeProvider>
+  );
 }
