@@ -20,6 +20,8 @@ import { useMutation } from '@tanstack/react-query';
 import { api } from '@/lib/ky';
 
 import { useRouter } from 'next/navigation';
+import { api } from '@/lib/ky';
+
 type FormState = {
   task?: string;
   deadlineDate?: Date;
@@ -75,9 +77,9 @@ const ScheduledTaskCreate = () => {
       ? funnel.historySteps[funnel.historySteps.length - 2].step
       : undefined;
 
+  const router = useRouter();
   const { isMounted } = useMount();
 
-  const router = useRouter();
   const { mutate: createScheduledTaskMutation } = useMutation({
     mutationFn: async (data: ScheduledTaskType) => {
       await api.post(`v1/tasks/scheduled`, {

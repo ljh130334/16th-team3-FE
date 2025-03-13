@@ -1,5 +1,6 @@
 'use client';
 
+import Loader from '@/components/loader/Loader';
 import { useUserStore } from '@/store/useUserStore';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useCallback } from 'react';
@@ -12,22 +13,20 @@ const KakaoTalk = () => {
 
   const { setUser } = useUserStore();
 
-  const loginMutation = useCallback(
-    async (authCode: string) => {
-      const response = await fetch('/api/oauth/callback/kakao', {
-        method: 'POST',
-        body: JSON.stringify({ authCode }),
-      }).then((res) => res.json());
+  const loginMutation = async (authCode: string) => {
+    const response = await fetch('/api/oauth/callback/kakao', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ authCode }),
+    }).then((res) => res.json());
 
-      if (response.success) {
-        router.push('/');
-        setUser(response.userData);
-      } else {
-        console.error('Failed to login');
-      }
-    },
-    [router, setUser],
-  );
+    if (response.success) {
+      router.push('/home-page');
+      setUser(response.userData);
+    } else {
+      console.error('Failed to login');
+    }
+  };
 
   useEffect(() => {
     if (authCode) {
@@ -36,15 +35,21 @@ const KakaoTalk = () => {
   }, [authCode, loginMutation]);
 
   return (
-    <div>
-      <span>로그인 중...</span>
+    <div className="flex h-screen items-center justify-center bg-background-primary px-5 py-12">
+      <Loader />
     </div>
   );
 };
 
 const KakaoTalkPage = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex h-screen items-center justify-center bg-background-primary px-5 py-12">
+          <Loader />
+        </div>
+      }
+    >
       <KakaoTalk />
     </Suspense>
   );
