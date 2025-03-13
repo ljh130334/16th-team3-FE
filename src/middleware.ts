@@ -48,8 +48,8 @@ import { NextRequest, NextResponse } from 'next/server';
 // }
 
 export async function middleware(request: NextRequest) {
-  const accessToken = request.cookies.get('accessToken')?.value;
-  const refreshToken = request.cookies.get('refreshToken')?.value;
+  // const accessToken = request.cookies.get('accessToken')?.value;
+  // const refreshToken = request.cookies.get('refreshToken')?.value;
 
   // ! TODO(prgmr99): 아래의 로직이 필요한지 여부 검토
   const requestHeaders = new Headers(request.headers);
@@ -59,12 +59,12 @@ export async function middleware(request: NextRequest) {
 
   // const isAccessTokenExpired = checkAccessTokenExpired(accessToken);
 
-  if (
-    (!accessToken || !refreshToken) &&
-    process.env.NODE_ENV === 'production'
-  ) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
+  // if (
+  //   (!accessToken || !refreshToken) &&
+  //   process.env.NODE_ENV === 'production'
+  // ) {
+  //   return NextResponse.redirect(new URL('/login', request.url));
+  // }
 
   // if (isAccessTokenExpired && refreshToken) {
   //   try {

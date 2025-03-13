@@ -42,13 +42,21 @@ const LoginPage = () => {
 
       const oauthResponse = await fetch('/api/oauth/callback/apple', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(response),
-      }).then((res) => res.json());
+      });
 
-      if (oauthResponse.success) {
+      if (!oauthResponse.ok) {
+        const errorText = await oauthResponse.text();
+        console.error('Error oauthResponse:', errorText);
+        return;
+      }
+      const responseText = await oauthResponse.text();
+      const oauthData = JSON.parse(responseText);
+
+      if (oauthData.success) {
         router.push('/home-page');
-        setUser(oauthResponse.userData);
+        setUser(oauthData.userData);
       } else {
         console.error('Failed to login');
       }
@@ -109,7 +117,7 @@ const LoginPage = () => {
             width={18}
             height={17}
           />
-          <span className="pt-0.5">카카오로 계속하기</span>
+          <span className="pt-0.5">카카오로 계속하기 1</span>
         </Button>
 
         <Button
@@ -123,7 +131,7 @@ const LoginPage = () => {
             width={15}
             height={19}
           />
-          <span className="pt-1">Apple로 계속하기</span>
+          <span className="pt-1">Apple로 계속하기 1</span>
         </Button>
       </div>
     </div>
