@@ -50,7 +50,6 @@ export async function middleware(request: NextRequest) {
   const refreshToken = request.cookies.get('refreshToken')?.value;
 
   const requestHeaders = new Headers(request.headers);
-
   requestHeaders.set('Content-Type', 'application/json');
   requestHeaders.set('Authorization', `Bearer ${accessToken}`);
 

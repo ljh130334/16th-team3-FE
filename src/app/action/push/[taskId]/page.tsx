@@ -1,8 +1,8 @@
 import { fetchTask } from '@/lib/task';
 import { TaskResponse } from '@/types/task';
+import { cookies } from 'next/headers';
 
 import ActionPushPageClient from './ActionPushPageClient';
-import { CloudCog } from 'lucide-react';
 import { CurrentTimeProvider } from '@/provider/CurrentTimeProvider';
 
 export default async function Push({
@@ -14,7 +14,15 @@ export default async function Push({
 }) {
   const { taskId } = await params;
   const { left } = await searchParams;
-  const task: TaskResponse = await fetchTask(taskId);
+
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('accessToken')?.value;
+
+  if (!accessToken) {
+    throw new Error('Access token is not found');
+  }
+
+  const task: TaskResponse = await fetchTask(taskId, accessToken);
 
   return (
     <CurrentTimeProvider>

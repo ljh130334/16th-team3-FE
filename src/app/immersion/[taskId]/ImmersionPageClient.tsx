@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { TaskResponse } from '@/types/task';
-import { usePatchTaskStatus, useTask } from '@/hooks/useTask';
+import { usePatchTaskStatus } from '@/hooks/useTask';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/component/Badge';
@@ -16,9 +16,9 @@ interface Props {
 export default function ImmersionPageClient({ initialTask }: Props) {
   const router = useRouter();
 
-  const { data, error, isLoading } = useTask(initialTask.id.toString(), {
-    initialData: initialTask,
-  });
+  // const { data, error, isLoading } = useTask(initialTask.id.toString(), {
+  //   initialData: initialTask,
+  // });
 
   const { mutate: patchTaskStatus } = usePatchTaskStatus();
 
@@ -30,7 +30,10 @@ export default function ImmersionPageClient({ initialTask }: Props) {
       </div>
       <div className="mt-4 flex flex-col items-center justify-center">
         <div className="text-s2">디프만 리서치 과제 마감까지</div>
-        <Countdown deadline={data?.dueDatetime ?? ''} className="text-h2" />
+        <Countdown
+          deadline={initialTask?.dueDatetime ?? ''}
+          className="text-h2"
+        />
       </div>
 
       <div className="mt-4 flex flex-col items-center justify-center gap-4">
@@ -51,7 +54,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
           className="relative mb-4 w-full"
           onClick={() =>
             patchTaskStatus({
-              taskId: data?.id?.toString() ?? '',
+              taskId: initialTask?.id?.toString() ?? '',
               status: 'COMPLETE',
             })
           }

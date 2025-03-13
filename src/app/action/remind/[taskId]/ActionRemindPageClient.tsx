@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { usePatchTaskHoldOff, useTask } from '@/hooks/useTask';
+import { usePatchTaskHoldOff } from '@/hooks/useTask';
 import { TaskResponse } from '@/types/task';
 
 import Header from './_component/Header';
@@ -63,6 +63,17 @@ const useReminderCount = (initialCount: number = DEFAULT_VALUES.COUNT) => {
   return { count, handleCountChange };
 };
 
+function formatTimestamp(timestamp: string): string {
+  const date = new Date(timestamp);
+  const year = date.getUTCFullYear();
+  const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+  const day = date.getUTCDate().toString().padStart(2, '0');
+  const hours = date.getUTCHours().toString().padStart(2, '0');
+  const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+  const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
 export default function ActionRemindPageClient({
   initialTask,
 }: ActionRemindPageClientProps) {
@@ -71,17 +82,14 @@ export default function ActionRemindPageClient({
     DEFAULT_VALUES.INTERVAL,
   );
   const { mutate } = usePatchTaskHoldOff();
-  const { data } = useTask(initialTask.id.toString(), {
-    initialData: initialTask,
-  });
 
   const handlePatch = () => {
     mutate({
-      taskId: data?.id.toString() ?? '',
+      taskId: initialTask?.id.toString() ?? '',
       data: {
         remindInterval: selectedInterval,
         remindCount: count,
-        remindBaseTime: new Date().toISOString(),
+        remindBaseTime: formatTimestamp(new Date().toISOString()),
       },
     });
   };
@@ -92,7 +100,7 @@ export default function ActionRemindPageClient({
     <>
       <Header maxNotificationCount={REMINDER_LIMITS.MAX} />
       <TaskDetails
-        taskName={data?.name ?? ''}
+        taskName={initialTask?.name ?? ''}
         remainingTime="4시간"
         selectedInterval={selectedInterval}
         onIntervalChange={setSelectedInterval}

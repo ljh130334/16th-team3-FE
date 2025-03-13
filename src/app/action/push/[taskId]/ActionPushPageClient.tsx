@@ -9,7 +9,6 @@ import ActionCard from './_component/ActionCard';
 import CountdownTimer from './_component/CountdownTimer';
 import ActionDrawer from './_component/ActionDrawer';
 import { TaskResponse } from '@/types/task';
-import { useTask } from '@/hooks/useTask';
 import { formatKoreanDateTime } from '@/utils/dateFormat';
 import { useWebViewMessage } from '@/hooks/useWebViewMessage';
 
@@ -52,10 +51,6 @@ export default function ActionPushPageClient({
   const router = useRouter();
   const { handleTakePicture } = useWebViewMessage(router);
 
-  const { data, error, isLoading } = useTask(task.id.toString(), {
-    initialData: task,
-  });
-
   const [screenState, setScreenState] = useState<PushScreenStateType>(
     getInitialState(left),
   );
@@ -67,11 +62,11 @@ export default function ActionPushPageClient({
       <div className="flex flex-col gap-4 px-5">
         <ActionCard
           badgeText="작은 행동"
-          actionText={data?.triggerAction ?? ''}
+          actionText={task?.triggerAction ?? ''}
         />
         <ScheduleCard
-          task={data?.name ?? ''}
-          deadline={formatKoreanDateTime(data?.dueDatetime ?? '')}
+          task={task?.name ?? ''}
+          deadline={formatKoreanDateTime(task?.dueDatetime ?? '')}
         />
       </div>
 
@@ -80,11 +75,11 @@ export default function ActionPushPageClient({
         {screenState === PushScreenState.FINAL_WARNING && (
           <div className="purple-blur-effect absolute inset-0" />
         )}
-        <CountdownTimer timeLeft={data?.dueDatetime ?? ''} />
+        <CountdownTimer timeLeft={task?.dueDatetime ?? ''} />
 
         <ActionDrawer
           screenState={screenState}
-          task={data ?? task}
+          task={task ?? task}
           onTakePicture={handleTakePicture}
         />
       </div>

@@ -17,6 +17,8 @@ import EstimatedTimeInput from '../_components/estimatedTimeInput/EstimatedTimeI
 import BufferTime from '../_components/bufferTime/BufferTime';
 import TaskTypeInput from '../_components/taskTypeInput/TaskTypeInput';
 import { useMutation } from '@tanstack/react-query';
+import { api } from '@/lib/ky';
+
 import { useRouter } from 'next/navigation';
 type FormState = {
   task?: string;
@@ -78,12 +80,7 @@ const ScheduledTaskCreate = () => {
   const router = useRouter();
   const { mutate: createScheduledTaskMutation } = useMutation({
     mutationFn: async (data: ScheduledTaskType) => {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/tasks/scheduled`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_TEST_TOKEN_1! + process.env.NEXT_PUBLIC_TEST_TOKEN_2!}`,
-        },
+      await api.post(`v1/tasks/scheduled`, {
         body: JSON.stringify(data),
       });
     },
