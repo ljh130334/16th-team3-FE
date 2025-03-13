@@ -14,6 +14,7 @@ export default function MyPage() {
   const userData = useUserStore((state) => state.userData);
   const [appVersion] = useState("V.0.0.1");
   const [pageLoading, setPageLoading] = useState(true);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     const initPage = async () => {
@@ -34,6 +35,20 @@ export default function MyPage() {
   
   const handleGoBack = () => {
     router.push("/home-page");
+  };
+
+  const handleLogout = () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = async () => {
+    await logout();
+    setShowLogoutModal(false);
+    router.push('/login');
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
   };
 
   const showLoading = pageLoading;
@@ -129,7 +144,7 @@ export default function MyPage() {
       {/* 로그아웃 */}
       <div className="px-5">
         <button
-          onClick={logout}
+          onClick={handleLogout}
           className="b2 text-gray-normal w-full text-left pt-6 pb-4 text-base"
         >
           로그아웃
@@ -144,6 +159,33 @@ export default function MyPage() {
       </div>
       
       <div className="h-12"></div>
+
+      {/* 로그아웃 확인 모달 */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-component-gray-secondary rounded-[24px] w-[90%] max-w-md overflow-hidden">
+            <div className="pt-6 p-4 text-center">
+              <h3 className="t3 text-gray-normal">로그아웃</h3>
+              <p className="b3 text-gray-neutral mb-5">정말 로그아웃 하시겠어요?</p>
+              
+              <div className="flex space-x-4">
+                <button
+                  onClick={cancelLogout}
+                  className="l1 flex-1 p-[13.5px] bg-component-gray-tertiary text-gray-neutral rounded-[12px]"
+                >
+                  닫기
+                </button>
+                <button
+                  onClick={confirmLogout}
+                  className="l1 flex-1 p-[13.5px] bg-component-accent-primary text-gray-strong rounded-[12px]"
+                >
+                  로그아웃
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

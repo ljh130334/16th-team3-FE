@@ -64,10 +64,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, []);
 
-  // 로그아웃 함수
+  // 로그아웃 함수 - 개선된 버전
   const logout = async () => {
     try {
-      await api.post('v1/auth/logout');
+      // 로그아웃 API 호출
+      const response = await api.post('v1/auth/logout');
+      
+      console.log('로그아웃 성공');
       
       // 쿠키 삭제
       document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -80,6 +83,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       router.push('/login');
     } catch (error) {
       console.error('로그아웃 중 오류 발생:', error);
+      
+      // API 실패해도 로컬 로그아웃 처리
+      clearUser();
+      router.push('/login');
     }
   };
 
