@@ -123,6 +123,10 @@ const HomePageContent = () => {
   const searchParams = useSearchParams();
   const [taskName, setTaskName] = useState('');
 
+  const handleNavigateToMyPage = () => {
+    router.push("/my-page");
+  };
+
   // 6. 다른 페이지에서 돌아올 때 재진입으로 간주
   useEffect(() => {
     const handleRouteChange = (url: string) => {
@@ -405,13 +409,14 @@ const HomePageContent = () => {
               priority
               className="w-[50px]"
             />
-            <Image
-              src="/icons/home/mypage.svg"
-              alt="My Page"
-              width={20}
-              height={20}
-              className="h-[19px] w-[20px]"
+            <button onClick={handleNavigateToMyPage}>
+            <Image 
+              src="/icons/home/mypage.svg" 
+              alt="마이페이지" 
+              width={20} 
+              height={20} 
             />
+          </button>
           </div>
           <div className="px-[20px] py-[11px]">
             <div className="flex space-x-4">
@@ -547,7 +552,7 @@ const HomePageContent = () => {
                   <div>
                     <button
                       className="flex w-full items-center justify-between rounded-[20px] bg-component-gray-secondary px-4 py-4"
-                      onClick={() => router.push('/weekly-tasks')}
+                      onClick={() => router.push('/home-page/weekly-tasks')}
                     >
                       <span className="s2 text-text-neutral">이번주 할일</span>
                       <Image
@@ -590,7 +595,7 @@ const HomePageContent = () => {
                   <div>
                     <button
                       className="flex w-full items-center justify-between rounded-[20px] bg-component-gray-secondary px-4 py-4"
-                      onClick={() => router.push('/weekly-tasks')}
+                      onClick={() => router.push('/home-page/weekly-tasks')}
                     >
                       <span className="s2 text-text-neutral">이번주 할일</span>
                       <Image
@@ -650,7 +655,7 @@ const HomePageContent = () => {
                   <div>
                     <button
                       className="flex w-full items-center justify-between px-4 py-4"
-                      onClick={() => router.push('/weekly-tasks')}
+                      onClick={() => router.push('/home-page/weekly-tasks')}
                     >
                       <span className="s2 text-text-neutral">
                         이번주 할일 더보기
