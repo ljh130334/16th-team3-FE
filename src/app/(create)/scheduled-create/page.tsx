@@ -16,7 +16,7 @@ import { ScheduledTaskType, TimePickerType } from '@/types/create';
 import EstimatedTimeInput from '../_components/estimatedTimeInput/EstimatedTimeInput';
 import BufferTime from '../_components/bufferTime/BufferTime';
 import TaskTypeInput from '../_components/taskTypeInput/TaskTypeInput';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/ky';
@@ -77,6 +77,7 @@ const ScheduledTaskCreate = () => {
       : undefined;
 
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { isMounted } = useMount();
 
   const { mutate: createScheduledTaskMutation } = useMutation({
@@ -86,6 +87,7 @@ const ScheduledTaskCreate = () => {
       });
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', 'home'] });
       router.push(`/home-page?dialog=success&task=${funnel.context.task}`);
     },
     onError: (error) => {
