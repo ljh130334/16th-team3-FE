@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
 
     nextResponse.cookies.set('accessToken', accessToken, {
       httpOnly: false,
-      secure: false, // ! TODO: 앱 심사 받을 때, true로 변경
+      secure: true, // ! TODO: 앱 심사 받을 때, true로 변경
       sameSite: 'none',
       path: '/',
       maxAge: 60 * 60,
