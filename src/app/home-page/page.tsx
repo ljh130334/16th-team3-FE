@@ -23,7 +23,7 @@ import { Drawer } from '@/components/ui/drawer';
 import Loader from '@/components/loader/Loader';
 
 const HomePageContent = () => {
-  // 1. 홈 API를 통해 모든 데이터 한번에 가져오기
+  // 홈 API를 통해 모든 데이터 한번에 가져오기
   const { data: homeData, isLoading: isLoadingHome, refetch } = useHomeData();
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const HomePageContent = () => {
     };
   }, [refetch]);
 
-  // 2. 데이터 구조 분해
+  // 데이터 구조 분해
   const todayTasks = useMemo(() => {
     const tasks = homeData?.todayTasks || [];
     const today = new Date();
@@ -55,6 +55,7 @@ const HomePageContent = () => {
       );
     });
   }, [homeData?.todayTasks]);
+
   // 이번주 할일 정의: 월~일 기준, 오늘 제외한 이번주 남은 날에 마감되는 할일
   const weeklyTasks = useMemo(() => {
     const tasks = homeData?.weeklyTasks || [];
@@ -86,29 +87,77 @@ const HomePageContent = () => {
       );
     });
   }, [homeData?.weeklyTasks]);
+
   const allTasks = useMemo(
     () => homeData?.allTasks || [],
     [homeData?.allTasks],
   );
+
   const inProgressTasks = useMemo(
     () => homeData?.inProgressTasks || [],
     [homeData?.inProgressTasks],
   );
-  const futureTasks = useMemo(
-    () => homeData?.futureTasks || [],
-    [homeData?.futureTasks],
-  );
+
+  // 미래 할일
+const futureTasks = useMemo(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  // 이번주의 일요일 계산
+  const dayOfWeek = today.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
+  const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  const mondayOfThisWeek = new Date(today);
+  mondayOfThisWeek.setDate(today.getDate() - daysFromMonday);
+  const sundayOfThisWeek = new Date(mondayOfThisWeek);
+  sundayOfThisWeek.setDate(mondayOfThisWeek.getDate() + 6);
+  sundayOfThisWeek.setHours(23, 59, 59, 999);
+  
+  // 모든 작업에서 미래 작업 필터링 
+  return allTasks.filter(task => {
+    const dueDate = task.dueDatetime 
+      ? new Date(task.dueDatetime)
+      : (task.dueDate ? new Date(task.dueDate) : null);
+    
+    if (!dueDate) {
+      return false;
+    }
+    
+    const isPastToday = dueDate > today;
+    const isAfterThisWeek = dueDate > sundayOfThisWeek;
+    
+    console.log('Task:', task.title, 'Is past today:', isPastToday, 'Is after this week:', isAfterThisWeek);
+    
+    if (task.status === 'inProgress' || task.status === 'INPROGRESS') {
+      return false;
+    }
+    
+    if (dueDate.getDate() === today.getDate() && 
+        dueDate.getMonth() === today.getMonth() && 
+        dueDate.getFullYear() === today.getFullYear()) {
+      return false;
+    }
+    
+    // 이번주 작업 제외 (오늘 이후, 이번주 일요일 이전)
+    if (dueDate > today && dueDate <= sundayOfThisWeek) {
+      return false;
+    }
+    
+    // 이번주 이후의 작업만 포함
+    const isAfterSunday = dueDate > sundayOfThisWeek;
+    return isAfterSunday;
+  });
+}, [allTasks]);
 
   const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
 
-  // 3. StartTask 뮤테이션 훅
+  // StartTask 뮤테이션 훅
   const { mutate: startTaskMutation } = useStartTask();
   const { mutate: deleteTaskMutation } = useDeleteTask();
 
-  // 4. Reset Alerts 훅
+  // Reset Alerts 훅
   const resetAlerts = useResetAlerts();
 
-  // 5. 화면 분기 처리를 위한 상태
+  // 화면 분기 처리를 위한 상태
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isDetailSheetOpen, setIsDetailSheetOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
@@ -127,12 +176,11 @@ const HomePageContent = () => {
     router.push("/my-page");
   };
 
-  // 6. 다른 페이지에서 돌아올 때 재진입으로 간주
+  // 다른 페이지에서 돌아올 때 재진입으로 간주
   useEffect(() => {
     const handleRouteChange = (url: string) => {
       if (url === '/' || url === '/home') {
         setIsReentry(true);
-        // 타임아웃 시간을 늘려서 바텀시트가 표시될 시간 확보
         setTimeout(() => {
           setIsReentry(false);
         }, 1000);
@@ -149,7 +197,7 @@ const HomePageContent = () => {
     };
   }, []);
 
-  // 7. 세션 스토리지를 사용해 더 확실한 재진입 감지
+  // 세션 스토리지를 사용해 더 확실한 재진입 감지
   useEffect(() => {
     const isFirstVisit = sessionStorage.getItem('visited');
     if (isFirstVisit) {
@@ -164,7 +212,7 @@ const HomePageContent = () => {
     }
   }, []);
 
-  // 8. 회고 페이지로 이동
+  // TODO: 회고 페이지로 이동
   const handleGoToReflection = (taskId: number) => {
     router.push(`/reflection?taskId=${taskId}`);
     setShowExpiredTaskSheet(false);
@@ -206,7 +254,7 @@ const HomePageContent = () => {
     }
   }, [isReentry, expiredTasks]);
 
-  // 9. 앱 진입 시 마감 지난 태스크 확인
+  // 앱 진입 시 마감 지난 태스크 확인
   useEffect(() => {
     // 마감 지난 태스크가 있으면 첫 번째 태스크로 바텀시트 표시
     if (expiredTasks.length > 0) {
@@ -215,7 +263,7 @@ const HomePageContent = () => {
     }
   }, [expiredTasks]);
 
-  // 10. 이벤트 핸들러 함수들
+  // 이벤트 핸들러 함수
   const handleCloseExpiredSheet = () => {
     setShowExpiredTaskSheet(false);
   };
@@ -225,52 +273,8 @@ const HomePageContent = () => {
     setIsDetailSheetOpen(true);
   };
 
-  // 11. 툴팁 표시 관련 로직
-  useEffect(() => {
-    const hasVisited = localStorage.getItem('hasVisitedBefore');
-    if (hasVisited) {
-      setShowTooltip(false);
-    } else {
-      localStorage.setItem('hasVisitedBefore', 'true');
-    }
-  }, []);
-
-  // 12. 진행 중인 작업 계속하기
-  const handleContinueTask = (taskId: number) => {
-    // 해당 태스크 찾기
-    const taskToContinue = inProgressTasks.find((task) => task.id === taskId);
-
-    if (taskToContinue) {
-      // 몰입 화면으로 이동
-      router.push(`/focus?taskId=${taskId}`);
-    }
-  };
-
-  // 13. 마감이 임박한 순으로 정렬된 이번주 할 일 (최대 2개)
-  const topWeeklyTasks = useMemo(() => {
-    return [...weeklyTasks]
-      .sort(
-        (a, b) =>
-          new Date(a.dueDatetime).getTime() - new Date(b.dueDatetime).getTime(),
-      )
-      .slice(0, 2);
-  }, [weeklyTasks]);
-
-  // 14. 마감이 임박한 순으로 정렬된 전체 할 일 (최대 2개)
-  const topAllTasks = useMemo(() => {
-    return [...allTasks]
-      .sort(
-        (a, b) =>
-          new Date(a.dueDatetime).getTime() - new Date(b.dueDatetime).getTime(),
-      )
-      .slice(0, 2);
-  }, [allTasks]);
-
-  // 15. 이벤트 핸들러 함수들
   const handleDeleteTask = (taskId: number) => {
     deleteTaskMutation(taskId);
-
-    // TaskDetailSheet이 열려있는 경우 닫기
     if (isDetailSheetOpen && detailTask && detailTask.id === taskId) {
       setIsDetailSheetOpen(false);
     }
@@ -289,11 +293,7 @@ const HomePageContent = () => {
   const handleStartTask = (taskId: number) => {
     // React Query mutation 실행
     startTaskMutation(taskId);
-
-    // 상세 시트 닫기
     setIsDetailSheetOpen(false);
-
-    // 몰입 화면으로 이동
     router.push(`/focus?taskId=${taskId}`);
   };
 
@@ -306,7 +306,48 @@ const HomePageContent = () => {
     refetch();
   };
 
-  // 16. 탭 전환 처리
+  // 툴팁 표시 관련 로직
+  useEffect(() => {
+    const hasVisited = localStorage.getItem('hasVisitedBefore');
+    if (hasVisited) {
+      setShowTooltip(false);
+    } else {
+      localStorage.setItem('hasVisitedBefore', 'true');
+    }
+  }, []);
+
+  // 진행 중인 작업 계속하기
+  const handleContinueTask = (taskId: number) => {
+    // 해당 태스크 찾기
+    const taskToContinue = inProgressTasks.find((task) => task.id === taskId);
+
+    if (taskToContinue) {
+      // TODO: 몰입 화면으로 이동
+      router.push(`/focus?taskId=${taskId}`);
+    }
+  };
+
+  // 마감이 임박한 순으로 정렬된 이번주 할 일 (최대 2개)
+  const topWeeklyTasks = useMemo(() => {
+    return [...weeklyTasks]
+      .sort(
+        (a, b) =>
+          new Date(a.dueDatetime).getTime() - new Date(b.dueDatetime).getTime(),
+      )
+      .slice(0, 2);
+  }, [weeklyTasks]);
+
+  // 마감이 임박한 순으로 정렬된 전체 할 일 (최대 2개)
+  const topAllTasks = useMemo(() => {
+    return [...allTasks]
+      .sort(
+        (a, b) =>
+          new Date(a.dueDatetime).getTime() - new Date(b.dueDatetime).getTime(),
+      )
+      .slice(0, 2);
+  }, [allTasks]);
+
+  // 탭 전환 처리
   const handleTabChange = (tab: 'today' | 'all') => {
     setActiveTab(tab);
   };
@@ -351,7 +392,7 @@ const HomePageContent = () => {
     }
   }, [searchParams, router]);
 
-  // 17. 로딩 상태 처리
+  // 로딩 상태 처리
   if (isLoadingHome) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background-primary">
@@ -360,7 +401,7 @@ const HomePageContent = () => {
     );
   }
 
-  // 18. 화면 분기 처리
+  // 화면 분기 처리
   // 1. 오늘 할 일이 없고, 진행 중인 일도 없는 경우 (완전 빈 화면)
   const isTotallyEmpty =
     todayTasks.length === 0 &&
@@ -912,7 +953,6 @@ const HomePageContent = () => {
     </Drawer>
   );
 };
-//
 
 const HomePage = () => (
   <Suspense>

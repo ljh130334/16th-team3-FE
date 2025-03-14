@@ -85,17 +85,12 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 
   // 이어서 몰입 버튼 클릭 시 - 홈화면 재진입이 아닌 경우에는 태스크 상세 바텀시트 표시
   const handleContinueClick = () => {
-    if (isReentry) {
-      // 재진입인 경우 이어서 몰입 바텀시트 표시
-      setShowBottomSheet(true);
+    // isReentry 조건을 무시하고 항상 TaskDetailSheet를 표시하도록 수정
+    if (onShowDetails) {
+      onShowDetails(task);
     } else {
-      // 일반 상태에서는 태스크 상세 바텀시트로 이동
-      if (onShowDetails) {
-        onShowDetails(task);
-      } else {
-        // 상세 정보 표시 콜백이 없는 경우 바로 몰입 화면으로 이동
-        router.push(`/focus?taskId=${task.id}`);
-      }
+      // 상세 정보 표시 콜백이 없는 경우 바로 몰입 화면으로 이동
+      router.push(`/focus?taskId=${task.id}`);
     }
   };
   
