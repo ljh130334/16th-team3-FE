@@ -1,4 +1,4 @@
-type TaskStatus = 
+export type TaskStatus = 
   | 'pending' | 'completed' | 'reflected' | 'procrastinating' | 'inProgress'
   | 'PENDING' | 'COMPLETED' | 'REFLECTED' | 'PROCRASTINATING' | 'INPROGRESS' | 'BEFORE';
 export type TaskType = 'today' | 'weekly' | 'future';
