@@ -37,11 +37,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setIsLoading(true);
       const response = await api.get('v1/members/me').json<User>();
-      console.log('사용자 프로필 로드 성공:', response);
       
       setUser(response);
     } catch (error) {
-      console.error('사용자 정보 로드 중 오류:', error);
       clearUser();
       // 인증 오류시 로그인 페이지로 리다이렉트
       router.push('/login');

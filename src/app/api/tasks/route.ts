@@ -46,11 +46,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data);
     
   } catch (error: any) {
-    console.error('API 요청 오류:', error);
-    console.error('오류 메시지:', error.message);
-    console.error('스택 트레이스:', error.stack);
-    
-    // AbortError 처리
     if (error.name === 'AbortError') {
       return NextResponse.json(
         { error: '요청 시간이 초과되었습니다.' },
