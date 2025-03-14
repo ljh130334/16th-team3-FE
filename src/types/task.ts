@@ -1,4 +1,6 @@
-export type TaskStatus = 'pending' | 'inProgress' | 'completed' | 'reflected' | 'procrastinating';
+type TaskStatus = 
+  | 'pending' | 'completed' | 'reflected' | 'procrastinating' | 'inProgress'
+  | 'PENDING' | 'COMPLETED' | 'REFLECTED' | 'PROCRASTINATING' | 'INPROGRESS' | 'BEFORE';
 export type TaskType = 'today' | 'weekly' | 'future';
 
 export interface Task {
