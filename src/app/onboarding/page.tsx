@@ -31,7 +31,7 @@ export default function OnboardingPage() {
     {
       title: '미루지 않는 하루,\n지금부터 만들어볼까요?',
       description: '지금 당장 시작할 일과, 여유롭게 준비할 일을\n구분해 추가해보세요!',
-      image: '/icons/onboarding/onboarding4.svg',
+      image: '/icons/onboarding/onboarding4.png',
       buttonText: '시작하기'
     }
   ];
@@ -72,7 +72,7 @@ export default function OnboardingPage() {
         <div className="flex flex-1 flex-col relative z-10">
           <div className="flex flex-1 flex-col items-center justify-center">
             <Image
-              src="/icons/onboarding/onboarding4.svg"
+              src="/icons/onboarding/onboarding4.png"
               alt="온보딩 이미지 4"
               width={142}
               height={80}
