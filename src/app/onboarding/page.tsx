@@ -13,25 +13,25 @@ export default function OnboardingPage() {
     {
       title: '여유 시간을 1.5배 확보하고,\n후회 없이 끝내세요!',
       description: '1.5배 여유 시간을 자동 추가하여\n여유롭게 완료할 수 있도록 도와드립니다.',
-      image: '/icons/onboarding/onboarding1.svg',
+      image: '/icons/onboarding/onboarding1.png',
       buttonText: '다음으로'
     },
     {
       title: '1분 안에 작은 행동을 시작하면,\n미루기는 이제 그만!',
       description: '작은 행동을 시작하는 데 1분이면 충분해요.\n완료할 때까지 진동이 울려 시작을 도와드립니다.',
-      image: '/icons/onboarding/onboarding2.svg',
+      image: '/icons/onboarding/onboarding2.png',
       buttonText: '다음으로'
     },
     {
       title: '캐릭터와 플레이리스트로\n몰입을 더 깊게!',
       description: '작업 카워드를 기반으로 몰입 캐릭터를 활성화하여\n맞춤 환경과 음악을 제공합니다.',
-      image: '/icons/onboarding/onboarding3.svg',
+      image: '/icons/onboarding/onboarding3.png',
       buttonText: '다음으로'
     },
     {
       title: '미루지 않는 하루,\n지금부터 만들어볼까요?',
       description: '지금 당장 시작할 일과, 여유롭게 준비할 일을\n구분해 추가해보세요!',
-      image: '/icons/onboarding/onboarding4.svg',
+      image: '/icons/onboarding/onboarding4.png',
       buttonText: '시작하기'
     }
   ];
@@ -72,7 +72,7 @@ export default function OnboardingPage() {
         <div className="flex flex-1 flex-col relative z-10">
           <div className="flex flex-1 flex-col items-center justify-center">
             <Image
-              src="/icons/onboarding/onboarding4.svg"
+              src="/icons/onboarding/onboarding4.png"
               alt="온보딩 이미지 4"
               width={142}
               height={80}
