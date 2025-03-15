@@ -38,6 +38,11 @@ const HomePageContent = () => {
   }, [refetch]);
 
   // 데이터 구조 분해
+  const allTasks = useMemo(
+    () => homeData?.allTasks || [],
+    [homeData?.allTasks],
+  );
+
   const todayTasks = useMemo(() => {
     const tasks = homeData?.todayTasks || [];
     const today = new Date();
@@ -56,9 +61,7 @@ const HomePageContent = () => {
     });
   }, [homeData?.todayTasks]);
 
-  // 이번주 할일 정의: 월~일 기준, 오늘 제외한 이번주 남은 날에 마감되는 할일
   const weeklyTasks = useMemo(() => {
-    const tasks = homeData?.weeklyTasks || [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -68,30 +71,32 @@ const HomePageContent = () => {
     const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // 일요일인 경우 이전 주의 월요일까지 거슬러 올라감
     mondayOfThisWeek.setDate(today.getDate() - daysFromMonday);
 
-    // 이번주의 일요일 찾기
+    // 이번주의 일요일 찾기 (일요일 23:59:59)
     const sundayOfThisWeek = new Date(mondayOfThisWeek);
     sundayOfThisWeek.setDate(mondayOfThisWeek.getDate() + 6);
+    sundayOfThisWeek.setHours(23, 59, 59, 999);
 
-    return tasks.filter((task) => {
+    return allTasks.filter((task) => {
+      if (task.status === 'inProgress' || task.status === 'INPROGRESS') return false;
+      
+      // 날짜 계산
       const taskDueDate = task.dueDatetime
         ? new Date(task.dueDatetime)
-        : new Date(task.dueDate);
-      const taskDate = new Date(taskDueDate);
-      taskDate.setHours(0, 0, 0, 0);
+        : (task.dueDate ? new Date(task.dueDate) : null);
+      if (!taskDueDate) return false;
 
-      // 오늘을 제외한 이번주 남은 날에 마감되는 할일만 포함
-      return (
-        taskDate.getTime() > today.getTime() &&
-        taskDate.getTime() <= sundayOfThisWeek.getTime() &&
-        task.status !== 'inProgress'
-      );
+      const taskDateOnly = new Date(taskDueDate);
+      taskDateOnly.setHours(0, 0, 0, 0);
+      
+      const taskIsAfterToday = taskDateOnly.getTime() > today.getTime() || 
+                              (taskDateOnly.getTime() === today.getTime() && taskDueDate.getHours() >= 1);
+      
+      const taskIsBeforeSunday = taskDueDate <= sundayOfThisWeek;
+      
+      // 오늘 이후(또는 오늘 새벽 1시 이후)이고 이번주 일요일 이전인 작업
+      return taskIsAfterToday && taskIsBeforeSunday;
     });
-  }, [homeData?.weeklyTasks]);
-
-  const allTasks = useMemo(
-    () => homeData?.allTasks || [],
-    [homeData?.allTasks],
-  );
+  }, [allTasks]);
 
   const inProgressTasks = useMemo(
     () => homeData?.inProgressTasks || [],
@@ -99,54 +104,54 @@ const HomePageContent = () => {
   );
 
   // 미래 할일
-const futureTasks = useMemo(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  // 이번주의 일요일 계산
-  const dayOfWeek = today.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
-  const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-  const mondayOfThisWeek = new Date(today);
-  mondayOfThisWeek.setDate(today.getDate() - daysFromMonday);
-  const sundayOfThisWeek = new Date(mondayOfThisWeek);
-  sundayOfThisWeek.setDate(mondayOfThisWeek.getDate() + 6);
-  sundayOfThisWeek.setHours(23, 59, 59, 999);
-  
-  // 모든 작업에서 미래 작업 필터링 
-  return allTasks.filter(task => {
-    const dueDate = task.dueDatetime 
-      ? new Date(task.dueDatetime)
-      : (task.dueDate ? new Date(task.dueDate) : null);
+  const futureTasks = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     
-    if (!dueDate) {
-      return false;
-    }
+    // 이번주의 일요일 계산
+    const dayOfWeek = today.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
+    const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const mondayOfThisWeek = new Date(today);
+    mondayOfThisWeek.setDate(today.getDate() - daysFromMonday);
+    const sundayOfThisWeek = new Date(mondayOfThisWeek);
+    sundayOfThisWeek.setDate(mondayOfThisWeek.getDate() + 6);
+    sundayOfThisWeek.setHours(23, 59, 59, 999);
     
-    const isPastToday = dueDate > today;
-    const isAfterThisWeek = dueDate > sundayOfThisWeek;
-    
-    console.log('Task:', task.title, 'Is past today:', isPastToday, 'Is after this week:', isAfterThisWeek);
-    
-    if (task.status === 'inProgress' || task.status === 'INPROGRESS') {
-      return false;
-    }
-    
-    if (dueDate.getDate() === today.getDate() && 
-        dueDate.getMonth() === today.getMonth() && 
-        dueDate.getFullYear() === today.getFullYear()) {
-      return false;
-    }
-    
-    // 이번주 작업 제외 (오늘 이후, 이번주 일요일 이전)
-    if (dueDate > today && dueDate <= sundayOfThisWeek) {
-      return false;
-    }
-    
-    // 이번주 이후의 작업만 포함
-    const isAfterSunday = dueDate > sundayOfThisWeek;
-    return isAfterSunday;
-  });
-}, [allTasks]);
+    // 모든 작업에서 미래 작업 필터링 
+    return allTasks.filter(task => {
+      const dueDate = task.dueDatetime 
+        ? new Date(task.dueDatetime)
+        : (task.dueDate ? new Date(task.dueDate) : null);
+      
+      if (!dueDate) {
+        return false;
+      }
+      
+      const isPastToday = dueDate > today;
+      const isAfterThisWeek = dueDate > sundayOfThisWeek;
+      
+      console.log('Task:', task.title, 'Is past today:', isPastToday, 'Is after this week:', isAfterThisWeek);
+      
+      if (task.status === 'inProgress' || task.status === 'INPROGRESS') {
+        return false;
+      }
+      
+      if (dueDate.getDate() === today.getDate() && 
+          dueDate.getMonth() === today.getMonth() && 
+          dueDate.getFullYear() === today.getFullYear()) {
+        return false;
+      }
+      
+      // 이번주 작업 제외 (오늘 이후, 이번주 일요일 이전)
+      if (dueDate > today && dueDate <= sundayOfThisWeek) {
+        return false;
+      }
+      
+      // 이번주 이후의 작업만 포함
+      const isAfterSunday = dueDate > sundayOfThisWeek;
+      return isAfterSunday;
+    });
+  }, [allTasks]);
 
   const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
 

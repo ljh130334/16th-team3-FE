@@ -1,19 +1,58 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/ui/header';
 import Image from 'next/image';
 import TaskDetailSheet from '@/app/home-page/_components/TaskDetailSheet';
 import WeeklyTaskItem from '@/app/home-page/_components/WeeklyTaskItem';
-import { useWeeklyTasks, useStartTask } from '@/hooks/useTasks';
+import { useHomeData, useStartTask, useDeleteTask } from '@/hooks/useTasks';
 import { Task } from '@/types/task';
 import Loader from '@/components/loader/Loader';
 
 const WeeklyTasksPage = () => {
   const router = useRouter();
-  const { data: weeklyTasks = [], isLoading } = useWeeklyTasks();
+  const { data: homeData, isLoading } = useHomeData();
   const { mutate: startTaskMutation } = useStartTask();
+  const { mutate: deleteTaskMutation } = useDeleteTask();
+  const allTasks = useMemo(() => homeData?.allTasks || [], [homeData?.allTasks]);
+  const weeklyTasks = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // 이번주의 월요일 찾기
+    const mondayOfThisWeek = new Date(today);
+    const dayOfWeek = today.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
+    const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // 일요일인 경우 이전 주의 월요일까지 거슬러 올라감
+    mondayOfThisWeek.setDate(today.getDate() - daysFromMonday);
+
+    // 이번주의 일요일 찾기 (일요일 23:59:59)
+    const sundayOfThisWeek = new Date(mondayOfThisWeek);
+    sundayOfThisWeek.setDate(mondayOfThisWeek.getDate() + 6);
+    sundayOfThisWeek.setHours(23, 59, 59, 999);
+
+    return allTasks.filter((task) => {
+      if (task.status === 'inProgress' || task.status === 'INPROGRESS') return false;
+      
+      // 날짜 계산
+      const taskDueDate = task.dueDatetime
+        ? new Date(task.dueDatetime)
+        : (task.dueDate ? new Date(task.dueDate) : null);
+      
+      if (!taskDueDate) return false;
+      
+      const taskDateOnly = new Date(taskDueDate);
+      taskDateOnly.setHours(0, 0, 0, 0);
+      
+      const taskIsAfterToday = taskDateOnly.getTime() > today.getTime() || 
+                              (taskDateOnly.getTime() === today.getTime() && taskDueDate.getHours() >= 1);
+      
+      const taskIsBeforeSunday = taskDueDate <= sundayOfThisWeek;
+      
+      // 오늘 이후(또는 오늘 새벽 1시 이후)이고 이번주 일요일 이전인 작업
+      return taskIsAfterToday && taskIsBeforeSunday;
+    });
+  }, [allTasks]);
 
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isDetailSheetOpen, setIsDetailSheetOpen] = useState(false);
@@ -28,20 +67,13 @@ const WeeklyTasksPage = () => {
   };
 
   const handleStartTask = (taskId: number) => {
-    // React Query mutation 실행
     startTaskMutation(taskId);
-
-    // 상세 시트 닫기
     setIsDetailSheetOpen(false);
-
-    // 몰입 화면으로 이동
     router.push(`/focus?taskId=${taskId}`);
   };
 
   const handleDeleteTask = (taskId: number) => {
-    // 삭제 API 연결 필요
-
-    // 삭제된 항목이 현재 상세 시트에 표시 중이라면 시트 닫기
+    deleteTaskMutation(taskId);
     if (isDetailSheetOpen && selectedTask && selectedTask.id === taskId) {
       setIsDetailSheetOpen(false);
     }

@@ -36,7 +36,6 @@ export async function GET(
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error('할일 조회 중 오류 발생:', error);
     return NextResponse.json(
       { error: '할일을 가져오는 중 오류가 발생했습니다.' },
       { status: 500 }
@@ -53,11 +52,8 @@ export async function DELETE(
   const accessToken = cookieStore.get('accessToken')?.value;
   
   try {
-    console.log(`할일 삭제 요청: ${taskId}`);
-    
     // 토큰 검사
     if (!accessToken) {
-      console.error('인증 토큰이 없습니다');
       return NextResponse.json(
         { error: '인증 정보가 없습니다. 다시 로그인해주세요.' },
         { status: 401 }
@@ -66,7 +62,7 @@ export async function DELETE(
     
     const apiUrl = `${API_BASE_URL}/v1/tasks/${taskId}`;
     console.log(`삭제 API 요청 URL: ${apiUrl}`);
-    
+
     const response = await fetch(apiUrl, {
       method: 'DELETE',
       headers: {
@@ -97,7 +93,6 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('할일 삭제 중 예외 발생:', error);
-    console.error('오류 세부 정보:', error.message || '알 수 없는 오류');
     
     return NextResponse.json(
       { error: `할일을 삭제하는 중 서버 오류가 발생했습니다: ${error.message || '알 수 없는 오류'}` },
