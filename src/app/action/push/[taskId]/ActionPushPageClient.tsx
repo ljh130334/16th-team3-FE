@@ -56,7 +56,7 @@ export default function ActionPushPageClient({
   );
 
   return (
-    <div className="flex h-screen flex-col gap-4 bg-background-primary">
+    <div className="flex h-full flex-col gap-4 bg-background-primary">
       <Header content={SCREEN_CONTENT[screenState]} />
 
       <div className="flex flex-col gap-4 px-5">

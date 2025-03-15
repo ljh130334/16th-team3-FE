@@ -3,10 +3,11 @@ import { create } from 'zustand';
 
 interface UserState {
   userData: User;
-
-  setUser: (user: User) => void;
-
+  deviceId: string;
+  deviceType: string;
+  setUser: (user: Partial<User>) => void;
   clearUser: () => void;
+  setDeviceInfo: (deviceId: string, deviceType: string) => void;
 }
 
 export const useUserStore = create<UserState>()((set) => ({
@@ -17,6 +18,8 @@ export const useUserStore = create<UserState>()((set) => ({
     profileImageUrl: '',
     isNewUser: true,
   },
+  deviceId: '',
+  deviceType: '',
 
   setUser: (user) =>
     set((state) => ({ userData: { ...state.userData, ...user } })),
@@ -31,4 +34,10 @@ export const useUserStore = create<UserState>()((set) => ({
         isNewUser: false,
       },
     }),
+  setDeviceInfo: (deviceId: string, deviceType: string) =>
+    set((state) => ({
+      ...state,
+      deviceId,
+      deviceType,
+    })),
 }));

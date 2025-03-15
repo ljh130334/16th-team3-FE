@@ -69,7 +69,7 @@ const BufferTime = ({
           </span>
         </div>
       </div>
-      <div className="pb-[46px] transition-all duration-300">
+      <div className="pb-[90px] transition-all duration-300">
         <div className="mb-9 flex flex-col items-start gap-5">
           <span className="text-normal s2">{task}</span>
           <div className="flex w-full items-center justify-between">

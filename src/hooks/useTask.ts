@@ -7,6 +7,7 @@ import {
 import { fetchTask, patchTaskHoldOff, patchTaskStatus } from '@/lib/task';
 import { TaskResponse } from '@/types/task';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 
 export interface TaskMutationParams {
   taskId: string;
@@ -85,10 +86,13 @@ export const usePatchTaskStatus = (): UseMutationResult<
   StatusParams
 > => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   return useMutation<TaskResponse, Error, StatusParams>({
     mutationFn: ({ taskId, status }) => patchTaskStatus({ taskId, status }),
     onSuccess: () => {
-      router.push('/home-page');
+      queryClient.invalidateQueries({ queryKey: ['tasks', 'home'] });
+
+      router.push('/immersion/complete');
     },
   });
 };

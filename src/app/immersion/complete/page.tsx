@@ -8,7 +8,7 @@ export default function ImmersionCompletePage() {
   const router = useRouter();
 
   return (
-    <div className="flex h-screen flex-col gap-4 bg-background-primary">
+    <div className="flex h-full flex-col gap-4 bg-background-primary">
       <div className="mt-[220px] flex flex-col items-center gap-2">
         <Image src="/check.png" alt="logo" width={60} height={60} />
         <p className="text-t3">고생하셨어요!</p>

@@ -19,7 +19,7 @@ export default function ActionStartPageClient({ initialTask }: Props) {
   const { handleTakePicture } = useWebViewMessage(router);
 
   return (
-    <div className="flex h-screen flex-col gap-4 bg-background-primary">
+    <div className="flex h-full flex-col gap-4 bg-background-primary">
       <ActionStartHeader />
       <div className="flex flex-col gap-4 px-5">
         <ActionCard title={initialTask?.triggerAction} />

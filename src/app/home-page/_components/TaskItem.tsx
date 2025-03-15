@@ -39,7 +39,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
   const [showUrgentBottomSheet, setShowUrgentBottomSheet] = useState(false);
   const [remainingTime, setRemainingTime] = useState('');
   const [isUrgent, setIsUrgent] = useState(false);
-  
+
   // 진행 중인 태스크인지 확인
   const isInProgress = status === 'inProgress';
 
@@ -51,30 +51,30 @@ const TaskItem: React.FC<TaskItemProps> = ({
     } else {
       dueDateObj = parseDateAndTime(dueDate, dueTime);
     }
-  
+
     // 남은 시간 계산
     const now = new Date();
     const diffMs = dueDateObj.getTime() - now.getTime();
-    
+
     // isUrgent 상태 업데이트 (1시간 이내거나 ignoredAlerts가 3이상이거나 status가 procrastinating인 경우)
-    const urgent = 
-      (diffMs <= 60 * 60 * 1000 && diffMs > 0) || 
-      ignoredAlerts >= 3 || 
+    const urgent =
+      (diffMs <= 60 * 60 * 1000 && diffMs > 0) ||
+      ignoredAlerts >= 3 ||
       status === 'procrastinating';
-      
+
     setIsUrgent(urgent);
-  
+
     return calculateRemainingTime(dueDateObj);
   }, [dueDate, dueTime, dueDatetime, ignoredAlerts, status]);
 
   // 1초마다 남은 시간 업데이트
   useEffect(() => {
     setRemainingTime(calculateRemainingTimeLocal());
-  
+
     const interval = setInterval(() => {
       setRemainingTime(calculateRemainingTimeLocal());
     }, 1000);
-  
+
     return () => clearInterval(interval);
   }, [calculateRemainingTimeLocal]);
 
@@ -82,7 +82,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
     e.stopPropagation();
 
     if (isInProgress) {
-      router.push(`/focus?taskId=${taskId}`);
+      router.push(`/immersion/${taskId}`);
     } else if (isUrgent) {
       setShowUrgentBottomSheet(true);
     } else {
@@ -96,7 +96,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
 
   const handleStart = () => {
     resetAlerts(taskId);
-    router.push(`/focus?taskId=${taskId}`);
+    router.push(`/immersion/${taskId}`);
     setShowUrgentBottomSheet(false);
   };
 
@@ -168,10 +168,10 @@ const TaskItem: React.FC<TaskItemProps> = ({
             }`}
             onClick={handleButtonClick}
           >
-            {isInProgress 
-              ? '이어서 몰입' 
-              : isUrgent 
-                ? '지금 시작' 
+            {isInProgress
+              ? '이어서 몰입'
+              : isUrgent
+                ? '지금 시작'
                 : '미리 시작'}
           </button>
         </div>

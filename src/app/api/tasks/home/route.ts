@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   try {
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
     const AUTH_TOKEN = accessToken;
-
+    console.log('AUTH_TOKEN:', AUTH_TOKEN);
     const fullUrl = `${API_BASE_URL}/v1/tasks/home`;
     console.log('요청 URL:', fullUrl);
 

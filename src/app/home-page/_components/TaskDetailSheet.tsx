@@ -35,7 +35,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   // 남은 시간 계산 함수
   const calculateRemainingTimeLocal = useCallback(() => {
     if (!task.dueDate) return '';
-  
+
     // dueDatetime이 있으면 사용, 없으면 dueDate와 dueTime에서 계산
     let dueDatetime;
     if (task.dueDatetime) {
@@ -45,17 +45,17 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
     } else {
       return '';
     }
-  
+
     const now = new Date();
     const diffMs = dueDatetime.getTime() - now.getTime();
-  
+
     // 1시간 이내인지 체크 또는 ignoredAlerts가 3 이상인지 확인 또는 status가 procrastinating인지 확인
     setIsUrgent(
       (diffMs <= 60 * 60 * 1000 && diffMs > 0) ||
         (task.ignoredAlerts || 0) >= 3 ||
         task.status === 'procrastinating',
     );
-  
+
     return calculateRemainingTime(dueDatetime);
   }, [task]);
 
@@ -108,7 +108,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
     }
 
     // 몰입 화면으로 이동
-    router.push(`/focus${task.id ? `?taskId=${task.id}` : ''}`);
+    router.push(`/immersion/${task.id}`);
     onClose();
   };
 
@@ -256,7 +256,9 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
             <div className="flex items-center justify-between py-2.5 pt-0">
               <div className="b2 text-text-alternative">마감일</div>
               <div className="flex items-center">
-                <span className="b2 text-text-neutral mr-3">{formatDueDatetime()}</span>
+                <span className="b2 mr-3 text-text-neutral">
+                  {formatDueDatetime()}
+                </span>
                 {showArrow && (
                   <Image
                     src="/icons/home/arrow-right.svg"
@@ -268,12 +270,14 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               </div>
             </div>
           </div>
-          
+
           <div>
-            <div className="flex justify-between items-center py-2.5">
+            <div className="flex items-center justify-between py-2.5">
               <div className="b2 text-text-alternative">작은 행동</div>
               <div className="flex items-center">
-                <span className="b2 text-text-neutral mr-3">{personaTriggerAction}</span>
+                <span className="b2 mr-3 text-text-neutral">
+                  {personaTriggerAction}
+                </span>
                 {showArrow && (
                   <Image
                     src="/icons/home/arrow-right.svg"
@@ -285,12 +289,14 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               </div>
             </div>
           </div>
-          
+
           <div>
-            <div className="flex justify-between items-center py-2.5">
+            <div className="flex items-center justify-between py-2.5">
               <div className="b2 text-text-alternative">예상 소요시간</div>
               <div className="flex items-center">
-                <span className="b2 text-text-neutral mr-3">{task.timeRequired || '-'}</span>
+                <span className="b2 mr-3 text-text-neutral">
+                  {task.timeRequired || '-'}
+                </span>
                 {showArrow && (
                   <Image
                     src="/icons/home/arrow-right.svg"
@@ -302,19 +308,23 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               </div>
             </div>
           </div>
-          
+
           <div>
-            <div className="flex justify-between items-center py-2.5">
+            <div className="flex items-center justify-between py-2.5">
               <div className="b2 text-text-alternative">첫 알림</div>
               <div className="flex items-center">
-                <span className={`s2 text-text-neutral ${isInProgress ? 'mr-[12px]' : 'mr-[19px]'}`}>
-                {task.triggerActionAlarmTime ? 
-                  `${new Date(task.triggerActionAlarmTime).getMonth() + 1}월 ${new Date(task.triggerActionAlarmTime).getDate()}일 (${['일', '월', '화', '수', '목', '금', '토'][new Date(task.triggerActionAlarmTime).getDay()]}), ${new Date(task.triggerActionAlarmTime).toLocaleTimeString('ko-KR', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true
-                  })}`
-                : '-'}
+                <span
+                  className={`s2 text-text-neutral ${isInProgress ? 'mr-[12px]' : 'mr-[19px]'}`}
+                >
+                  {task.triggerActionAlarmTime
+                    ? `${new Date(task.triggerActionAlarmTime).getMonth() + 1}월 ${new Date(task.triggerActionAlarmTime).getDate()}일 (${['일', '월', '화', '수', '목', '금', '토'][new Date(task.triggerActionAlarmTime).getDay()]}), ${new Date(
+                        task.triggerActionAlarmTime,
+                      ).toLocaleTimeString('ko-KR', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true,
+                      })}`
+                    : '-'}
                 </span>
               </div>
             </div>

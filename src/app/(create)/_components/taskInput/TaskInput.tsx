@@ -99,7 +99,7 @@ const TaskInput = ({ context, lastStep, onNext, onEdit }: TaskInputProps) => {
   }, [context]);
 
   return (
-    <div className="flex h-full w-full flex-col justify-between">
+    <div className="flex h-full w-full flex-col">
       <div>
         <HeaderTitle title="어떤 일의 마감이 급하신가요?" />
         <div className="flex flex-col gap-6">
@@ -136,7 +136,7 @@ const TaskInput = ({ context, lastStep, onNext, onEdit }: TaskInputProps) => {
         </div>
       </div>
 
-      <div className="pb-[46px]">
+      <div className="mb-[30px] mt-auto">
         <Button
           variant="primary"
           className="mt-6"

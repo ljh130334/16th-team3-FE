@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { usePatchTaskHoldOff } from '@/hooks/useTask';
 import { TaskResponse } from '@/types/task';
 
+import Image from 'next/image';
 import Header from './_component/Header';
 import TimesList from './_component/TimesList';
 import TaskDetails from './_component/TaskDetails';
@@ -97,7 +98,11 @@ export default function ActionRemindPageClient({
   const reminderTimes = calculateReminderTimes(count, selectedInterval);
 
   return (
-    <>
+    <div className="flex h-full flex-col bg-background-primary pb-[30px]">
+      {/* TODO : 헤더 컴포넌트로 변경 예정 */}
+      <div className="flex items-center px-5 py-[14px]">
+        <Image src="/arrow-left.svg" alt="왼쪽 화살표" width={24} height={24} />
+      </div>{' '}
       <Header maxNotificationCount={REMINDER_LIMITS.MAX} />
       <TaskDetails
         taskName={initialTask?.name ?? ''}
@@ -112,6 +117,6 @@ export default function ActionRemindPageClient({
       />
       <TimesList times={reminderTimes} />
       <CompleteButton onClick={handlePatch} />
-    </>
+    </div>
   );
 }

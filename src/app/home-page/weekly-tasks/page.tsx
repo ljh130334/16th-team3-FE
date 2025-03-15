@@ -15,7 +15,10 @@ const WeeklyTasksPage = () => {
   const { data: homeData, isLoading } = useHomeData();
   const { mutate: startTaskMutation } = useStartTask();
   const { mutate: deleteTaskMutation } = useDeleteTask();
-  const allTasks = useMemo(() => homeData?.allTasks || [], [homeData?.allTasks]);
+  const allTasks = useMemo(
+    () => homeData?.allTasks || [],
+    [homeData?.allTasks],
+  );
   const weeklyTasks = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -32,23 +35,28 @@ const WeeklyTasksPage = () => {
     sundayOfThisWeek.setHours(23, 59, 59, 999);
 
     return allTasks.filter((task) => {
-      if (task.status === 'inProgress' || task.status === 'INPROGRESS') return false;
-      
+      if (task.status === 'inProgress' || task.status === 'INPROGRESS')
+        return false;
+
       // 날짜 계산
       const taskDueDate = task.dueDatetime
         ? new Date(task.dueDatetime)
-        : (task.dueDate ? new Date(task.dueDate) : null);
-      
+        : task.dueDate
+          ? new Date(task.dueDate)
+          : null;
+
       if (!taskDueDate) return false;
-      
+
       const taskDateOnly = new Date(taskDueDate);
       taskDateOnly.setHours(0, 0, 0, 0);
-      
-      const taskIsAfterToday = taskDateOnly.getTime() > today.getTime() || 
-                              (taskDateOnly.getTime() === today.getTime() && taskDueDate.getHours() >= 1);
-      
+
+      const taskIsAfterToday =
+        taskDateOnly.getTime() > today.getTime() ||
+        (taskDateOnly.getTime() === today.getTime() &&
+          taskDueDate.getHours() >= 1);
+
       const taskIsBeforeSunday = taskDueDate <= sundayOfThisWeek;
-      
+
       // 오늘 이후(또는 오늘 새벽 1시 이후)이고 이번주 일요일 이전인 작업
       return taskIsAfterToday && taskIsBeforeSunday;
     });
@@ -69,7 +77,7 @@ const WeeklyTasksPage = () => {
   const handleStartTask = (taskId: number) => {
     startTaskMutation(taskId);
     setIsDetailSheetOpen(false);
-    router.push(`/focus?taskId=${taskId}`);
+    router.push(`/immersion/${taskId}`);
   };
 
   const handleDeleteTask = (taskId: number) => {

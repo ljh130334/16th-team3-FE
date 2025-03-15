@@ -1,3 +1,4 @@
+import { useUserStore } from '@/store/useUserStore';
 import { AppleAuthorizationResponse } from '@/types/auth';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -16,8 +17,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const deviceId = '0f365b39-c33d-39be-bdfc-74aaf55'; // ! TODO: 기기 id 동적 처리
-    const deviceType = 'IOS'; // ! TODO: 기기 타입 동적 처리
+    const deviceId = useUserStore.getState().deviceId;
+    const deviceType = useUserStore.getState().deviceType;
+
+    console.log('deviceId: ' + deviceId);
+    console.log('deviceType: ' + deviceType);
 
     const oauthResponse = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/v1/auth/login/apple`,

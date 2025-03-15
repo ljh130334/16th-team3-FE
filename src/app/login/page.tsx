@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { useWebViewMessage } from '@/hooks/useWebViewMessage';
 import { useUserStore } from '@/store';
 import { AppleAuthorizationResponse } from '@/types/auth';
 import Image from 'next/image';
@@ -20,10 +21,15 @@ const SCOPE_KAKAO = ['openid'].join(',');
 const LoginPage = () => {
   const router = useRouter();
   const [isKakaoLoaded, setIsKakaoLoaded] = useState(false);
+  const { handleGetDeviceToken } = useWebViewMessage();
 
   const { setUser } = useUserStore();
 
-  const handleKakaoLogin = () => {
+  useEffect(() => {
+    handleGetDeviceToken();
+  }, []);
+
+  const handleKakaoLogin = async () => {
     if (!isKakaoLoaded || !window.Kakao?.Auth) {
       console.error('Kakao SDK not loaded');
       return;
@@ -99,7 +105,7 @@ const LoginPage = () => {
   }, []);
 
   return (
-    <div className="flex h-screen flex-col justify-between bg-background-primary px-5 py-12">
+    <div className="flex h-full flex-col justify-between bg-background-primary px-5 py-12">
       <div className="mt-[144px]">
         <div className="t2 text-strong">
           <p>

@@ -77,22 +77,27 @@ const HomePageContent = () => {
     sundayOfThisWeek.setHours(23, 59, 59, 999);
 
     return allTasks.filter((task) => {
-      if (task.status === 'inProgress' || task.status === 'INPROGRESS') return false;
-      
+      if (task.status === 'inProgress' || task.status === 'INPROGRESS')
+        return false;
+
       // 날짜 계산
       const taskDueDate = task.dueDatetime
         ? new Date(task.dueDatetime)
-        : (task.dueDate ? new Date(task.dueDate) : null);
+        : task.dueDate
+          ? new Date(task.dueDate)
+          : null;
       if (!taskDueDate) return false;
 
       const taskDateOnly = new Date(taskDueDate);
       taskDateOnly.setHours(0, 0, 0, 0);
-      
-      const taskIsAfterToday = taskDateOnly.getTime() > today.getTime() || 
-                              (taskDateOnly.getTime() === today.getTime() && taskDueDate.getHours() >= 1);
-      
+
+      const taskIsAfterToday =
+        taskDateOnly.getTime() > today.getTime() ||
+        (taskDateOnly.getTime() === today.getTime() &&
+          taskDueDate.getHours() >= 1);
+
       const taskIsBeforeSunday = taskDueDate <= sundayOfThisWeek;
-      
+
       // 오늘 이후(또는 오늘 새벽 1시 이후)이고 이번주 일요일 이전인 작업
       return taskIsAfterToday && taskIsBeforeSunday;
     });
@@ -107,7 +112,6 @@ const HomePageContent = () => {
   const futureTasks = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
     // 이번주의 일요일 계산
     const dayOfWeek = today.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
     const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
@@ -116,37 +120,47 @@ const HomePageContent = () => {
     const sundayOfThisWeek = new Date(mondayOfThisWeek);
     sundayOfThisWeek.setDate(mondayOfThisWeek.getDate() + 6);
     sundayOfThisWeek.setHours(23, 59, 59, 999);
-    
-    // 모든 작업에서 미래 작업 필터링 
-    return allTasks.filter(task => {
-      const dueDate = task.dueDatetime 
+
+    // 모든 작업에서 미래 작업 필터링
+    return allTasks.filter((task) => {
+      const dueDate = task.dueDatetime
         ? new Date(task.dueDatetime)
-        : (task.dueDate ? new Date(task.dueDate) : null);
-      
+        : task.dueDate
+          ? new Date(task.dueDate)
+          : null;
+
       if (!dueDate) {
         return false;
       }
-      
+
       const isPastToday = dueDate > today;
       const isAfterThisWeek = dueDate > sundayOfThisWeek;
-      
-      console.log('Task:', task.title, 'Is past today:', isPastToday, 'Is after this week:', isAfterThisWeek);
-      
+
+      console.log(
+        'Task:',
+        task.title,
+        'Is past today:',
+        isPastToday,
+        'Is after this week:',
+        isAfterThisWeek,
+      );
+
       if (task.status === 'inProgress' || task.status === 'INPROGRESS') {
         return false;
       }
-      
-      if (dueDate.getDate() === today.getDate() && 
-          dueDate.getMonth() === today.getMonth() && 
-          dueDate.getFullYear() === today.getFullYear()) {
+
+      if (
+        dueDate.getDate() === today.getDate() &&
+        dueDate.getMonth() === today.getMonth() &&
+        dueDate.getFullYear() === today.getFullYear()
+      ) {
         return false;
       }
-      
+
       // 이번주 작업 제외 (오늘 이후, 이번주 일요일 이전)
       if (dueDate > today && dueDate <= sundayOfThisWeek) {
         return false;
       }
-      
       // 이번주 이후의 작업만 포함
       const isAfterSunday = dueDate > sundayOfThisWeek;
       return isAfterSunday;
@@ -178,7 +192,7 @@ const HomePageContent = () => {
   const [taskName, setTaskName] = useState('');
 
   const handleNavigateToMyPage = () => {
-    router.push("/my-page");
+    router.push('/my-page');
   };
 
   // 다른 페이지에서 돌아올 때 재진입으로 간주
@@ -299,7 +313,7 @@ const HomePageContent = () => {
     // React Query mutation 실행
     startTaskMutation(taskId);
     setIsDetailSheetOpen(false);
-    router.push(`/focus?taskId=${taskId}`);
+    router.push(`/immersion/${taskId}`);
   };
 
   const handleAddTask = () => {
@@ -328,7 +342,7 @@ const HomePageContent = () => {
 
     if (taskToContinue) {
       // TODO: 몰입 화면으로 이동
-      router.push(`/focus?taskId=${taskId}`);
+      router.push(`/immersion/${taskId}`);
     }
   };
 
@@ -445,7 +459,7 @@ const HomePageContent = () => {
   return (
     <Drawer open={isDialogOpen && taskName !== ''}>
       <div className="flex min-h-screen flex-col bg-background-primary">
-        <header className="fixed left-0 right-0 top-0 z-20 bg-background-primary">
+        <header className="fixed left-0 right-0 top-[60px] z-20 bg-background-primary">
           <div className="flex items-center justify-between px-[20px] py-[15px]">
             <Image
               src="/icons/home/spurt.svg"
@@ -456,13 +470,13 @@ const HomePageContent = () => {
               className="w-[50px]"
             />
             <button onClick={handleNavigateToMyPage}>
-            <Image 
-              src="/icons/home/mypage.svg" 
-              alt="마이페이지" 
-              width={20} 
-              height={20} 
-            />
-          </button>
+              <Image
+                src="/icons/home/mypage.svg"
+                alt="마이페이지"
+                width={20}
+                height={20}
+              />
+            </button>
           </div>
           <div className="px-[20px] py-[11px]">
             <div className="flex space-x-4">
