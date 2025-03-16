@@ -485,7 +485,7 @@ const HomePageContent = () => {
                   className={`t3 ${activeTab === 'today' ? 'text-text-normal' : 'text-text-disabled'}`}
                 >
                   오늘 할일
-                </span>{' '}
+                </span>
                 <span
                   className={`s1 ${activeTab === 'today' ? 'text-text-primary' : 'text-text-disabled'}`}
                 >
@@ -497,7 +497,7 @@ const HomePageContent = () => {
                   className={`t3 ${activeTab === 'all' ? 'text-text-normal' : 'text-text-disabled'}`}
                 >
                   전체 할일
-                </span>{' '}
+                </span>
                 <span
                   className={`s1 ${activeTab === 'all' ? 'text-text-primary' : 'text-text-disabled'}`}
                 >
@@ -808,7 +808,7 @@ const HomePageContent = () => {
                         {new Date(expiredTask.dueDate).toLocaleDateString(
                           'ko-KR',
                           { month: 'long', day: 'numeric' },
-                        )}{' '}
+                        )}
                         ({expiredTask.dueDay}), {expiredTask.dueTime}
                       </p>
                     </div>

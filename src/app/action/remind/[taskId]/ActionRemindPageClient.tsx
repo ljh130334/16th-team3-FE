@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { usePatchTaskHoldOff } from '@/hooks/useTask';
 import { TaskResponse } from '@/types/task';
+import { useRouter } from 'next/navigation';
 
 import Image from 'next/image';
 import Header from './_component/Header';
@@ -83,7 +84,7 @@ export default function ActionRemindPageClient({
     DEFAULT_VALUES.INTERVAL,
   );
   const { mutate } = usePatchTaskHoldOff();
-
+  const router = useRouter();
   const handlePatch = () => {
     mutate({
       taskId: initialTask?.id.toString() ?? '',
@@ -101,8 +102,14 @@ export default function ActionRemindPageClient({
     <div className="flex h-full flex-col bg-background-primary pb-[30px]">
       {/* TODO : 헤더 컴포넌트로 변경 예정 */}
       <div className="flex items-center px-5 py-[14px]">
-        <Image src="/arrow-left.svg" alt="왼쪽 화살표" width={24} height={24} />
-      </div>{' '}
+        <Image
+          src="/arrow-left.svg"
+          alt="왼쪽 화살표"
+          width={24}
+          height={24}
+          onClick={() => router.back()}
+        />
+      </div>
       <Header maxNotificationCount={REMINDER_LIMITS.MAX} />
       <TaskDetails
         taskName={initialTask?.name ?? ''}

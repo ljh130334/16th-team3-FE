@@ -239,8 +239,8 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 
         <div className="px-5">
           <p className="b3 mb-5 text-center text-text-neutral">
-            '{task.persona?.taskKeywordsCombination?.taskType?.name || '일반'}{' '}
-            {task.persona?.taskKeywordsCombination?.taskMode?.name || '모드'}'{' '}
+            '{task.persona?.taskKeywordsCombination?.taskType?.name || '일반'}
+            {task.persona?.taskKeywordsCombination?.taskMode?.name || '모드'}'
             {formatNickname(personaName)}님!
             <br />
             미루지 말고 여유있게 시작해볼까요?

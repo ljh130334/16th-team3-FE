@@ -64,7 +64,7 @@ const BufferTime = ({
           <span className="t2 text-strong">시작할 수 있게</span>
           <span className="t2 text-strong">작은 행동 알림을 보낼게요</span>
           <span className="b3 text-neutral mt-6">
-            {`${formattedDate} ${deadlineTime.meridiem} ${deadlineTime.hour}:${deadlineTime.minute}`}{' '}
+            {`${formattedDate} ${deadlineTime.meridiem} ${deadlineTime.hour}:${deadlineTime.minute}`}
             첫 알림
           </span>
         </div>
