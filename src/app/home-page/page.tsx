@@ -19,23 +19,12 @@ import {
 } from '@/hooks/useTasks';
 
 import CharacterDialog from '../(create)/_components/characterDialog/CharacterDialog';
-import { Drawer } from '@/components/ui/drawer';
 import Loader from '@/components/loader/Loader';
+import { Dialog } from '@/components/ui/dialog';
 
 const HomePageContent = () => {
   // 홈 API를 통해 모든 데이터 한번에 가져오기
-  const { data: homeData, isLoading: isLoadingHome, refetch } = useHomeData();
-
-  useEffect(() => {
-    const handleFocus = () => {
-      refetch();
-    };
-
-    window.addEventListener('focus', handleFocus);
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, [refetch]);
+  const { data: homeData, isLoading: isLoadingHome } = useHomeData();
 
   // 데이터 구조 분해
   const allTasks = useMemo(
@@ -136,15 +125,6 @@ const HomePageContent = () => {
       const isPastToday = dueDate > today;
       const isAfterThisWeek = dueDate > sundayOfThisWeek;
 
-      console.log(
-        'Task:',
-        task.title,
-        'Is past today:',
-        isPastToday,
-        'Is after this week:',
-        isAfterThisWeek,
-      );
-
       if (task.status === 'inProgress' || task.status === 'INPROGRESS') {
         return false;
       }
@@ -190,6 +170,11 @@ const HomePageContent = () => {
 
   const searchParams = useSearchParams();
   const [taskName, setTaskName] = useState('');
+  const [personaName, setPersonaName] = useState('');
+  const [personaType, setPersonaType] = useState({
+    taskType: '',
+    taskMode: '',
+  });
 
   const handleNavigateToMyPage = () => {
     router.push('/my-page');
@@ -267,7 +252,6 @@ const HomePageContent = () => {
   useEffect(() => {
     // 재진입 상태이고, 만료된 작업이 있을 때 바텀시트 표시
     if (isReentry && expiredTasks.length > 0) {
-      console.log('재진입 감지 및 만료된 작업 발견:', expiredTasks);
       setExpiredTask(expiredTasks[0]);
       setShowExpiredTaskSheet(true);
     }
@@ -322,7 +306,6 @@ const HomePageContent = () => {
 
   const handleCloseCreateSheet = () => {
     setIsCreateSheetOpen(false);
-    refetch();
   };
 
   // 툴팁 표시 관련 로직
@@ -386,6 +369,13 @@ const HomePageContent = () => {
       newParams.delete('task');
       router.replace(`/home-page?${newParams.toString()}`, { scroll: false });
     }
+
+    if (searchParams.get('taskType') && searchParams.get('taskMode')) {
+      setPersonaType({
+        taskType: searchParams.get('taskType') || '',
+        taskMode: searchParams.get('taskMode') || '',
+      });
+    }
   }, [searchParams, router]);
 
   useEffect(() => {
@@ -403,6 +393,14 @@ const HomePageContent = () => {
     if (taskParam) {
       setTaskName(taskParam);
       newParams.delete('task');
+      shouldReplace = true;
+    }
+
+    const personaParam = searchParams.get('personaName');
+
+    if (personaParam) {
+      setPersonaName(personaParam);
+      newParams.delete('personaName');
       shouldReplace = true;
     }
 
@@ -457,7 +455,7 @@ const HomePageContent = () => {
     inProgressTasks.length === 0 && todayTasks.length > 0;
 
   return (
-    <Drawer open={isDialogOpen && taskName !== ''}>
+    <Dialog open={isDialogOpen && taskName !== ''}>
       <div className="flex min-h-screen flex-col bg-background-primary">
         <header className="fixed left-0 right-0 top-[60px] z-20 bg-background-primary">
           <div className="flex items-center justify-between px-[20px] py-[15px]">
@@ -485,7 +483,7 @@ const HomePageContent = () => {
                   className={`t3 ${activeTab === 'today' ? 'text-text-normal' : 'text-text-disabled'}`}
                 >
                   오늘 할일
-                </span>{' '}
+                </span>
                 <span
                   className={`s1 ${activeTab === 'today' ? 'text-text-primary' : 'text-text-disabled'}`}
                 >
@@ -497,7 +495,7 @@ const HomePageContent = () => {
                   className={`t3 ${activeTab === 'all' ? 'text-text-normal' : 'text-text-disabled'}`}
                 >
                   전체 할일
-                </span>{' '}
+                </span>
                 <span
                   className={`s1 ${activeTab === 'all' ? 'text-text-primary' : 'text-text-disabled'}`}
                 >
@@ -808,7 +806,7 @@ const HomePageContent = () => {
                         {new Date(expiredTask.dueDate).toLocaleDateString(
                           'ko-KR',
                           { month: 'long', day: 'numeric' },
-                        )}{' '}
+                        )}
                         ({expiredTask.dueDay}), {expiredTask.dueTime}
                       </p>
                     </div>
@@ -948,7 +946,6 @@ const HomePageContent = () => {
           </div>
         </footer>
 
-        {/* 할 일 상세 바텀 시트 */}
         {detailTask && (
           <TaskDetailSheet
             isOpen={isDetailSheetOpen}
@@ -959,8 +956,11 @@ const HomePageContent = () => {
           />
         )}
 
+        {/* TODO(prgmr99): 모달 띄워지는 애니메이션 확인 필요 */}
         <CharacterDialog
           task={taskName}
+          personaName={personaName}
+          personaType={personaType}
           onClick={() => setIsDialogOpen(false)}
         />
 
@@ -969,7 +969,7 @@ const HomePageContent = () => {
           onClose={handleCloseCreateSheet}
         />
       </div>
-    </Drawer>
+    </Dialog>
   );
 };
 

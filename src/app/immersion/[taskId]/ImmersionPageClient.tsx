@@ -6,6 +6,7 @@ import { TaskResponse } from '@/types/task';
 import { usePatchTaskStatus } from '@/hooks/useTask';
 import { useEffect, useState } from 'react';
 import { calculateRemainingTime } from '@/utils/dateFormat';
+import { useUserStore } from '@/store/useUserStore';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/component/Badge';
@@ -19,6 +20,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
   const router = useRouter();
   const [remainingTime, setRemainingTime] = useState('');
 
+  const nickname = useUserStore((state) => state.userData.nickname);
   // const { data, error, isLoading } = useTask(initialTask.id.toString(), {
   //   initialData: initialTask,
   // });
@@ -31,7 +33,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
       if (initialTask?.dueDatetime) {
         const targetDate = new Date(initialTask.dueDatetime);
         const timeStr = calculateRemainingTime(targetDate);
-        
+
         // 일수가 99일이 넘는지 확인
         if (timeStr.match(/^\d{3,}일/)) {
           // 일수가 3자리(100일) 이상인 경우, '남음' 텍스트를 줄바꿈 처리
@@ -67,8 +69,8 @@ export default function ImmersionPageClient({ initialTask }: Props) {
         </div>
       </Link>
       <div className="mt-[120px] flex flex-col items-center justify-center">
-        <div className="text-s2">디프만 리서치 과제 마감까지</div>
-        <div className="text-h2 bg-hologram bg-clip-text text-transparent whitespace-pre-line text-center">
+        <div className="text-s2">{initialTask.name} 마감까지</div>
+        <div className="whitespace-pre-line bg-hologram bg-clip-text text-center text-h2 text-transparent">
           {remainingTime}
         </div>
       </div>
@@ -84,7 +86,9 @@ export default function ImmersionPageClient({ initialTask }: Props) {
             height={140}
           />
         </div>
-        <Badge>눈물의 과제 김디퍼</Badge>
+        <Badge>
+          {initialTask.persona?.name} {nickname}
+        </Badge>
       </div>
 
       <div className="relative mt-auto flex flex-col items-center px-5 py-6">

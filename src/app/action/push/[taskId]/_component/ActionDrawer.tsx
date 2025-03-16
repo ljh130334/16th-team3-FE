@@ -85,7 +85,7 @@ export default function PushActionDrawer({
               </p>
             </DrawerTitle>
           </DrawerHeader>
-          <div className="px-5">
+          <div className="px-5 pb-[30px]">
             <ActionCard
               variant="drawer"
               badgeText="작은 행동"

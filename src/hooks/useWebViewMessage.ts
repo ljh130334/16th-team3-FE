@@ -36,6 +36,7 @@ export const useWebViewMessage = (router?: ReturnType<typeof useRouter>) => {
         }
         if (data.type === 'GET_DEVICE_TOKEN') {
           localStorage.setItem('deviceToken', data.payload.fcmToken);
+          console.log('data.payload.fcmToken', data.payload.fcmToken);
           Cookies.set('deviceId', data.payload.fcmToken, {
             expires: 30, // 30일
             path: '/',

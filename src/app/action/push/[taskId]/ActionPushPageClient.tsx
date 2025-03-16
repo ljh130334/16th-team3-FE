@@ -87,7 +87,7 @@ export default function ActionPushPageClient({
       {screenState !== PushScreenState.FINAL_WARNING && (
         <button
           className="relative mb-[34px] text-gray-neutral"
-          onClick={() => setScreenState(PushScreenState.SECOND_CHANCE)}
+          onClick={() => router.push('/action/remind/' + task.id)}
         >
           나중에 할래요
         </button>
