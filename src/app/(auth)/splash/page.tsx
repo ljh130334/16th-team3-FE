@@ -37,7 +37,7 @@ export default function SplashPage() {
           width={108}
           height={41}
           priority
-          className="mb-10"
+          className="mb-40"
         />
       </div>
     </div>
