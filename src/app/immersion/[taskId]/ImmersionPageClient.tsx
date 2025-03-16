@@ -40,7 +40,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
         <div className="text-s2">디프만 리서치 과제 마감까지</div>
         <Countdown
           deadline={initialTask?.dueDatetime ?? ''}
-          className="text-h2"
+          className="text-h2 bg-hologram bg-clip-text text-transparent"
         />
       </div>
 
