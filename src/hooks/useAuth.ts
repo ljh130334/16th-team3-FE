@@ -37,13 +37,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isAuthenticated = userData && userData.memberId !== -1;
 
   const loadUserProfile = useCallback(async () => {
-    try {
-      const response = await api.get('v1/members/me').json<User>();
-      setUser(response);
-    } catch (error) {
-      clearUser();
-    }
-  }, [clearUser, setUser]);
+    const response = await api.get('v1/members/me').json<User>();
+    setUser(response);
+  }, [setUser]);
 
   // 쿠키 및 사용자 정보 초기화 함수
   const clearAuthData = () => {
