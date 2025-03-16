@@ -132,17 +132,39 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 
   const formatDueDatetime = () => {
     if (!task.dueDate) return '-';
-
+  
     // Date 객체로 변환해서 새롭게 포맷팅
     const dueDate = new Date(task.dueDate);
     const month = dueDate.getMonth() + 1;
     const day = dueDate.getDate();
     const dayOfWeek = task.dueDay || '';
-
+  
     // 시간 처리
-    let timeDisplay = task.dueTime || '';
-    timeDisplay = timeDisplay.replace('까지', '');
-
+    let timeDisplay = '';
+    
+    if (task.dueDatetime) {
+      const dueDateObj = new Date(task.dueDatetime);
+      const hours = dueDateObj.getHours();
+      const minutes = dueDateObj.getMinutes();
+      const amPm = hours >= 12 ? '오후' : '오전';
+      const hour12 = hours % 12 || 12;
+      
+      // 자정인 경우
+      if (hours === 0 && minutes === 0) {
+        timeDisplay = '자정';
+      } 
+      // 분이 0인 경우는 시간만
+      else if (minutes === 0) {
+        timeDisplay = `${amPm} ${hour12}시`;
+      } 
+      // 아닌 경우는 분까지 표시
+      else {
+        timeDisplay = `${amPm} ${hour12}시 ${minutes}분`;
+      }
+    } else if (task.dueTime) {
+      timeDisplay = task.dueTime.replace('까지', '');
+    }
+  
     return `${month}월 ${day}일 ${dayOfWeek}, ${timeDisplay}`;
   };
 
@@ -153,17 +175,8 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   const personaTriggerAction = task.triggerAction || '노트북 켜기';
 
   // 이미지 URL 처리
-  const personaImageUrl = '/icons/home/happy-character.svg';
-
-  // if (task.persona?.personalImageUrl) {
-  //   const imageUrl = task.persona.personalImageUrl;
-  //   if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://') || imageUrl.startsWith('/')) {
-  //     personaImageUrl = imageUrl;
-  //   } else {
-  //     personaImageUrl = `/${imageUrl}`;
-  //   }
-  // }
-
+  const personaImageUrl = '/icons/home/happy-character.png';
+  
   // 미리 시작 상태일 때만 화살표 표시 (지금 시작 또는 이어서 몰입일 때는 표시 안함)
   const showArrow = !isInProgress;
 
