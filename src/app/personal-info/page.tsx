@@ -22,7 +22,7 @@ export default function PersonalInfoPage() {
             height={24}
           />
         </button>
-        <div className="s2 w-full text-center text-gray-normal">개인정보 처리 방침</div>
+        <div className="s2 w-full text-center text-gray-normal">이용약관</div>
       </div>
 
       {/* 개인정보 처리방침 내용 */}
@@ -30,7 +30,7 @@ export default function PersonalInfoPage() {
         <div className="mb-[4.5px]">
           <h2 className="l4 text-gray-normal mb-2">약관 및 정책</h2>
           <p className="l5 text-gray-normal mb-4">
-            「SPURT」 서비스는 「개인정보 보호법」 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보 처리방침을 수립 공개합니다.
+            「SPURT」 서비스는 「개인정보 보호법」 제 30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보 처리방침을 수립 공개합니다.
           </p>
           <p className="l5 text-gray-normal mb-8">이 개인정보처리방침은 2025년 4월 19일부터 적용됩니다.</p>
         </div>
