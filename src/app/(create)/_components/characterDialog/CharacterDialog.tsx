@@ -33,7 +33,7 @@ const CharacterDialog = ({
       <div className="mb-1 flex flex-col items-center gap-5">
         <div className="flex h-20 w-20 items-center justify-center rounded-[28px] bg-component-gray-tertiary">
           <Image
-            src="/icons/home/happy-character.svg"
+            src="/icons/home/happy-character.png"
             alt="happy-character"
             width={54}
             height={54}

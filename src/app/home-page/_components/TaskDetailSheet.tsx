@@ -175,7 +175,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   const personaTriggerAction = task.triggerAction || '노트북 켜기';
 
   // 이미지 URL 처리
-  const personaImageUrl = '/icons/home/happy-character.svg';
+  const personaImageUrl = '/icons/home/happy-character.png';
   
   // 미리 시작 상태일 때만 화살표 표시 (지금 시작 또는 이어서 몰입일 때는 표시 안함)
   const showArrow = !isInProgress;

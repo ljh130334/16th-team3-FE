@@ -165,7 +165,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
           <div className="mb-4 flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-[20px] bg-component-gray-tertiary p-2">
               <Image
-                src="/icons/home/happy-character.svg"
+                src="/icons/home/happy-character.png"
                 alt="Task"
                 width={32}
                 height={32}
@@ -238,7 +238,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 
         <div className="my-8 flex justify-center overflow-hidden">
           <Image
-            src="/icons/home/happy-character.svg"
+            src="/icons/home/happy-character.png"
             alt="Character"
             width={87}
             height={87}

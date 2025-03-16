@@ -125,21 +125,21 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({ task, onClick, onDelete }) =>
         <Button 
             variant="hologram" 
             size="sm"
-            className="text-text-inverse z-10 rounded-[6px] px-[15px] py-[3px] h-auto"
+            className="text-text-inverse z-10 rounded-[6px] px-[15px] py-[3px] h-auto flex items-center justify-center"
         >
-            <span className="c2">D-DAY</span>
+            <span className="c2 flex items-center justify-center">D-DAY</span>
         </Button>
       );
     } else if (taskType === 'weekly') {
       return (
-        <div className="bg-component-accent-secondary text-text-primary rounded-[6px] px-[15px] py-[0px]">
-          <span className="c2">{dDayText}</span>
+        <div className="bg-component-accent-secondary text-text-primary rounded-[6px] px-[15px] py-[3px] flex items-center justify-center">
+            <span className="c2 flex items-center justify-center">{dDayText}</span>
         </div>
       );
     } else {
       return (
-        <div className="bg-component-gray-tertiary text-text-neutral rounded-[6px] px-[15px] py-[0px]">
-          <span className="c2">{dDayText}</span>
+        <div className="bg-component-gray-tertiary text-text-neutral rounded-[6px] px-[15px] py-[3px] flex items-center justify-center">
+          <span className="c2 flex items-center justify-center">{dDayText}</span>
         </div>
       );
     }
