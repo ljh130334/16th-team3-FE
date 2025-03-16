@@ -6,11 +6,10 @@ import React, {
   useContext,
   useCallback,
 } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { api } from '@/lib/ky';
 import { User } from '@/types/user';
 import { useUserStore } from '@/store/useUserStore';
-import Cookies from 'js-cookie';
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -30,23 +29,21 @@ const AuthContext = createContext<AuthContextType>(defaultValue);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const userData = useUserStore((state) => state.userData);
   const setUser = useUserStore((state) => state.setUser);
   const clearUser = useUserStore((state) => state.clearUser);
-  const token = Cookies.get('accessToken');
 
   const isAuthenticated = userData && userData.memberId !== -1;
 
   const loadUserProfile = useCallback(async () => {
     try {
-      if (token) {
-        const response = await api.get('v1/members/me').json<User>();
-        setUser(response);
-      }
+      const response = await api.get('v1/members/me').json<User>();
+      setUser(response);
     } catch (error) {
       clearUser();
     }
-  }, [token, clearUser, setUser]);
+  }, [clearUser, setUser]);
 
   // 쿠키 및 사용자 정보 초기화 함수
   const clearAuthData = () => {
@@ -59,19 +56,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     clearUser();
   };
 
-  // 컴포넌트 마운트 시 사용자 정보 로드
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        await loadUserProfile();
-      } catch (error) {
-        console.error('인증 확인 중 오류:', error);
-      } finally {
-      }
-    };
-
-    checkAuth();
-  }, [loadUserProfile]);
+    if (pathname !== '/login') {
+      const checkAuth = async () => {
+        try {
+          await loadUserProfile();
+        } catch (error) {
+          console.error('인증 확인 중 오류:', error);
+        }
+      };
+      checkAuth();
+    }
+  }, [pathname, loadUserProfile]);
 
   const logout = async () => {
     try {

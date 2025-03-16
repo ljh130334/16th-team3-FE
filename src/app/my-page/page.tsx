@@ -11,7 +11,7 @@ import { api } from '@/lib/ky';
 
 export default function MyPage() {
   const router = useRouter();
-  const { logout, isLoading, loadUserProfile } = useAuth();
+  const { logout, loadUserProfile } = useAuth();
   const userData = useUserStore((state) => state.userData);
   const clearUser = useUserStore((state) => state.clearUser);
   const [appVersion] = useState('V.0.0.1');

@@ -3,8 +3,10 @@ import { cookies } from 'next/headers';
 
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
-  const deviceId = cookieStore.get('deviceId')?.value?cookieStore.get('deviceId')?.value : '0f365b39-c33d-39be-bdfc-74aaf55';
-  const deviceType = cookieStore.get('deviceType')?.value?cookieStore.get('deviceType')?.value : 'IOS';
+  const deviceId =
+    cookieStore.get('deviceId')?.value || '0f365b39-c33d-39be-bdfc-74aaf55';
+  const deviceType = cookieStore.get('deviceType')?.value || 'IOS';
+
   try {
     const body = await req.json();
     const { authCode } = body;
@@ -16,8 +18,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log('deviceId: ' + deviceId);
-    console.log('deviceType: ' + deviceType);
     // * AccessToken을 headers에 담아서 보내는 요청이 아니어서 fetch를 사용함.
     const oauthResponse = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/v1/auth/login`,
