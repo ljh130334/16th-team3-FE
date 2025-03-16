@@ -22,7 +22,7 @@ export default function TermsPage() {
             height={24}
           />
         </button>
-        <div className="s2 w-full text-center text-gray-normal">이용약관</div>
+        <div className="s2 w-full text-center text-gray-normal">개인정보 처리 방침</div>
       </div>
 
       {/* 이용약관 내용 */}
