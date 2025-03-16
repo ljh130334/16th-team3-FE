@@ -164,13 +164,16 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({ task, onClick, onDelete }) =>
         dueDay = `(${days[date.getDay()]})`;
       }
       
-      // 시간 설정 (없는 경우)
+      // 시간 설정 (없는 경우) - 분 정보 포함
       if (!dueTime) {
         const hours = date.getHours();
         const minutes = date.getMinutes();
         const ampm = hours >= 12 ? '오후' : '오전';
         const hour12 = hours % 12 || 12;
-        dueTime = `${ampm} ${hour12}시${minutes > 0 ? ` ${minutes}분` : ''}까지`;
+        
+        dueTime = minutes === 0
+          ? `${ampm} ${hour12}시까지`
+          : `${ampm} ${hour12}시 ${minutes}분까지`;
       }
     }
     

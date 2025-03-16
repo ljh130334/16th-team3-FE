@@ -28,17 +28,23 @@ export function formatDateWithDay(isoString: string): string {
   export function formatTimeForList(isoString: string, includeToday = true): string {
     const date = new Date(isoString);
     let hours = date.getHours();
+    const minutes = date.getMinutes();
     
     const period = hours >= 12 ? '오후' : '오전';
     if (hours > 12) hours -= 12;
     if (hours === 0) hours = 12;
     
     // 자정인 경우 특별 처리
-    if (hours === 12 && date.getMinutes() === 0 && period === '오전') {
+    if (hours === 12 && minutes === 0 && period === '오전') {
       return includeToday ? '오늘 자정까지' : '자정까지';
     }
     
-    return includeToday ? `오늘 ${period} ${hours}시까지` : `${period} ${hours}시까지`;
+    // 분이 0인 경우는 시간만, 아닌 경우는 분까지 표시
+    const timeStr = minutes === 0 
+      ? `${period} ${hours}시까지` 
+      : `${period} ${hours}시 ${minutes}분까지`;
+    
+    return includeToday ? `오늘 ${timeStr}` : timeStr;
   }
   
   // 오늘인지 판별

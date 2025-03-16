@@ -115,9 +115,14 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
 
     // 시간 형식 변환 (예: "오후 6시까지")
     const hours = dueDate.getHours();
+    const minutes = dueDate.getMinutes();
     const amPm = hours >= 12 ? '오후' : '오전';
     const hour12 = hours % 12 || 12;
-    const dueTime = `${amPm} ${hour12}시까지`;
+
+    // 분이 0인 경우는 시간만, 아닌 경우는 분까지 표시
+    const dueTime = minutes === 0
+      ? `${amPm} ${hour12}시까지`
+      : `${amPm} ${hour12}시 ${minutes}분까지`;
 
     // D-Day 계산 및 마감 지난 경우 D+1 형식으로 표시
     const today = new Date();
