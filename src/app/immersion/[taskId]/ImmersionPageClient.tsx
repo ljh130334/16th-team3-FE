@@ -4,10 +4,11 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { TaskResponse } from '@/types/task';
 import { usePatchTaskStatus } from '@/hooks/useTask';
+import { useEffect, useState } from 'react';
+import { calculateRemainingTime } from '@/utils/dateFormat';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/component/Badge';
-import Countdown from '@/components/countdown/countdown';
 import Link from 'next/link';
 
 interface Props {
@@ -16,12 +17,41 @@ interface Props {
 
 export default function ImmersionPageClient({ initialTask }: Props) {
   const router = useRouter();
+  const [remainingTime, setRemainingTime] = useState('');
 
   // const { data, error, isLoading } = useTask(initialTask.id.toString(), {
   //   initialData: initialTask,
   // });
 
   const { mutate: patchTaskStatus } = usePatchTaskStatus();
+
+  // 남은 시간을 계산하고 상태 업데이트하는 함수
+  useEffect(() => {
+    const updateRemainingTime = () => {
+      if (initialTask?.dueDatetime) {
+        const targetDate = new Date(initialTask.dueDatetime);
+        const timeStr = calculateRemainingTime(targetDate);
+        
+        // 일수가 99일이 넘는지 확인
+        if (timeStr.match(/^\d{3,}일/)) {
+          // 일수가 3자리(100일) 이상인 경우, '남음' 텍스트를 줄바꿈 처리
+          const withoutSuffix = timeStr.replace(' 남음', '');
+          setRemainingTime(`${withoutSuffix}\n남음`);
+        } else {
+          setRemainingTime(timeStr);
+        }
+      }
+    };
+
+    // 초기 업데이트
+    updateRemainingTime();
+
+    // 1초마다 업데이트
+    const intervalId = setInterval(updateRemainingTime, 1000);
+
+    // 컴포넌트 언마운트 시 인터벌 정리
+    return () => clearInterval(intervalId);
+  }, [initialTask?.dueDatetime]);
 
   return (
     <div className="flex h-full flex-col bg-background-primary">
@@ -38,10 +68,9 @@ export default function ImmersionPageClient({ initialTask }: Props) {
       </Link>
       <div className="mt-[120px] flex flex-col items-center justify-center">
         <div className="text-s2">디프만 리서치 과제 마감까지</div>
-        <Countdown
-          deadline={initialTask?.dueDatetime ?? ''}
-          className="text-h2 bg-hologram bg-clip-text text-transparent"
-        />
+        <div className="text-h2 bg-hologram bg-clip-text text-transparent whitespace-pre-line text-center">
+          {remainingTime}
+        </div>
       </div>
 
       <div className="relative mt-4 flex flex-col items-center justify-center gap-4">
