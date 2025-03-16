@@ -21,7 +21,9 @@ export const api = ky.create({
     ],
     afterResponse: [
       async (request, options, response) => {
-        if (response.status === UNAUTHORIZED_CODE) {
+        const accessToken = Cookies.get('accessToken');
+
+        if (response.status === UNAUTHORIZED_CODE || !accessToken) {
           try {
             const refreshResponse = await ky.post(
               `${process.env.NEXT_PUBLIC_API_URL}${REFRESH_ENDPOINT}`,
@@ -29,6 +31,9 @@ export const api = ky.create({
                 headers: {
                   'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({
+                  refreshToken: Cookies.get('refreshToken'),
+                }),
                 credentials: 'include',
               },
             );

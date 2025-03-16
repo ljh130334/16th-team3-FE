@@ -20,6 +20,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/ky';
+import { TaskResponse } from '@/types/task';
 
 type FormState = {
   task?: string;
@@ -81,14 +82,22 @@ const ScheduledTaskCreate = () => {
   const { isMounted } = useMount();
 
   const { mutate: createScheduledTaskMutation } = useMutation({
-    mutationFn: async (data: ScheduledTaskType) => {
-      await api.post(`v1/tasks/scheduled`, {
+    mutationFn: async (data: ScheduledTaskType): Promise<TaskResponse> => {
+      const response = await api.post(`v1/tasks/scheduled`, {
         body: JSON.stringify(data),
       });
+
+      return response.json() as Promise<TaskResponse>;
     },
-    onSuccess: () => {
+    onSuccess: (data: TaskResponse) => {
+      const personaName = data.persona.name;
+      const taskMode = data.persona.taskKeywordsCombination.taskMode.name;
+      const taskType = data.persona.taskKeywordsCombination.taskType.name;
+
       queryClient.invalidateQueries({ queryKey: ['tasks', 'home'] });
-      router.push(`/home-page?dialog=success&task=${funnel.context.task}`);
+      router.push(
+        `/home-page?dialog=success&task=${funnel.context.task}&personaName=${personaName}&taskMode=${taskMode}&taskType=${taskType}`,
+      );
     },
     onError: (error) => {
       console.error('Error creating scheduled task:', error);
