@@ -70,6 +70,8 @@ const InstantTaskCreate = () => {
     },
     onError: (error) => {
       console.error('Error creating instant task:', error);
+      alert(error);
+      alert(error.message);
     },
   });
 
