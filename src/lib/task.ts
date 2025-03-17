@@ -2,7 +2,7 @@ import { TaskResponse } from '@/types/task';
 import { HoldOffParams, StatusParams } from '@/hooks/useTask';
 import { api } from '@/lib/ky';
 
-const API_BASE_URL = 'https://dev.app.spurt.site';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const fetchTask = async (
   taskId: string,
