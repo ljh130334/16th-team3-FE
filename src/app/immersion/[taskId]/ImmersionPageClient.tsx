@@ -14,9 +14,13 @@ import Link from 'next/link';
 
 interface Props {
   initialTask: TaskResponse;
+  errorMessage: string;
 }
 
-export default function ImmersionPageClient({ initialTask }: Props) {
+export default function ImmersionPageClient({
+  initialTask,
+  errorMessage = '',
+}: Props) {
   const router = useRouter();
   const [remainingTime, setRemainingTime] = useState('');
 
@@ -55,6 +59,17 @@ export default function ImmersionPageClient({ initialTask }: Props) {
     return () => clearInterval(intervalId);
   }, [initialTask?.dueDatetime]);
 
+  useEffect(() => {
+    if (errorMessage) {
+      alert(errorMessage);
+    }
+  }, [errorMessage]);
+
+  if (errorMessage) {
+    // 에러 상황이면 사용자에게 에러 안내 메시지를 보여주거나,
+    // 다른 화면으로 유도하는 로직을 넣어도 됩니다.
+    return <div>에러가 발생했습니다: {errorMessage}</div>;
+  }
   return (
     <div className="flex h-full flex-col bg-background-primary">
       {/* TODO : 헤더 컴포넌트로 변경 예정 */}
