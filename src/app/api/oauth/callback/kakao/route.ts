@@ -3,19 +3,10 @@ import { cookies } from 'next/headers';
 
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
-<<<<<<< Updated upstream
   const deviceId =
     cookieStore.get('deviceId')?.value || '0f365b39-c33d-39be-bdfc-74aaf55';
   const deviceType = cookieStore.get('deviceType')?.value || 'IOS';
 
-=======
-  const deviceId = cookieStore.get('deviceId')?.value
-    ? cookieStore.get('deviceId')?.value
-    : '0f365b39-c33d-39be-bdfc-74aaf55';
-  const deviceType = cookieStore.get('deviceType')?.value
-    ? cookieStore.get('deviceType')?.value
-    : 'IOS';
->>>>>>> Stashed changes
   try {
     const body = await req.json();
     const { authCode } = body;
@@ -71,24 +62,15 @@ export async function POST(req: NextRequest) {
 
     nextResponse.cookies.set('accessToken', accessToken, {
       httpOnly: false,
-<<<<<<< Updated upstream
       secure: true, // ! TODO: 앱 심사 받을 때, true로 변경 / 로컬(웹)에서 테스트할 떄, true로 변경 / 로컬(앱)에서 테스트할 때, false로 변경
-=======
-      secure: false, // ! TODO: 앱 심사 받을 때, true로 변경
->>>>>>> Stashed changes
       sameSite: 'none',
       path: '/',
       maxAge: 60 * 60,
     });
 
     nextResponse.cookies.set('refreshToken', refreshToken, {
-<<<<<<< Updated upstream
       httpOnly: false,
       secure: true,
-=======
-      httpOnly: true,
-      secure: false,
->>>>>>> Stashed changes
       sameSite: 'none',
       path: '/',
       maxAge: 60 * 60 * 24 * 7,
