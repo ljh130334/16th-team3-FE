@@ -53,39 +53,32 @@ const InstantTaskCreate = () => {
   const { mutate: createScheduledTaskMutation } = useMutation({
     mutationFn: async (data: InstantTaskType): Promise<TaskResponse> => {
       try {
-        alert('Step 1: 요청 시작');
         const response = await api.post(`v1/tasks/urgent`, {
           body: JSON.stringify(data),
         });
-        alert('Step 2: 응답 수신, JSON 파싱 시작');
 
         const result = await response.json();
-        alert('Step 3: JSON 파싱 완료');
 
         return result as TaskResponse;
       } catch (err) {
-        alert('mutationFn 에러 발생: ' + JSON.stringify(err));
         throw err;
       }
     },
     onSuccess: (data: TaskResponse) => {
-      alert('Step 4: 요청 성공, 데이터 처리 시작');
       const personaName = data.persona.name;
       const taskMode = data.persona.taskKeywordsCombination.taskMode.name;
       const taskType = data.persona.taskKeywordsCombination.taskType.name;
 
       queryClient.invalidateQueries({ queryKey: ['tasks', 'home'] });
-      alert('Step 5: 홈 페이지로 리디렉션');
+
       router.push(
         `/home-page?dialog=success&task=${funnel.context.task}&personaName=${personaName}&taskMode=${taskMode}&taskType=${taskType}`,
       );
     },
     onError: (error) => {
-      alert('Step X: onError 호출됨');
       console.error('Error creating instant task:', error);
-      alert('에러 상세: ' + JSON.stringify(error));
+
       if (error.message) {
-        alert('에러 메시지: ' + error.message);
       }
     },
   });
