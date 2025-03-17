@@ -1,3 +1,5 @@
+import { api } from './ky';
+
 interface RemindData {
   remindInterval: number;
   remindCount: number;
@@ -5,11 +7,7 @@ interface RemindData {
 }
 
 export const fetchRemind = async (taskId: string, data: RemindData) => {
-  const response = await fetch(`/v1/tasks/${taskId}/hold-off`, {
-    method: 'PATCH',
-    headers: {
-      Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwIiwiaWF0IjoxNzQwMzA3MjAwLCJleHAiOjE3NDc5OTMyMDB9.wzUeK94JGyNnC0iyZpWjdJppD66R3dI4jBD8sdWdT44`,
-    },
+  const response = await api.patch(`/v1/tasks/${taskId}/hold-off`, {
     body: JSON.stringify(data),
   });
   return response;

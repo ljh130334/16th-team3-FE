@@ -40,13 +40,13 @@ export const useWebViewMessage = (router?: ReturnType<typeof useRouter>) => {
           Cookies.set('deviceId', data.payload.fcmToken, {
             expires: 30, // 30일
             path: '/',
-            secure: true,
+            secure: false,
           });
 
           Cookies.set('deviceType', data.payload.deviceType, {
             expires: 30,
             path: '/',
-            secure: true,
+            secure: false,
           });
         }
       } catch (error) {
