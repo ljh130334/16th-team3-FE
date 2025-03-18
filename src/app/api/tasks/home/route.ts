@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-    const response = await serverApi(`v1/tasks/home`);
+    const response = await serverApi.get(`v1/tasks/home`);
 
     clearTimeout(timeoutId);
 
