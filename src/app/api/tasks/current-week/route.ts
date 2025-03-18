@@ -1,19 +1,11 @@
-import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
+import { serverApi } from '@/lib/serverKy';
 
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get('accessToken')?.value;
-    
-    if (!accessToken) {
-      return NextResponse.json(
-        { error: '인증 토큰이 없습니다. 로그인이 필요합니다.' },
-        { status: 401 }
-      );
-    }
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
     const today = new Date();
     const dayOfWeek = today.getDay();
     const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
@@ -26,34 +18,34 @@ export async function GET(request: NextRequest) {
     sundayOfThisWeek.setDate(mondayOfThisWeek.getDate() + 6);
     sundayOfThisWeek.setHours(23, 59, 59, 999);
     
-    // URL에 쿼리 파라미터 추가
-    const url = new URL(`${API_BASE_URL}/v1/tasks/current-week`);
-    url.searchParams.append('startDate', mondayOfThisWeek.toISOString());
-    url.searchParams.append('endDate', sundayOfThisWeek.toISOString());
-    
-    // 사용자 토큰으로 API 요청
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`
-      },
-      next: { 
-        revalidate: 60 
-      }
+    const searchParams = new URLSearchParams({
+      startDate: mondayOfThisWeek.toISOString(),
+      endDate: sundayOfThisWeek.toISOString()
     });
+    
+    const response = await serverApi.get(`v1/tasks/current-week?${searchParams}`);
+    
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
+      const errorText = await response.text();
+      
       throw new Error(`API 요청 실패: ${response.status}`);
     }
 
     const data = await response.json();
     return NextResponse.json(data);
-  } catch (error) {
-    console.error('이번주 할일 조회 중 오류 발생:', error);
+  } catch (error: any) {
+    if (error.name === 'AbortError') {
+      return NextResponse.json(
+        { error: '요청 시간이 초과되었습니다.' },
+        { status: 408 },
+      );
+    }
+    
     return NextResponse.json(
       { error: '이번주 할일을 가져오는 중 오류가 발생했습니다.' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

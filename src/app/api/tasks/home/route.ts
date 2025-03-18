@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
+    // AbortController를 사용하여 요청 시간이 10초를 초과하면 요청을 취소합니다.
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 

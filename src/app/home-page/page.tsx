@@ -485,7 +485,7 @@ const HomePageContent = () => {
                   오늘 할일
                 </span>
                 <span
-                  className={`s1 ${activeTab === 'today' ? 'text-text-primary' : 'text-text-disabled'}`}
+                  className={`s1 ml-1 ${activeTab === 'today' ? 'text-text-primary' : 'text-text-disabled'}`}
                 >
                   {todayTasks.length + inProgressTasks.length}
                 </span>
@@ -497,7 +497,7 @@ const HomePageContent = () => {
                   전체 할일
                 </span>
                 <span
-                  className={`s1 ${activeTab === 'all' ? 'text-text-primary' : 'text-text-disabled'}`}
+                  className={`s1 ml-1 ${activeTab === 'all' ? 'text-text-primary' : 'text-text-disabled'}`}
                 >
                   {allTasks.length}
                 </span>
