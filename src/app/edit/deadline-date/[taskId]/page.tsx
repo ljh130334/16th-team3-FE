@@ -31,8 +31,6 @@ const DeadlineDateEditPage = ({ params, searchParams }: EditPageProps) => {
     minute: minuteQuery,
   } = use(searchParams);
 
-  console.log(taskQuery);
-
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -79,8 +77,6 @@ const DeadlineDateEditPage = ({ params, searchParams }: EditPageProps) => {
       hour: deadlineTime.hour,
       minute: deadlineTime.minute,
     }).toString();
-
-    console.log('query', query);
 
     router.push(`/edit/buffer-time/${taskId}?${query}`);
   };
