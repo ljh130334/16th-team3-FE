@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    console.error('전체 할일 조회 중 오류 발생:', error);
     return NextResponse.json(
       { error: '전체 할일을 가져오는 중 오류가 발생했습니다.' },
       { status: 500 },

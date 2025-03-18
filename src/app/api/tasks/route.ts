@@ -2,18 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { serverApi } from '@/lib/serverKy';
 
 export async function GET(request: NextRequest) {try {
-    // AbortController 설정
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-    // serverApi 사용
     const response = await serverApi.get('v1/tasks/all-todos');
 
     clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('API 오류 응답:', errorText);
 
       return NextResponse.json(
         { error: `API 요청 실패 (${response.status}): ${errorText}` },

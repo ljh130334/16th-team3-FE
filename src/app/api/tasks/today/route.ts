@@ -14,12 +14,6 @@ export async function GET(request: NextRequest) {
         .text()
         .catch(() => '응답 내용을 읽을 수 없습니다');
 
-      console.error('API 응답 오류:', {
-        status: response.status,
-        statusText: response.statusText,
-        body: errorText,
-      });
-
       return NextResponse.json(
         {
           error: '오늘 할일을 가져오는 중 오류가 발생했습니다',
@@ -45,7 +39,6 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    console.error('오늘 할일 조회 중 예외 발생:', error);
     return NextResponse.json(
       { error: '오늘 할일을 가져오는 중 서버 오류가 발생했습니다' },
       { status: 500 },

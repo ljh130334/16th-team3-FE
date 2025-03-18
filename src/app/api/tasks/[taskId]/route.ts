@@ -73,7 +73,6 @@ export async function DELETE(
       );
     }
 
-    console.log(`할일 삭제 성공: ${taskId}`);
     return NextResponse.json({ success: true });
   } catch (error: any) {
     if (error.name === 'AbortError') {

@@ -28,7 +28,6 @@ export async function PATCH(
       }
       
       const errorData = (await response.json().catch(() => ({ message: '오류 내용을 읽을 수 없습니다' }))) as { message: string };
-      console.log('errorData', errorData.message);
 
       throw new Error(`API 요청 실패: ${errorData.message}`);
     }
@@ -43,7 +42,6 @@ export async function PATCH(
       );
     }
     
-    console.error('할일 상태 변경 중 오류 발생:', error);
     return NextResponse.json(
       { error: '할일 상태를 변경하는 중 오류가 발생했습니다.' },
       { status: 500 },
