@@ -1,38 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { serverApi } from '@/lib/serverKy';
 
-export async function GET(request: NextRequest) {
-  const cookieStore = await cookies();
-  const AUTH_TOKEN = cookieStore.get('accessToken')?.value;
-
-  try {
-    // 디버깅 로그 추가
-    console.log('API 호출 시작');
-
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-
-    // URL 변경: /v1/tasks -> /v1/tasks/all-todos
-    const fullUrl = `${API_BASE_URL}/v1/tasks/all-todos`;
-    console.log('요청 URL:', fullUrl);
-
-    // 명시적 AbortController 사용
+export async function GET(request: NextRequest) {try {
+    // AbortController 설정
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-    const response = await fetch(fullUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${AUTH_TOKEN}`,
-      },
-      signal: controller.signal,
-    });
+    // serverApi 사용
+    const response = await serverApi.get('v1/tasks/all-todos');
 
     clearTimeout(timeoutId);
-
-    // 응답 정보 상세 로깅
-    console.log('응답 상태:', response.status, response.statusText);
-    console.log('응답 헤더:', Object.fromEntries([...response.headers]));
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -45,7 +22,6 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json();
-    console.log('응답 데이터 받음:', !!data);
     return NextResponse.json(data);
   } catch (error: any) {
     if (error.name === 'AbortError') {

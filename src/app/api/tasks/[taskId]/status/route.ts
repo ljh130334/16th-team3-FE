@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+import { serverApi } from '@/lib/serverKy';
 
 export async function PATCH(
   request: NextRequest,
@@ -10,19 +8,16 @@ export async function PATCH(
   const { taskId } = await params;
 
   try {
-    const cookieStore = await cookies();
-    const AUTH_TOKEN = cookieStore.get('accessToken')?.value;
-
     const body = await request.json();
-    // 백엔드 API 호출
-    const response = await fetch(`${API_BASE_URL}/v1/tasks/${taskId}/status`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${AUTH_TOKEN}`,
-      },
-      body: JSON.stringify(body),
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    
+    const response = await serverApi.patch(`v1/tasks/${taskId}/status`, {
+      json: body,
     });
+    
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       if (response.status === 404) {
@@ -31,7 +26,8 @@ export async function PATCH(
           { status: 404 },
         );
       }
-      const errorData = await response.json();
+      
+      const errorData = (await response.json().catch(() => ({ message: '오류 내용을 읽을 수 없습니다' }))) as { message: string };
       console.log('errorData', errorData.message);
 
       throw new Error(`API 요청 실패: ${errorData.message}`);
@@ -39,7 +35,14 @@ export async function PATCH(
 
     const data = await response.json();
     return NextResponse.json(data);
-  } catch (error) {
+  } catch (error: any) {
+    if (error.name === 'AbortError') {
+      return NextResponse.json(
+        { error: '요청 시간이 초과되었습니다.' },
+        { status: 408 },
+      );
+    }
+    
     console.error('할일 상태 변경 중 오류 발생:', error);
     return NextResponse.json(
       { error: '할일 상태를 변경하는 중 오류가 발생했습니다.' },
