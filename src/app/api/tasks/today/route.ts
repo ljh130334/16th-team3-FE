@@ -27,6 +27,9 @@ export async function GET(request: NextRequest) {
     const data = await response.json();
 
     return NextResponse.json(data, {
+      // TODO: Cache-Control 헤더(private, max-age=60)는 클라이언트 측 캐싱을 통해 
+      // 반복적인, 짧은 시간 내의 동일 요청을 최적화하기 위한 설정입니다.
+      // 할일 데이터가 자주 변경되거나 실시간성이 중요해지면 캐싱 전략을 재검토해야 합니다.
       headers: {
         'Cache-Control': 'private, max-age=60',
       },
