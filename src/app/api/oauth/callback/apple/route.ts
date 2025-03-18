@@ -1,9 +1,15 @@
 import { useUserStore } from '@/store/useUserStore';
 import { AppleAuthorizationResponse } from '@/types/auth';
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
+    const cookieStore = await cookies();
+    const deviceId =
+      cookieStore.get('deviceId')?.value || '0f365b39-c33d-39be-bdfc-74aaf55';
+    const deviceType = cookieStore.get('deviceType')?.value || 'IOS';
+
     const body: AppleAuthorizationResponse = await req.json();
     const {
       authorization: { code, id_token },
@@ -16,12 +22,6 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
-
-    const deviceId = useUserStore.getState().deviceId;
-    const deviceType = useUserStore.getState().deviceType;
-
-    console.log('deviceId: ' + deviceId);
-    console.log('deviceType: ' + deviceType);
 
     const oauthResponse = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/v1/auth/login/apple`,

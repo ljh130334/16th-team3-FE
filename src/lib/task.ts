@@ -2,7 +2,7 @@ import { TaskResponse } from '@/types/task';
 import { HoldOffParams, StatusParams } from '@/hooks/useTask';
 import { api } from '@/lib/ky';
 
-const API_BASE_URL = 'https://dev.app.spurt.site';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const fetchTask = async (
   taskId: string,
@@ -16,12 +16,16 @@ export const fetchTask = async (
       },
     });
 
+    console.log('accessToken: ' + accessToken);
+
     if (!response.ok) {
+      console.log('response.ok: ' + response.ok);
       throw new Error('네트워크 응답에 문제가 있습니다.');
     }
 
     return response.json();
   } catch (error) {
+    console.log('error: ' + error);
     console.error('Error fetching task:', error);
     throw error;
   }

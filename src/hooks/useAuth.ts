@@ -1,19 +1,17 @@
 'use client';
 
 import React, {
-  useState,
   useEffect,
   createContext,
   useContext,
   useCallback,
 } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { api } from '@/lib/ky';
 import { User } from '@/types/user';
 import { useUserStore } from '@/store/useUserStore';
 
 type AuthContextType = {
-  isLoading: boolean;
   isAuthenticated: boolean;
   logout: () => Promise<void>;
   withdraw: () => Promise<void>;
@@ -21,7 +19,6 @@ type AuthContextType = {
 };
 
 const defaultValue: AuthContextType = {
-  isLoading: true,
   isAuthenticated: false,
   logout: async () => {},
   withdraw: async () => {},
@@ -32,7 +29,7 @@ const AuthContext = createContext<AuthContextType>(defaultValue);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
+  const pathname = usePathname();
   const userData = useUserStore((state) => state.userData);
   const setUser = useUserStore((state) => state.setUser);
   const clearUser = useUserStore((state) => state.clearUser);
@@ -40,18 +37,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isAuthenticated = userData && userData.memberId !== -1;
 
   const loadUserProfile = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const response = await api.get('v1/members/me').json<User>();
-
-      setUser(response);
-    } catch (error) {
-      clearUser();
-      router.push('/login');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [router, clearUser, setUser]);
+    const response = await api.get('v1/members/me').json<User>();
+    setUser(response);
+  }, [setUser]);
 
   // 쿠키 및 사용자 정보 초기화 함수
   const clearAuthData = () => {
@@ -64,20 +52,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     clearUser();
   };
 
-  // 컴포넌트 마운트 시 사용자 정보 로드
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        await loadUserProfile();
-      } catch (error) {
-        console.error('인증 확인 중 오류:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, [loadUserProfile]);
+    if (pathname !== '/login') {
+      const checkAuth = async () => {
+        try {
+          await loadUserProfile();
+        } catch (error) {
+          console.error('인증 확인 중 오류:', error);
+        }
+      };
+      checkAuth();
+    }
+  }, [pathname, loadUserProfile]);
 
   const logout = async () => {
     try {
@@ -119,7 +105,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     AuthContext.Provider,
     {
       value: {
-        isLoading,
         isAuthenticated,
         logout,
         withdraw,

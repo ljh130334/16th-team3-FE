@@ -13,7 +13,6 @@ export default async function Immersion({
   const { taskId } = await params;
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('accessToken')?.value;
-
   // TODO(supersett) : 토큰이 없을때 로그인화면으로 가게 하는 로직 추가
   if (!accessToken) {
     throw new Error('Access token is not found');

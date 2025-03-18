@@ -1,6 +1,5 @@
 'use client';
 
-import { AuthProvider } from '@/hooks/useAuth';
 import {
   isServer,
   QueryClient,
@@ -43,8 +42,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>{children}</AuthProvider>
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 }

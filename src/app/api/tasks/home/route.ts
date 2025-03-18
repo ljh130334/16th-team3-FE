@@ -1,36 +1,17 @@
-import { cookies } from 'next/headers';
+import { serverApi } from '@/lib/serverKy';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get('accessToken')?.value;
-
   try {
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-    const AUTH_TOKEN = accessToken;
-    console.log('AUTH_TOKEN:', AUTH_TOKEN);
-    const fullUrl = `${API_BASE_URL}/v1/tasks/home`;
-    console.log('요청 URL:', fullUrl);
-
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-    const response = await fetch(fullUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${AUTH_TOKEN}`,
-      },
-      signal: controller.signal,
-    });
+    const response = await serverApi.get(`v1/tasks/home`);
 
     clearTimeout(timeoutId);
 
-    console.log('응답 상태:', response.status, response.statusText);
-
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('API 오류 응답:', errorText);
 
       return NextResponse.json(
         { error: `API 요청 실패 (${response.status}): ${errorText}` },
@@ -39,12 +20,8 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json();
-    console.log('홈 데이터 응답 받음');
     return NextResponse.json(data);
   } catch (error: any) {
-    console.error('홈 API 요청 오류:', error);
-    console.error('오류 메시지:', error.message);
-
     if (error.name === 'AbortError') {
       return NextResponse.json(
         { error: '요청 시간이 초과되었습니다.' },
