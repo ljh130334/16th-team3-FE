@@ -14,8 +14,10 @@ export const api = ky.create({
     beforeRequest: [
       (request) => {
         const accessToken = Cookies.get('accessToken');
+
         if (accessToken) {
           request.headers.set('Authorization', `Bearer ${accessToken}`);
+          request.headers.set('Connection', 'keep-alive');
         }
       },
     ],
@@ -30,6 +32,7 @@ export const api = ky.create({
               {
                 headers: {
                   'Content-Type': 'application/json',
+                  Connection: 'keep-alive',
                 },
                 body: JSON.stringify({
                   refreshToken: Cookies.get('refreshToken'),
