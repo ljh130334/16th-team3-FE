@@ -513,7 +513,7 @@ const HomePageContent = () => {
           {activeTab === 'today' && (
             <>
               {isTotallyEmpty && (
-                <div className="mt-20 flex h-full flex-col items-center justify-center px-4 text-center">
+                <div className="flex h-full flex-col items-center justify-center px-4 text-center">
                   <div className="mb-[50px] mt-[50px]">
                     <Image
                       src="/icons/home/rocket.svg"
@@ -835,7 +835,7 @@ const HomePageContent = () => {
           {activeTab === 'all' && (
             <>
               {isAllEmpty ? (
-                <div className="mt-20 flex h-full flex-col items-center justify-center px-4 text-center">
+                <div className="flex h-full flex-col items-center justify-center px-4 text-center">
                   <div className="mb-[50px] mt-[50px]">
                     <Image
                       src="/icons/home/rocket.svg"
@@ -934,10 +934,20 @@ const HomePageContent = () => {
           
           {/* 버튼 컨테이너 */}
           <div className="relative flex justify-end p-5 pb-[47px]">
-            {showTooltip && (
-              <div className="b3 absolute bottom-24 right-4 rounded-[12px] bg-component-accent-primary px-4 py-3 text-text-strong shadow-lg">
+          {showTooltip && (
+              <div className="b3 rounded-[12px] bg-component-accent-primary px-4 py-3 text-text-strong shadow-lg absolute bottom-[130px] right-4">
                 지금 바로 할 일을 추가해보세요!
-                <div className="absolute -bottom-2 right-12 h-4 w-4 rotate-45 bg-component-accent-primary"></div>
+                <div 
+                  className="absolute w-0 h-0"
+                  style={{
+                    bottom: '-11px',
+                    right: '3rem',
+                    transform: 'translateX(50%)',
+                    borderStyle: 'solid',
+                    borderWidth: '12px 7px 0 7px',
+                    borderColor: '#6B6BE1 transparent transparent transparent'
+                  }}
+                ></div>
               </div>
             )}
             <Button
