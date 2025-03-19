@@ -6,6 +6,8 @@ export async function POST(req: NextRequest) {
   const deviceId =
     cookieStore.get('deviceId')?.value || '0f365b39-c33d-39be-bdfc-74aaf55';
 
+  console.log(cookieStore.get('deviceId'));
+  console.log(cookieStore.get('deviceId')?.value);
   const deviceType = cookieStore.get('deviceType')?.value || 'IOS';
 
   try {
