@@ -511,26 +511,28 @@ const HomePageContent = () => {
   <main className="flex-1 overflow-y-auto px-5 pb-40">
           {/* 오늘 할일 탭 */}
           {activeTab === 'today' && (
-            <div className="mt-[130px]">
+            <>
               {isTotallyEmpty && (
-                <div className="flex flex-col items-center px-4 text-center">
-                  <div className="mb-[50px]">
-                    <Image
-                      src="/icons/home/rocket.svg"
-                      alt="Rocket"
-                      width={64}
-                      height={64}
-                      className="mx-auto h-auto w-auto"
-                    />
+                <div className="mt-[130px]">
+                  <div className="flex flex-col items-center px-4 text-center">
+                    <div className="mb-[50px]">
+                      <Image
+                        src="/icons/home/rocket.svg"
+                        alt="Rocket"
+                        width={64}
+                        height={64}
+                        className="mx-auto h-auto w-auto"
+                      />
+                    </div>
+                    <h2 className="t3 mb-[8px] text-text-strong">
+                      마감 할 일을 추가하고
+                      <br />
+                      바로 시작해볼까요?
+                    </h2>
+                    <p className="b3 text-text-alternative">
+                      미루지 않도록 알림을 보내 챙겨드릴게요.
+                    </p>
                   </div>
-                  <h2 className="t3 mb-[8px] text-text-strong">
-                    마감 할 일을 추가하고
-                    <br />
-                    바로 시작해볼까요?
-                  </h2>
-                  <p className="b3 text-text-alternative">
-                    미루지 않도록 알림을 보내 챙겨드릴게요.
-                  </p>
                 </div>
               )}
 
@@ -828,31 +830,33 @@ const HomePageContent = () => {
                   </div>
                 </div>
               )}
-            </div>
+            </>
           )}
 
           {/* 전체 할일 탭 */}
           {activeTab === 'all' && (
-            <div className="mt-[130px]">
+            <>
               {isAllEmpty ? (
-                <div className="flex h-full flex-col items-center justify-center px-4 text-center">
-                  <div className="mb-[50px]">
-                    <Image
-                      src="/icons/home/rocket.svg"
-                      alt="Rocket"
-                      width={64}
-                      height={64}
-                      className="mx-auto h-auto w-auto"
-                    />
+                <div className="mt-[130px]">
+                  <div className="flex h-full flex-col items-center justify-center px-4 text-center">
+                    <div className="mb-[50px]">
+                      <Image
+                        src="/icons/home/rocket.svg"
+                        alt="Rocket"
+                        width={64}
+                        height={64}
+                        className="mx-auto h-auto w-auto"
+                      />
+                    </div>
+                    <h2 className="t3 mb-[8px] text-text-strong">
+                      이번주 할일이 없어요.
+                      <br />
+                      마감할 일을 추가해볼까요?
+                    </h2>
+                    <p className="b3 text-text-alternative">
+                      미루지 않도록 알림을 보내 챙겨드릴게요.
+                    </p>
                   </div>
-                  <h2 className="t3 mb-[8px] text-text-strong">
-                    이번주 할일이 없어요.
-                    <br />
-                    마감할 일을 추가해볼까요?
-                  </h2>
-                  <p className="b3 text-text-alternative">
-                    미루지 않도록 알림을 보내 챙겨드릴게요.
-                  </p>
                 </div>
               ) : (
                 <>
@@ -919,7 +923,7 @@ const HomePageContent = () => {
                   )}
                 </>
               )}
-            </div>
+            </>
           )}
         </main>
 
