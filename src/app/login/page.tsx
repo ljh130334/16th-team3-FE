@@ -28,11 +28,9 @@ const LoginPage = () => {
 
   const { setUser } = useUserStore();
 
-  useEffect(() => {
-    handleGetDeviceToken();
-  }, []);
-
   const handleKakaoLogin = async () => {
+    handleGetDeviceToken();
+
     if (!isKakaoLoaded || !window.Kakao?.Auth) {
       console.error('Kakao SDK not loaded');
       return;
@@ -45,6 +43,8 @@ const LoginPage = () => {
   };
 
   const handleAppleLogin = async () => {
+    handleGetDeviceToken();
+
     try {
       const response: AppleAuthorizationResponse =
         await window.AppleID.auth.signIn();
