@@ -208,7 +208,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
                   : `마감까지 ${remainingTime}`}
               </p>
               <button
-                className="l2 mb-3 w-full rounded-[16px] bg-component-accent-primary py-4 text-white"
+                className="l2 w-full rounded-[16px] bg-component-accent-primary py-4 text-white"
                 onClick={handleContinueToFocus}
               >
                 이어서 몰입
@@ -248,7 +248,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
         <Button
           variant="hologram"
           onClick={handleContinueClick}
-          className="l2 z-10 w-full rounded-[12px] p-3.5 text-center text-text-inverse"
+          className="l1 z-10 w-full h-[52px] rounded-[12px] p-3.5 text-center text-text-inverse"
         >
           {showRemaining ? getTimeDisplay() : '이어서 몰입'}
         </Button>
@@ -270,7 +270,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
                 : `마감까지 ${remainingTime}`}
             </p>
             <button
-              className="l2 mb-3 w-full rounded-[16px] bg-component-accent-primary py-4 text-white"
+              className="l2 w-full rounded-[16px] bg-component-accent-primary py-4 text-white"
               onClick={handleContinueToFocus}
             >
               이어서 몰입

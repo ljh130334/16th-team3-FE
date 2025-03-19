@@ -23,6 +23,9 @@ const WeeklyTasksPage = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
     // 이번주의 월요일 찾기
     const mondayOfThisWeek = new Date(today);
     const dayOfWeek = today.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
@@ -50,10 +53,7 @@ const WeeklyTasksPage = () => {
       const taskDateOnly = new Date(taskDueDate);
       taskDateOnly.setHours(0, 0, 0, 0);
 
-      const taskIsAfterToday =
-        taskDateOnly.getTime() > today.getTime() ||
-        (taskDateOnly.getTime() === today.getTime() &&
-          taskDueDate.getHours() >= 1);
+      const taskIsAfterToday = taskDateOnly.getTime() >= tomorrow.getTime();
 
       const taskIsBeforeSunday = taskDueDate <= sundayOfThisWeek;
 

@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} h-screen pt-[60px] antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} overflow-hidden h-screen pt-[60px] antialiased`}
       >
         <Providers>
           <AuthProvider>{children}</AuthProvider>
