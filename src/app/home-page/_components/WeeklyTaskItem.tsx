@@ -58,8 +58,8 @@ const WeeklyTaskItem: React.FC<WeeklyTaskItemProps> = ({
 
   // 날짜 및 시간 표시 형식 수정
   const formatDateTime = () => {
-    const month = task.dueDate.substring(5, 7);
-    const day = task.dueDate.substring(8, 10);
+    const month = Number(task.dueDate.substring(5, 7)).toString();
+    const day = Number(task.dueDate.substring(8, 10)).toString();
 
     // 시간 형식 처리
     let timeDisplay = task.dueTime;
@@ -93,7 +93,7 @@ const WeeklyTaskItem: React.FC<WeeklyTaskItemProps> = ({
               alt="Clock"
               width={14}
               height={14}
-              className="mb-[2px] mr-[4px]"
+              className="mr-[4px]"
             />
             <span className="c3 text-text-neutral">{task.timeRequired}</span>
           </div>

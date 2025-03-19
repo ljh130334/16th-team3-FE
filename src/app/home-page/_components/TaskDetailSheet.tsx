@@ -161,13 +161,12 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
       if (hours === 0 && minutes === 0) {
         timeDisplay = '자정';
       }
-      // 분이 0인 경우는 시간만
-      else if (minutes === 0) {
-        timeDisplay = `${amPm} ${hour12}시`;
-      }
-      // 아닌 경우는 분까지 표시
+      // 그 외의 경우는 'nn:nn' 형식으로 표시
       else {
-        timeDisplay = `${amPm} ${hour12}시 ${minutes}분`;
+        // 시와 분을 모두 두 자리 숫자로 포맷팅
+        const formattedHour = hour12.toString().padStart(2, '0');
+        const formattedMinutes = minutes.toString().padStart(2, '0');
+        timeDisplay = `${amPm} ${formattedHour}:${formattedMinutes}`;
       }
     } else if (task.dueTime) {
       timeDisplay = task.dueTime.replace('까지', '');
@@ -215,7 +214,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               ref={menuRef}
               className="absolute right-[20px] top-[70px] z-10 w-[190px] rounded-[16px] bg-component-gray-tertiary drop-shadow-lg"
             >
-              <div className="c2 p-5 pb-0 text-text-alternative">설정</div>
+              <div className="c2 p-5 pb-0 text-text-alternative">편집</div>
               <div
                 className="l3 flex items-center justify-between px-5 py-3 text-text-red"
                 onClick={handleDelete}
@@ -255,12 +254,12 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
             미루지 말고 여유있게 시작해볼까요?
           </p>
 
-          <div className="mb-[27px] flex items-center justify-center">
+          <div className="mb-[12px] flex items-center justify-center">
             <Image
               src={personaImageUrl}
               alt="Character"
-              width={90}
-              height={90}
+              width={120}
+              height={120}
             />
           </div>
 
@@ -268,7 +267,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
             <Button
               variant="hologram"
               size="sm"
-              className="z-10 mb-6 h-auto w-auto rounded-[8px] px-[7px] py-[5px] text-text-inverse"
+              className="z-10 mb-6 h-[26px] w-auto rounded-[8px] px-[7px] py-[6px] text-text-inverse"
             >
               <span className="l6 text-text-inverse">{personaName}</span>
             </Button>
@@ -285,15 +284,15 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
             >
               <div className="b2 text-text-alternative">마감일</div>
               <div className="flex items-center">
-                <span className="b2 mr-3 text-text-neutral">
+                <span className="b2 mr-1 text-text-neutral">
                   {formatDueDatetime()}
                 </span>
                 {showArrow && (
                   <Image
-                    src="/icons/home/arrow-right.svg"
+                    src="/icons/home/detail-arrow-right.svg"
                     alt="Edit"
-                    width={7}
-                    height={12}
+                    width={20}
+                    height={20}
                   />
                 )}
               </div>
@@ -311,15 +310,15 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
             >
               <div className="b2 text-text-alternative">작은 행동</div>
               <div className="flex items-center">
-                <span className="b2 mr-3 text-text-neutral">
+                <span className="b2 mr-1 text-text-neutral">
                   {personaTriggerAction}
                 </span>
                 {showArrow && (
                   <Image
-                    src="/icons/home/arrow-right.svg"
+                    src="/icons/home/detail-arrow-right.svg"
                     alt="Edit"
-                    width={7}
-                    height={12}
+                    width={20}
+                    height={20}
                   />
                 )}
               </div>
@@ -337,15 +336,15 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
             >
               <div className="b2 text-text-alternative">예상 소요시간</div>
               <div className="flex items-center">
-                <span className="b2 mr-3 text-text-neutral">
+                <span className="b2 mr-1 text-text-neutral">
                   {task.timeRequired || '-'}
                 </span>
                 {showArrow && (
                   <Image
-                    src="/icons/home/arrow-right.svg"
+                    src="/icons/home/detail-arrow-right.svg"
                     alt="Edit"
-                    width={7}
-                    height={12}
+                    width={20}
+                    height={20}
                   />
                 )}
               </div>
@@ -355,7 +354,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
           <div className="flex items-center justify-between py-2.5">
             <div className="b2 text-text-alternative">첫 알림</div>
             <div className="flex items-center justify-end">
-              <span className={`s2 text-text-neutral`}>
+              <span className={`s2 text-text-neutral mr-1`}>
                 {task.triggerActionAlarmTime
                   ? `${new Date(task.triggerActionAlarmTime).getMonth() + 1}월 ${new Date(task.triggerActionAlarmTime).getDate()}일 (${['일', '월', '화', '수', '목', '금', '토'][new Date(task.triggerActionAlarmTime).getDay()]}), ${new Date(
                       task.triggerActionAlarmTime,
@@ -366,6 +365,9 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
                     })}`
                   : '-'}
               </span>
+              {showArrow && (
+                <span className="mr-5"></span>
+              )}
             </div>
           </div>
 
@@ -374,7 +376,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               <Button
                 variant={isUrgent ? 'hologram' : 'primary'}
                 size="default"
-                className={`l2 w-full ${isUrgent ? 'text-text-inverse' : 'text-text-strong'} rounded-[20px] py-4`}
+                className={`l2 w-full ${isUrgent ? 'text-text-inverse' : 'text-text-strong'} rounded-[16px] py-4`}
                 onClick={handleStartTask}
               >
                 {isInProgress

@@ -54,6 +54,9 @@ const HomePageContent = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
     // 이번주의 월요일 찾기
     const mondayOfThisWeek = new Date(today);
     const dayOfWeek = today.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
@@ -80,10 +83,7 @@ const HomePageContent = () => {
       const taskDateOnly = new Date(taskDueDate);
       taskDateOnly.setHours(0, 0, 0, 0);
 
-      const taskIsAfterToday =
-        taskDateOnly.getTime() > today.getTime() ||
-        (taskDateOnly.getTime() === today.getTime() &&
-          taskDueDate.getHours() >= 1);
+      const taskIsAfterToday = taskDateOnly.getTime() >= tomorrow.getTime();
 
       const taskIsBeforeSunday = taskDueDate <= sundayOfThisWeek;
 
@@ -456,57 +456,59 @@ const HomePageContent = () => {
 
   return (
     <Dialog open={isDialogOpen && taskName !== ''}>
-      <div className="flex min-h-screen flex-col bg-background-primary">
-        <header className="fixed left-0 right-0 top-[60px] z-20 bg-background-primary">
-          <div className="flex items-center justify-between px-[20px] py-[15px]">
-            <Image
-              src="/icons/home/spurt.svg"
-              alt="SPURT"
-              width={50}
-              height={20}
-              priority
-              className="w-[50px]"
-            />
-            <button onClick={handleNavigateToMyPage}>
-              <Image
-                src="/icons/home/mypage.svg"
-                alt="마이페이지"
-                width={20}
-                height={20}
-              />
-            </button>
-          </div>
-          <div className="px-[20px] py-[11px]">
-            <div className="flex space-x-4">
-              <div onClick={() => handleTabChange('today')}>
-                <span
-                  className={`t3 ${activeTab === 'today' ? 'text-text-normal' : 'text-text-disabled'}`}
-                >
-                  오늘 할일
-                </span>
-                <span
-                  className={`s1 ml-1 ${activeTab === 'today' ? 'text-text-primary' : 'text-text-disabled'}`}
-                >
-                  {todayTasks.length + inProgressTasks.length}
-                </span>
-              </div>
-              <div onClick={() => handleTabChange('all')}>
-                <span
-                  className={`t3 ${activeTab === 'all' ? 'text-text-normal' : 'text-text-disabled'}`}
-                >
-                  전체 할일
-                </span>
-                <span
-                  className={`s1 ml-1 ${activeTab === 'all' ? 'text-text-primary' : 'text-text-disabled'}`}
-                >
-                  {allTasks.length}
-                </span>
-              </div>
-            </div>
-          </div>
-        </header>
+      <div className="flex h-screen flex-col overflow-hidden bg-background-primary">
+  {/* 헤더 - fixed 대신 static으로 변경 */}
+  <header className="z-20 bg-background-primary">
+    <div className="flex items-center justify-between px-[20px] py-[15px]">
+      <Image
+        src="/icons/home/spurt.svg"
+        alt="SPURT"
+        width={50}
+        height={20}
+        priority
+        className="w-[50px]"
+      />
+      <button onClick={handleNavigateToMyPage}>
+        <Image
+          src="/icons/home/mypage.svg"
+          alt="마이페이지"
+          width={20}
+          height={20}
+        />
+      </button>
+    </div>
+    <div className="px-[20px] py-[11px]">
+      <div className="flex space-x-4">
+        <div onClick={() => handleTabChange('today')}>
+          <span
+            className={`t3 ${activeTab === 'today' ? 'text-text-normal' : 'text-text-disabled'}`}
+          >
+            오늘 할일
+          </span>
+          <span
+            className={`s1 ml-1 ${activeTab === 'today' ? 'text-text-primary' : 'text-text-disabled'}`}
+          >
+            {todayTasks.length + inProgressTasks.length}
+          </span>
+        </div>
+        <div onClick={() => handleTabChange('all')}>
+          <span
+            className={`t3 ${activeTab === 'all' ? 'text-text-normal' : 'text-text-disabled'}`}
+          >
+            전체 할일
+          </span>
+          <span
+            className={`s1 ml-1 ${activeTab === 'all' ? 'text-text-primary' : 'text-text-disabled'}`}
+          >
+            {allTasks.length}
+          </span>
+        </div>
+      </div>
+    </div>
+  </header>
 
-        <main className="mb-40 mt-[104px] flex-1 px-5">
+  {/* 메인 영역 - flex-1과 overflow-y-auto로 설정 */}
+  <main className="flex-1 overflow-y-auto px-5 pb-40">
           {/* 오늘 할일 탭 */}
           {activeTab === 'today' && (
             <>
@@ -564,7 +566,7 @@ const HomePageContent = () => {
                         onClick={() => handleTaskClick(task)}
                         onDelete={() => handleDeleteTask(task.id)}
                         timeRequired={task.timeRequired}
-                        onPreviewStart={() => handleDetailTask(task)}
+                        onPreviewStart={(taskId) => taskId && startTaskMutation(taskId)}
                         ignoredAlerts={task.ignoredAlerts}
                         resetAlerts={resetAlerts}
                         dueDatetime={task.dueDatetime}
@@ -642,7 +644,7 @@ const HomePageContent = () => {
                         onClick={() => handleTaskClick(task)}
                         onDelete={() => handleDeleteTask(task.id)}
                         timeRequired={task.timeRequired}
-                        onPreviewStart={() => handleDetailTask(task)}
+                        onPreviewStart={(taskId) => taskId && startTaskMutation(taskId)}
                         ignoredAlerts={task.ignoredAlerts}
                         resetAlerts={resetAlerts}
                         dueDatetime={task.dueDatetime}
@@ -701,7 +703,7 @@ const HomePageContent = () => {
                         onClick={() => handleTaskClick(task)}
                         onDelete={() => handleDeleteTask(task.id)}
                         timeRequired={task.timeRequired}
-                        onPreviewStart={() => handleDetailTask(task)}
+                        onPreviewStart={(taskId) => taskId && startTaskMutation(taskId)}
                         ignoredAlerts={task.ignoredAlerts}
                         resetAlerts={resetAlerts}
                         dueDatetime={task.dueDatetime}
@@ -763,7 +765,7 @@ const HomePageContent = () => {
                         onClick={() => handleTaskClick(task)}
                         onDelete={() => handleDeleteTask(task.id)}
                         timeRequired={task.timeRequired}
-                        onPreviewStart={() => handleDetailTask(task)}
+                        onPreviewStart={(taskId) => taskId && startTaskMutation(taskId)}
                         ignoredAlerts={task.ignoredAlerts}
                         resetAlerts={resetAlerts}
                         dueDatetime={task.dueDatetime}
@@ -921,8 +923,17 @@ const HomePageContent = () => {
           )}
         </main>
 
-        <footer className="fixed bottom-8 left-0 right-0 z-10 bg-none">
-          <div className="flex justify-end p-5">
+        <footer className="fixed bottom-0 left-0 right-0 z-10">
+          {/* 투명에서 검정색으로 페이드되는 그라디언트 오버레이 */}
+          <div 
+            className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none"
+            style={{
+              background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%)'
+            }}
+          />
+          
+          {/* 버튼 컨테이너 */}
+          <div className="relative flex justify-end p-5 pb-[47px]">
             {showTooltip && (
               <div className="b3 absolute bottom-24 right-4 rounded-[12px] bg-component-accent-primary px-4 py-3 text-text-strong shadow-lg">
                 지금 바로 할 일을 추가해보세요!
@@ -937,7 +948,7 @@ const HomePageContent = () => {
             >
               <Image
                 src="/icons/home/plus.svg"
-                alt="Add Task"
+                alt="할일 추가"
                 width={16}
                 height={16}
               />
