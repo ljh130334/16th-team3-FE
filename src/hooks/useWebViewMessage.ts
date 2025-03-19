@@ -37,17 +37,20 @@ export const useWebViewMessage = (router?: ReturnType<typeof useRouter>) => {
         if (data.type === 'GET_DEVICE_TOKEN') {
           localStorage.setItem('deviceToken', data.payload.fcmToken);
           console.log('data.payload.fcmToken', data.payload.fcmToken);
-          Cookies.set('deviceId', data.payload.fcmToken, {
-            expires: 30, // 30일
-            path: '/',
-            secure: false,
-          });
 
-          Cookies.set('deviceType', data.payload.deviceType, {
-            expires: 30,
-            path: '/',
-            secure: false,
-          });
+          if (data.payload.fcmToken) {
+            Cookies.set('deviceId', data.payload.fcmToken, {
+              expires: 30, // 30일
+              path: '/',
+              secure: false,
+            });
+
+            Cookies.set('deviceType', data.payload.deviceType, {
+              expires: 30,
+              path: '/',
+              secure: false,
+            });
+          }
         }
       } catch (error) {
         console.error('메시지 파싱 에러:', error);

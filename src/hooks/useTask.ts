@@ -22,6 +22,7 @@ export interface HoldOffParams extends TaskMutationParams {
 }
 
 export interface StatusParams extends TaskMutationParams {
+  taskId: string;
   status:
     | 'BEFORE'
     | 'WARMING_UP'
@@ -88,7 +89,7 @@ export const usePatchTaskStatus = (): UseMutationResult<
   const router = useRouter();
   const queryClient = useQueryClient();
   return useMutation<TaskResponse, Error, StatusParams>({
-    mutationFn: ({ taskId, status }) => patchTaskStatus({ taskId, status }),
+    mutationFn: ({ taskId, status }) => patchTaskStatus(taskId, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks', 'home'] });
 

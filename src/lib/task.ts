@@ -40,27 +40,23 @@ export const patchTaskHoldOff = async ({
   taskId,
   data,
 }: HoldOffParams): Promise<TaskResponse> => {
-  const response = await api.patch(`v1/tasks/${taskId}/hold-off`, {
+  const response = await fetch(`/api/tasks/${taskId}/hold-off`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify(data),
   });
-
-  if (!response.ok) {
-    throw new Error('작업 업데이트에 실패했습니다.');
-  }
-
-  if (response.status === 204) {
-    return {} as TaskResponse;
-  }
-
   return response.json();
 };
 
-export const patchTaskStatus = async ({
-  taskId,
-  status,
-}: StatusParams): Promise<TaskResponse> => {
-  const response = await api.patch(`v1/tasks/${taskId}/status`, {
-    body: JSON.stringify({ status }),
+export const patchTaskStatus = async (taskId: string, data: string) => {
+  const response = await fetch(`/api/tasks/${taskId}/status`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ status: data }),
   });
 
   if (!response.ok) {
