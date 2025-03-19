@@ -462,10 +462,10 @@ const HomePageContent = () => {
             <Image
               src="/icons/home/spurt.svg"
               alt="SPURT"
-              width={50}
+              width={54}
               height={20}
               priority
-              className="w-[50px]"
+              className="w-[54px]"
             />
             <button onClick={handleNavigateToMyPage}>
               <Image
@@ -923,10 +923,20 @@ const HomePageContent = () => {
 
         <footer className="fixed bottom-8 left-0 right-0 z-10 bg-none">
           <div className="flex justify-end p-5">
-            {showTooltip && (
-              <div className="b3 absolute bottom-24 right-4 rounded-[12px] bg-component-accent-primary px-4 py-3 text-text-strong shadow-lg">
+          {showTooltip && (
+              <div className="b3 rounded-[12px] bg-component-accent-primary px-4 py-3 text-text-strong shadow-lg absolute bottom-24 right-4">
                 지금 바로 할 일을 추가해보세요!
-                <div className="absolute -bottom-2 right-12 h-4 w-4 rotate-45 bg-component-accent-primary"></div>
+                <div 
+                  className="absolute w-0 h-0"
+                  style={{
+                    bottom: '-12px',
+                    right: '3rem',
+                    transform: 'translateX(50%)',
+                    borderStyle: 'solid',
+                    borderWidth: '12px 7px 0 7px',
+                    borderColor: '#6B6BE1 transparent transparent transparent'
+                  }}
+                ></div>
               </div>
             )}
             <Button
