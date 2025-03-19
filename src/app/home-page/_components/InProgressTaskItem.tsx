@@ -161,7 +161,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
   if (!isUrgent) {
     return (
       <>
-        <div className="mb-4 rounded-[12px] bg-component-gray-secondary p-4">
+        <div className="mb-5 rounded-[12px] bg-component-gray-secondary p-4">
           <div className="mb-4 flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-[20px] bg-component-gray-tertiary p-2">
               <Image

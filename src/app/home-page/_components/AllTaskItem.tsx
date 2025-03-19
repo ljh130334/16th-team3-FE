@@ -231,7 +231,7 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({ task, onClick, onDelete }) =>
               alt="Clock" 
               width={14} 
               height={14} 
-              className="mr-[4px] mb-[2px]" 
+              className="mr-[4px]" 
             />
             <span className="c3 text-text-neutral">{task.timeRequired}</span>
           </div>

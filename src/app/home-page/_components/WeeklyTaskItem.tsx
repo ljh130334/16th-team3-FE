@@ -93,7 +93,7 @@ const WeeklyTaskItem: React.FC<WeeklyTaskItemProps> = ({
               alt="Clock"
               width={14}
               height={14}
-              className="mb-[2px] mr-[4px]"
+              className="mr-[4px]"
             />
             <span className="c3 text-text-neutral">{task.timeRequired}</span>
           </div>

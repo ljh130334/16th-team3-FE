@@ -149,7 +149,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
                   alt="Character"
                   width={14}
                   height={14}
-                  className="mb-[2px] mr-[4px]"
+                  className="mr-[4px]"
                 />
                 <span className="c3 text-text-neutral">
                   {timeRequired || '1시간 소요'}
