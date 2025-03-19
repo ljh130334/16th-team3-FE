@@ -566,7 +566,7 @@ const HomePageContent = () => {
                         onClick={() => handleTaskClick(task)}
                         onDelete={() => handleDeleteTask(task.id)}
                         timeRequired={task.timeRequired}
-                        onPreviewStart={() => handleDetailTask(task)}
+                        onPreviewStart={(taskId) => taskId && startTaskMutation(taskId)}
                         ignoredAlerts={task.ignoredAlerts}
                         resetAlerts={resetAlerts}
                         dueDatetime={task.dueDatetime}
@@ -644,7 +644,7 @@ const HomePageContent = () => {
                         onClick={() => handleTaskClick(task)}
                         onDelete={() => handleDeleteTask(task.id)}
                         timeRequired={task.timeRequired}
-                        onPreviewStart={() => handleDetailTask(task)}
+                        onPreviewStart={(taskId) => taskId && startTaskMutation(taskId)}
                         ignoredAlerts={task.ignoredAlerts}
                         resetAlerts={resetAlerts}
                         dueDatetime={task.dueDatetime}
@@ -703,7 +703,7 @@ const HomePageContent = () => {
                         onClick={() => handleTaskClick(task)}
                         onDelete={() => handleDeleteTask(task.id)}
                         timeRequired={task.timeRequired}
-                        onPreviewStart={() => handleDetailTask(task)}
+                        onPreviewStart={(taskId) => taskId && startTaskMutation(taskId)}
                         ignoredAlerts={task.ignoredAlerts}
                         resetAlerts={resetAlerts}
                         dueDatetime={task.dueDatetime}
@@ -765,7 +765,7 @@ const HomePageContent = () => {
                         onClick={() => handleTaskClick(task)}
                         onDelete={() => handleDeleteTask(task.id)}
                         timeRequired={task.timeRequired}
-                        onPreviewStart={() => handleDetailTask(task)}
+                        onPreviewStart={(taskId) => taskId && startTaskMutation(taskId)}
                         ignoredAlerts={task.ignoredAlerts}
                         resetAlerts={resetAlerts}
                         dueDatetime={task.dueDatetime}
@@ -923,8 +923,17 @@ const HomePageContent = () => {
           )}
         </main>
 
-        <footer className="fixed bottom-8 left-0 right-0 z-10 bg-none">
-          <div className="flex justify-end p-5">
+        <footer className="fixed bottom-0 left-0 right-0 z-10">
+          {/* 투명에서 검정색으로 페이드되는 그라디언트 오버레이 */}
+          <div 
+            className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none"
+            style={{
+              background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%)'
+            }}
+          />
+          
+          {/* 버튼 컨테이너 */}
+          <div className="relative flex justify-end p-5 pb-[47px]">
             {showTooltip && (
               <div className="b3 absolute bottom-24 right-4 rounded-[12px] bg-component-accent-primary px-4 py-3 text-text-strong shadow-lg">
                 지금 바로 할 일을 추가해보세요!
@@ -939,7 +948,7 @@ const HomePageContent = () => {
             >
               <Image
                 src="/icons/home/plus.svg"
-                alt="Add Task"
+                alt="할일 추가"
                 width={16}
                 height={16}
               />

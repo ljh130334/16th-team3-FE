@@ -83,15 +83,17 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
     }
   }, [isReentry]);
 
-  // 이어서 몰입 버튼 클릭 시 - 홈화면 재진입이 아닌 경우에는 태스크 상세 바텀시트 표시
-  const handleContinueClick = () => {
-    // isReentry 조건을 무시하고 항상 TaskDetailSheet를 표시하도록 수정
+  // 카드 영역 클릭 시 - TaskDetailSheet 표시
+  const handleCardClick = () => {
     if (onShowDetails) {
       onShowDetails(task);
-    } else {
-      // 상세 정보 표시 콜백이 없는 경우 바로 몰입 화면으로 이동
-      router.push(`/immersion/${task.id}`);
     }
+  };
+
+  // 이어서 몰입 버튼 클릭 시 - 바로 몰입 화면으로 이동
+  const handleContinueClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // 이벤트 버블링 방지
+    router.push(`/immersion/${task.id}`);
   };
 
   const handleCloseBottomSheet = () => {
@@ -161,7 +163,10 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
   if (!isUrgent) {
     return (
       <>
-        <div className="mb-5 rounded-[12px] bg-component-gray-secondary p-4">
+        <div 
+          className="mb-5 rounded-[12px] bg-component-gray-secondary p-4" 
+          onClick={handleCardClick}
+        >
           <div className="mb-4 flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-[20px] bg-component-gray-tertiary p-2">
               <Image
@@ -230,7 +235,10 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
   // 시간 임박 컴포넌트 (1시간 이내)
   return (
     <>
-      <div className="bg-gradient-component-01 mb-4 flex h-auto flex-col justify-between rounded-[24px] p-4">
+      <div 
+        className="bg-gradient-component-01 mb-4 flex h-auto flex-col justify-between rounded-[24px] p-4"
+        onClick={handleCardClick}
+      >
         <div>
           <h2 className="s1 mb-1 text-text-strong">{task.title}</h2>
           <p className="b3 text-text-neutral">{formatDueTime()}</p>

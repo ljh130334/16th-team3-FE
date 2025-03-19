@@ -13,7 +13,7 @@ type TaskItemProps = {
   taskId: number;
   onClick: () => void;
   onDelete: () => void;
-  onPreviewStart?: () => void;
+  onPreviewStart?: (taskId?: number) => void;
   ignoredAlerts?: number;
   timeRequired: string;
   resetAlerts?: (taskId: number) => void;
@@ -86,7 +86,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
     } else if (isUrgent) {
       setShowUrgentBottomSheet(true);
     } else {
-      onPreviewStart();
+      onPreviewStart(taskId);
     }
   };
 
@@ -96,6 +96,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
 
   const handleStart = () => {
     resetAlerts(taskId);
+    onPreviewStart(taskId);
     router.push(`/immersion/${taskId}`);
     setShowUrgentBottomSheet(false);
   };
@@ -112,11 +113,36 @@ const TaskItem: React.FC<TaskItemProps> = ({
     );
   }, [dueDate]);
 
+  // 날짜를 포맷팅하는 함수 - 오늘이면 "오늘", 아니면 "n월 n일 (요일)"
+  const formatTaskDate = useCallback(() => {
+    const dateToCheck = dueDatetime ? new Date(dueDatetime) : new Date(dueDate);
+    
+    // 오늘 날짜인지 확인
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const checkDate = new Date(dateToCheck);
+    checkDate.setHours(0, 0, 0, 0);
+    
+    if (checkDate.getTime() === today.getTime()) {
+      return '오늘';
+    }
+    
+    // 요일 이름 배열
+    const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+    const month = dateToCheck.getMonth() + 1;
+    const day = dateToCheck.getDate();
+    const dayOfWeek = dayNames[dateToCheck.getDay()];
+    
+    return `${month}월 ${day}일`;
+  }, [dueDate, dueDatetime]);
+
   // 시간 표시 형식 수정
   const formatDueTime = useCallback(() => {
+    const formattedDate = formatTaskDate();
+    
     // 자정인 경우
     if (dueTime.includes('자정')) {
-      return '오늘 자정까지';
+      return `${formattedDate} 자정까지`;
     }
 
     // 시간 텍스트에 "오후" 또는 "오전"이 포함되어 있는지 확인
@@ -125,12 +151,12 @@ const TaskItem: React.FC<TaskItemProps> = ({
       const formattedTime = dueTime.includes('까지')
         ? dueTime
         : `${dueTime}까지`;
-      return `오늘 ${formattedTime}`;
+      return `${formattedDate} ${formattedTime}`;
     }
 
     // 그 외 경우 (예: "3시간 소요")
     return dueTime;
-  }, [dueTime]);
+  }, [dueTime, formatTaskDate]);
 
   return (
     <>

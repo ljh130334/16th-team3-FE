@@ -185,9 +185,6 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({ task, onClick, onDelete }) =>
       return '날짜 정보 없음';
     }
     
-    const month = dueDate.substring(5, 7);
-    const day = dueDate.substring(8, 10);
-    
     // 오늘 날짜와 비교
     const today = new Date();
     const taskDate = new Date(dueDate);
@@ -206,14 +203,17 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({ task, onClick, onDelete }) =>
         if (!timeDisplay.includes('까지')) {
           timeDisplay = `${timeDisplay}까지`;
         }
-        
-        if (isToday) {
-          timeDisplay = `오늘 ${timeDisplay}`;
-        }
       }
     }
     
-    return `${month}월 ${day}일 ${dueDay || ''} ${timeDisplay}`;
+    // 오늘 날짜는 "오늘"로만 표시, 그 외 날짜는 "n월 n일 (요일)"로 표시
+    if (isToday) {
+      return `오늘 ${timeDisplay}`;
+    } else {
+      const month = Number(dueDate.substring(5, 7)).toString();
+      const day = Number(dueDate.substring(8, 10)).toString();
+      return `${month}월 ${day}일 ${dueDay || ''} ${timeDisplay}`;
+    }
   };
 
   return (
