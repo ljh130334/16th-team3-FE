@@ -16,11 +16,9 @@ import { ScheduledTaskType, TimePickerType } from '@/types/create';
 import EstimatedTimeInput from '../_components/estimatedTimeInput/EstimatedTimeInput';
 import BufferTime from '../_components/bufferTime/BufferTime';
 import TaskTypeInput from '../_components/taskTypeInput/TaskTypeInput';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { useRouter } from 'next/navigation';
-import { api } from '@/lib/ky';
-import { TaskResponse } from '@/types/task';
 
 type FormState = {
   task?: string;
@@ -81,28 +79,27 @@ const ScheduledTaskCreate = () => {
   const queryClient = useQueryClient();
   const { isMounted } = useMount();
 
-  const { mutate: createScheduledTaskMutation } = useMutation({
-    mutationFn: async (data: ScheduledTaskType): Promise<TaskResponse> => {
-      const response = await api.post(`v1/tasks/scheduled`, {
-        body: JSON.stringify(data),
-      });
+  const scheduledTaskMutation = async (data: ScheduledTaskType) => {
+    const res = await fetch('/api/tasks/scheduled', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
 
-      return response.json() as Promise<TaskResponse>;
-    },
-    onSuccess: (data: TaskResponse) => {
-      const personaName = data.persona.name;
-      const taskMode = data.persona.taskKeywordsCombination.taskMode.name;
-      const taskType = data.persona.taskKeywordsCombination.taskType.name;
+    const text = await res.text();
+    const response = text ? JSON.parse(text) : {};
+
+    if (response.success) {
+      const personaName = response.personaName;
+      const taskMode = response.taskMode;
+      const taskType = response.taskType;
 
       queryClient.invalidateQueries({ queryKey: ['tasks', 'home'] });
       router.push(
         `/home-page?dialog=success&task=${funnel.context.task}&personaName=${personaName}&taskMode=${taskMode}&taskType=${taskType}`,
       );
-    },
-    onError: (error) => {
-      console.error('Error creating scheduled task:', error);
-    },
-  });
+    }
+  };
 
   const handleHistoryBack = () => {
     if (funnel.step === 'smallActionInput') {
@@ -260,7 +257,7 @@ const ScheduledTaskCreate = () => {
         taskTypeInput={({ context }) => (
           <TaskTypeInput
             context={context}
-            onClick={(data) => createScheduledTaskMutation(data)}
+            onClick={(data) => scheduledTaskMutation(data)}
           />
         )}
       />
