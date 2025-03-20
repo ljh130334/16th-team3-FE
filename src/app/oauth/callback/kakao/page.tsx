@@ -5,6 +5,7 @@ import { useUserStore } from '@/store/useUserStore';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { Suspense } from 'react';
+import Cookies from 'js-cookie';
 
 const KakaoTalk = () => {
   const router = useRouter();
@@ -17,7 +18,11 @@ const KakaoTalk = () => {
     const response = await fetch('/api/oauth/callback/kakao', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ authCode }),
+      body: JSON.stringify({
+        authCode,
+        deviceId: Cookies.get('deviceId'),
+        deviceType: Cookies.get('deviceType'),
+      }),
     }).then((res) => res.json());
 
     if (response.success) {

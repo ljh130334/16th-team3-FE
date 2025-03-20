@@ -5,16 +5,15 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const deviceId =
-      cookieStore.get('deviceId')?.value || '0f365b39-c33d-39be-bdfc-74aaf55';
-    const deviceType = cookieStore.get('deviceType')?.value || 'IOS';
-
     const body: AppleAuthorizationResponse = await req.json();
     const {
       authorization: { code, id_token },
       user,
+      deviceId,
+      deviceType,
     } = body;
+
+    console.log(deviceId, deviceType);
 
     if (!code || !id_token) {
       return NextResponse.json(

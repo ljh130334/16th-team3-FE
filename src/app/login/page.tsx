@@ -49,7 +49,11 @@ const LoginPage = () => {
       const oauthResponse = await fetch('/api/oauth/callback/apple', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: JSON.stringify(response),
+        body: JSON.stringify({
+          ...response,
+          deviceId: Cookies.get('deviceId'),
+          deviceType: Cookies.get('deviceType'),
+        }),
       });
 
       if (!oauthResponse.ok) {

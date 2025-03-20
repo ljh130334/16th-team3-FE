@@ -1,18 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 
 export async function POST(req: NextRequest) {
-  const cookieStore = await cookies();
-  const deviceId =
-    cookieStore.get('deviceId')?.value || '0f365b39-c33d-39be-bdfc-74aaf55';
-
-  console.log(cookieStore.get('deviceId'));
-  console.log(cookieStore.get('deviceId')?.value);
-  const deviceType = cookieStore.get('deviceType')?.value || 'IOS';
-
   try {
     const body = await req.json();
-    const { authCode } = body;
+    const { authCode, deviceId, deviceType } = body;
 
     if (!authCode) {
       return NextResponse.json(

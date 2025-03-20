@@ -8,4 +8,6 @@ export interface AppleAuthorizationResponse {
     name: { firstName: string; lastName: string } | null;
     email: string | null;
   };
+  deviceId?: string;
+  deviceType?: string;
 }
