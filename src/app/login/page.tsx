@@ -7,6 +7,7 @@ import { AppleAuthorizationResponse } from '@/types/auth';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Cookies from 'js-cookie';
 
 declare global {
   interface Window {
@@ -29,8 +30,6 @@ const LoginPage = () => {
   const { setUser } = useUserStore();
 
   const handleKakaoLogin = async () => {
-    handleGetDeviceToken();
-
     if (!isKakaoLoaded || !window.Kakao?.Auth) {
       console.error('Kakao SDK not loaded');
       return;
@@ -43,8 +42,6 @@ const LoginPage = () => {
   };
 
   const handleAppleLogin = async () => {
-    handleGetDeviceToken();
-
     try {
       const response: AppleAuthorizationResponse =
         await window.AppleID.auth.signIn();
@@ -107,6 +104,14 @@ const LoginPage = () => {
     checkKakaoSDK();
   }, []);
 
+  useEffect(() => {
+    handleGetDeviceToken();
+  }, [handleGetDeviceToken]);
+
+  const handlealertDeviceToken = () => {
+    alert(Cookies.get('deviceId'));
+    alert(Cookies.get('deviceType'));
+  };
   return (
     <div className="flex h-full flex-col justify-between bg-background-primary px-5 py-12">
       <div className="mt-[144px]">
@@ -121,6 +126,9 @@ const LoginPage = () => {
       </div>
 
       <div className="flex w-full flex-col gap-4">
+        <Button variant="default" onClick={handlealertDeviceToken}>
+          디바이스 토큰 확인
+        </Button>
         <Button
           variant="default"
           className="l2 gap-2 rounded-[16px] bg-[#FEE500] text-[#0f1114]"
