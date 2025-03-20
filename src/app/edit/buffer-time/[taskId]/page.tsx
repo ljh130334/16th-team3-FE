@@ -2,25 +2,25 @@
 
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import getBufferTime from '@/utils/getBufferTime';
 import formatBufferTime from '@/utils/formatBufferTime';
 import { use } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { TaskResponse } from '@/types/task';
-import { api } from '@/lib/ky';
 import {
   calculateTriggerActionAlarmTime,
   clearTimeOnDueDatetime,
   combineDeadlineDateTime,
+  combineDeadlineDateTimeToDate,
   convertEstimatedTime,
   convertToFormattedTime,
   getValidDate,
 } from '@/utils/dateFormat';
 import { useRouter } from 'next/navigation';
 import { EditPageProps } from '../../context';
+import { fetchSingleTask } from '@/services/taskService';
 
 const BufferTimeEditPage = ({ params, searchParams }: EditPageProps) => {
   const { taskId } = use(params);
@@ -33,6 +33,8 @@ const BufferTimeEditPage = ({ params, searchParams }: EditPageProps) => {
     triggerAction: triggerActionQuery,
     estimatedTime: estimatedTimeQuery,
     triggerActionAlarmTime: triggerActionAlarmTimeQuery,
+    isUrgent: isUrgentQuery,
+    type,
   } = use(searchParams);
 
   const query = new URLSearchParams({
@@ -44,6 +46,7 @@ const BufferTimeEditPage = ({ params, searchParams }: EditPageProps) => {
     triggerAction: triggerActionQuery || '',
     estimatedTime: estimatedTimeQuery ? estimatedTimeQuery.toString() : '',
     triggerActionAlarmTime: triggerActionAlarmTimeQuery || '',
+    isUrgent: isUrgentQuery ? isUrgentQuery.toString() : '',
   }).toString();
 
   const router = useRouter();
@@ -51,8 +54,7 @@ const BufferTimeEditPage = ({ params, searchParams }: EditPageProps) => {
 
   const { data: taskData } = useQuery<TaskResponse>({
     queryKey: ['singleTask', taskId],
-    queryFn: async () =>
-      await api.get(`v1/tasks/${taskId}`).json<TaskResponse>(),
+    queryFn: () => fetchSingleTask(taskId),
   });
 
   const baseDate = deadlineDateQuery
@@ -72,11 +74,17 @@ const BufferTimeEditPage = ({ params, searchParams }: EditPageProps) => {
     minute: minuteQuery || minute,
   };
 
+  const deadlineDateTime = combineDeadlineDateTimeToDate({
+    deadlineDate: dateAtMidnight,
+    deadlineTime: effectiveTime,
+  });
+
   const { estimatedDay, estimatedHour, estimatedMinute } = convertEstimatedTime(
     estimatedTimeQuery ? estimatedTimeQuery : (taskData?.estimatedTime ?? 0),
   );
 
   const { finalDays, finalHours, finalMinutes } = getBufferTime(
+    deadlineDateTime,
     estimatedDay.toString(),
     estimatedHour.toString(),
     estimatedMinute.toString(),
@@ -98,42 +106,61 @@ const BufferTimeEditPage = ({ params, searchParams }: EditPageProps) => {
     },
   );
 
-  const { mutate: editTaskDataMutation } = useMutation({
-    mutationFn: async () => {
-      if (!dateAtMidnight) {
-        throw new Error('마감 날짜가 선택되지 않았습니다.');
-      }
+  const editTaskDataMutation = async () => {
+    if (!dateAtMidnight) {
+      throw new Error('마감 날짜가 선택되지 않았습니다.');
+    }
 
-      const dueDatetime = combineDeadlineDateTime(dateAtMidnight, {
-        meridiem: meridiemQuery ? meridiemQuery : meridiem,
-        hour: hourQuery ? hourQuery : hour,
-        minute: minuteQuery ? minuteQuery : minute,
-      });
+    const dueDatetime = combineDeadlineDateTime(dateAtMidnight, {
+      meridiem: meridiemQuery ? meridiemQuery : meridiem,
+      hour: hourQuery ? hourQuery : hour,
+      minute: minuteQuery ? minuteQuery : minute,
+    });
 
-      const body = {
-        name: taskQuery || taskData?.name,
+    let body = {};
+
+    if (type === 'deadline') {
+      body = {
+        name: taskQuery,
         dueDatetime: dueDatetime,
-        triggerAction: triggerActionQuery || taskData?.triggerAction,
-        estimatedTime: estimatedTimeQuery || taskData?.estimatedTime,
-        triggerActionAlarmTime:
-          triggerActionAlarmTimeQuery ||
-          taskData?.triggerActionAlarmTime.replace('T', ' '),
+        triggerActionAlarmTime: triggerActionAlarmTimeQuery,
+        isUrgent: isUrgentQuery ? JSON.parse(isUrgentQuery.toString()) : false,
       };
+    }
 
-      const response = await api.patch(`v1/tasks/${taskId}`, {
-        body: JSON.stringify(body),
-      });
+    if (type === 'smallAction') {
+      body = {
+        triggerAction: triggerActionQuery,
+      };
+    }
 
-      return response.json();
-    },
-    onSuccess: (data) => {
-      console.log('Mutation response:', data);
-      queryClient.invalidateQueries({
-        queryKey: ['tasks', 'home'],
-      });
-      router.push('/home-page');
-    },
-  });
+    if (type === 'estimatedTime') {
+      body = {
+        estimatedTime: estimatedTimeQuery,
+        triggerActionAlarmTime: triggerActionAlarmTimeQuery,
+      };
+    }
+
+    const res = await fetch(`/api/tasks/${taskId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    const text = await res.text();
+    const response = text ? JSON.parse(text) : {};
+
+    if (response.success) {
+      const personaName = response.personaName;
+      const taskMode = response.taskMode;
+      const taskType = response.taskType;
+
+      queryClient.invalidateQueries({ queryKey: ['tasks', 'home'] });
+      router.push(
+        `/home-page?dialog=success&task=${taskQuery || taskData?.name}&personaName=${personaName}&taskMode=${taskMode}&taskType=${taskType}`,
+      );
+    }
+  };
 
   const timeString = formatBufferTime({
     days: finalDays,
@@ -184,11 +211,6 @@ const BufferTimeEditPage = ({ params, searchParams }: EditPageProps) => {
                 <span className="b2 text-neutral mt-[2px]">
                   {`${formattedDate}, ${effectiveTime.meridiem} ${effectiveTime.hour}:${effectiveTime.minute}`}
                 </span>
-                <ChevronRight
-                  width={20}
-                  height={20}
-                  className="text-icon-secondary"
-                />
               </div>
             </div>
             <div className="flex w-full items-center justify-between">
@@ -204,11 +226,6 @@ const BufferTimeEditPage = ({ params, searchParams }: EditPageProps) => {
                     ? triggerActionQuery
                     : taskData.triggerAction}
                 </span>
-                <ChevronRight
-                  width={20}
-                  height={20}
-                  className="text-icon-secondary"
-                />
               </div>
             </div>
             <div className="flex w-full items-center justify-between">
@@ -230,11 +247,6 @@ const BufferTimeEditPage = ({ params, searchParams }: EditPageProps) => {
                     .filter(Boolean)
                     .join(' ')}
                 </span>
-                <ChevronRight
-                  width={20}
-                  height={20}
-                  className="text-icon-secondary"
-                />
               </div>
             </div>
           </div>
