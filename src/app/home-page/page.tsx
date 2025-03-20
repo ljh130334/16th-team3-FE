@@ -570,7 +570,7 @@ const HomePageContent = () => {
                                 <span className="flex items-center">
                                   <span>
                                     {task.dueTime && task.dueDate
-                                      ? `${task.dueDate === new Date().toISOString().split('T')[0] ? '오늘' : new Date(task.dueDate).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })} ${task.dueTime}까지`
+                                      ? `${task.dueDate === new Date().toISOString().split('T')[0] ? '오늘' : new Date(task.dueDate).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })} ${task.dueTime}`
                                       : task.dueDatetime
                                       ? `${new Date(task.dueDatetime).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })} ${new Date(task.dueDatetime).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: 'numeric' })}까지`
                                       : '시간 미정'}
@@ -693,7 +693,7 @@ const HomePageContent = () => {
                                 <span className="flex items-center">
                                   <span>
                                     {task.dueTime && task.dueDate
-                                      ? `${task.dueDate === new Date().toISOString().split('T')[0] ? '오늘' : new Date(task.dueDate).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })} ${task.dueTime}까지`
+                                      ? `${task.dueDate === new Date().toISOString().split('T')[0] ? '오늘' : new Date(task.dueDate).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })} ${task.dueTime}`
                                       : task.dueDatetime
                                       ? `${new Date(task.dueDatetime).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })} ${new Date(task.dueDatetime).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: 'numeric' })}까지`
                                       : '시간 미정'}
