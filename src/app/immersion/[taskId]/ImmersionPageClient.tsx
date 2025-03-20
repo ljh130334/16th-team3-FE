@@ -32,16 +32,13 @@ export default function ImmersionPageClient({ initialTask }: Props) {
     const updateRemainingTime = () => {
       if (initialTask?.dueDatetime) {
         const targetDate = new Date(initialTask.dueDatetime);
+        // 원래 계산된 시간 문자열을 가져옴
         const timeStr = calculateRemainingTime(targetDate);
-
-        // 일수가 99일이 넘는지 확인
-        if (timeStr.match(/^\d{3,}일/)) {
-          // 일수가 3자리(100일) 이상인 경우, '남음' 텍스트를 줄바꿈 처리
-          const withoutSuffix = timeStr.replace(' 남음', '');
-          setRemainingTime(`${withoutSuffix}\n남음`);
-        } else {
-          setRemainingTime(timeStr);
-        }
+        
+        // '남음' 텍스트를 완전히 제거
+        const formattedTime = timeStr.replace(' 남음', '');
+        
+        setRemainingTime(formattedTime);
       }
     };
 
@@ -75,7 +72,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
         </div>
       </div>
 
-      <div className="relative mt-4 flex flex-col items-center justify-center gap-4">
+      <div className="relative mt-5 flex flex-col items-center justify-center gap-4">
         <div className="fixed left-0 right-0 top-[290px] h-[190px] bg-[rgba(65,65,137,0.40)] blur-[75px]" />
 
         <div className="relative z-10 flex items-center gap-2">
