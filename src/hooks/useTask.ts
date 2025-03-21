@@ -92,8 +92,6 @@ export const usePatchTaskStatus = (): UseMutationResult<
     mutationFn: ({ taskId, status }) => patchTaskStatus(taskId, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks', 'home'] });
-
-      router.push('/immersion/complete');
     },
   });
 };

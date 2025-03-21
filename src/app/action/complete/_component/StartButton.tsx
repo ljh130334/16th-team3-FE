@@ -1,21 +1,28 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { usePatchTaskStatus } from '@/hooks/useTask';
 
 export default function StartButton({
   currentTaskId,
 }: {
   currentTaskId: string;
 }) {
+  const router = useRouter();
+  const { mutate: patchTaskStatus } = usePatchTaskStatus();
+
+  const handleStart = async () => {
+    await patchTaskStatus({ taskId: currentTaskId, status: 'FOCUSED' });
+    router.push(`/immersion/${currentTaskId}`);
+  };
+
   return (
-    <div className="relative mt-auto flex w-full flex-col items-center px-5 py-6">
+    <div className="mt-auto flex w-full flex-col items-center px-5 py-6">
       <div className="fixed bottom-0 left-0 right-0 h-[245px]" />
-      <Link href={`/immersion/${currentTaskId}`}>
-        <Button variant="primary" className="relative mb-4 w-full">
-          몰입 시작하기
-        </Button>
-      </Link>
+      <Button variant="primary" className="mb-4 w-full" onClick={handleStart}>
+        몰입 시작하기
+      </Button>
     </div>
   );
 }

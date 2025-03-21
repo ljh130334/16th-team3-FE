@@ -20,7 +20,7 @@ export default function Complete() {
   }, []);
 
   return (
-    <div className="flex h-screen flex-col gap-4 bg-background-primary">
+    <div className="flex h-full w-full flex-col gap-4 bg-background-primary">
       <Header />
 
       <PhotoCard
@@ -30,14 +30,17 @@ export default function Complete() {
       />
 
       {/* 인증 사진 사각박스 */}
-      <CharacterMotivation />
+      {currentTask && <CharacterMotivation currentTask={currentTask} />}
       <div className="relative">
         <div className="absolute inset-0 h-[245px] bg-[rgba(65,65,137,0.40)] blur-[75px]" />
 
         <div className="relative flex h-[245px] flex-col items-center justify-center gap-[27px]">
-          <Image src="/repeat.svg" alt="모래시계" width={48} height={48} />
-
-          <Badge>작은 행동</Badge>
+          <Image
+            src="/icons/immersion/study.png"
+            alt="모래시계"
+            width={48}
+            height={48}
+          />
         </div>
       </div>
       <StartButton currentTaskId={currentTask?.id?.toString() ?? ''} />

@@ -52,6 +52,14 @@ export default function ImmersionPageClient({ initialTask }: Props) {
     return () => clearInterval(intervalId);
   }, [initialTask?.dueDatetime]);
 
+  const handleComplete = () => {
+    patchTaskStatus({
+      taskId: initialTask?.id?.toString() ?? '',
+      status: 'COMPLETE',
+    });
+    router.push('/immersion/complete');
+  };
+
   return (
     <div className="flex h-full flex-col bg-background-primary">
       {/* TODO : 헤더 컴포넌트로 변경 예정 */}
@@ -92,12 +100,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
         <Button
           variant="primary"
           className="relative mb-4 w-full"
-          onClick={() =>
-            patchTaskStatus({
-              taskId: initialTask?.id?.toString() ?? '',
-              status: 'COMPLETE',
-            })
-          }
+          onClick={handleComplete}
         >
           다했어요!
         </Button>
