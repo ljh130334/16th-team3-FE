@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { TaskResponse } from '@/types/task';
-import { usePatchTaskStatus } from '@/hooks/useTask';
 import { useEffect, useState } from 'react';
 import { calculateRemainingTime } from '@/utils/dateFormat';
 import { useUserStore } from '@/store/useUserStore';
@@ -11,6 +10,7 @@ import { useUserStore } from '@/store/useUserStore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/component/Badge';
 import Link from 'next/link';
+import { useCompleteTask } from '@/hooks/useTasks';
 
 interface Props {
   initialTask: TaskResponse;
@@ -25,8 +25,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
   //   initialData: initialTask,
   // });
 
-  const { mutate: patchTaskStatus } = usePatchTaskStatus();
-
+  const { mutate: completeTask } = useCompleteTask();
   // 남은 시간을 계산하고 상태 업데이트하는 함수
   useEffect(() => {
     const updateRemainingTime = () => {
@@ -53,10 +52,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
   }, [initialTask?.dueDatetime]);
 
   const handleComplete = () => {
-    patchTaskStatus({
-      taskId: initialTask?.id?.toString() ?? '',
-      status: 'COMPLETE',
-    });
+    completeTask(Number(initialTask.id));
     router.push('/immersion/complete');
   };
 

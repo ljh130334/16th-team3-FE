@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import { usePatchTaskStatus } from '@/hooks/useTask';
+import { useStartTask } from '@/hooks/useTasks';
 
 export default function StartButton({
   currentTaskId,
@@ -10,11 +10,11 @@ export default function StartButton({
   currentTaskId: string;
 }) {
   const router = useRouter();
-  const { mutate: patchTaskStatus } = usePatchTaskStatus();
+  const { mutate: startTaskMutation } = useStartTask();
 
   const handleStart = async () => {
     try {
-      await patchTaskStatus({ taskId: currentTaskId, status: 'FOCUSED' });
+      startTaskMutation(Number(currentTaskId));
       router.push(`/immersion/${currentTaskId}`);
     } catch (error) {
       console.error('Failed to start immersion:', error);

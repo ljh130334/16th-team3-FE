@@ -1,10 +1,5 @@
-import {
-  useMutation,
-  useQuery,
-  UseQueryOptions,
-  UseMutationResult,
-} from '@tanstack/react-query';
-import { fetchTask, patchTaskHoldOff, patchTaskStatus } from '@/lib/task';
+import { useMutation, UseMutationResult } from '@tanstack/react-query';
+import { patchTaskHoldOff, patchTaskStatus } from '@/lib/task';
 import { TaskResponse } from '@/types/task';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
@@ -31,35 +26,6 @@ export interface StatusParams extends TaskMutationParams {
     | 'FOCUSED'
     | 'COMPLETE';
 }
-
-// // 할일 조회
-// export const useTask = (
-//   taskId: string,
-//   accessToken: string,
-//   options?: Omit<UseQueryOptions<TaskResponse, Error>, 'queryKey' | 'queryFn'>,
-// ) => {
-//   return useQuery<TaskResponse, Error>({
-//     queryKey: ['task', taskId],
-//     queryFn: () => fetchTask(taskId, accessToken),
-//     ...options,
-//   });
-// };
-
-// // 마감일 조회
-// export const useTaskDueDatetime = (
-//   taskId: string,
-//   accessToken: string,
-//   options?: Omit<UseQueryOptions<string, Error>, 'queryKey' | 'queryFn'>,
-// ) => {
-//   return useQuery<string, Error>({
-//     queryKey: ['taskDueDatetime', taskId],
-//     queryFn: async () => {
-//       const task = await fetchTask(taskId, accessToken);
-//       return task.dueDatetime;
-//     },
-//     ...options,
-//   });
-// };
 
 // 할일 보류 요청
 export const usePatchTaskHoldOff = (): UseMutationResult<
