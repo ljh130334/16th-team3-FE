@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import Header from './_component/Header';
@@ -11,6 +11,7 @@ import ActionDrawer from './_component/ActionDrawer';
 import { TaskResponse } from '@/types/task';
 import { formatKoreanDateTime } from '@/utils/dateFormat';
 import { useWebViewMessage } from '@/hooks/useWebViewMessage';
+import { useTaskProgressStore } from '@/store';
 
 const PushScreenState = {
   INITIAL: 'initial',
@@ -54,6 +55,12 @@ export default function ActionPushPageClient({
   const [screenState, setScreenState] = useState<PushScreenStateType>(
     getInitialState(left),
   );
+
+  const { setCurrentTask } = useTaskProgressStore();
+
+  useEffect(() => {
+    setCurrentTask(task);
+  }, [task, setCurrentTask]);
 
   return (
     <div className="flex h-full flex-col gap-4 bg-background-primary">

@@ -9,7 +9,8 @@ import ActionCard from './_component/ActionCard';
 import ScheduleCard from './_component/ScheduleCard';
 import ActionStartDrawer from './_component/ActionStartDrawer';
 import ActionStartHeader from './_component/ActionStartHeader';
-
+import { useTaskProgressStore } from '@/store';
+import { useEffect } from 'react';
 interface Props {
   initialTask: TaskResponse;
 }
@@ -17,6 +18,11 @@ interface Props {
 export default function ActionStartPageClient({ initialTask }: Props) {
   const router = useRouter();
   const { handleTakePicture } = useWebViewMessage(router);
+  const { setCurrentTask } = useTaskProgressStore();
+
+  useEffect(() => {
+    setCurrentTask(initialTask);
+  }, [initialTask, setCurrentTask]);
 
   return (
     <div className="flex h-full flex-col gap-4 bg-background-primary">
