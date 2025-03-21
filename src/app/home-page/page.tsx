@@ -206,10 +206,6 @@ const HomePageContent = () => {
     const isFirstVisit = sessionStorage.getItem('visited');
     if (isFirstVisit) {
       setIsReentry(true);
-      // 바텀시트 표시 후 상태 초기화 시간 조정
-      setTimeout(() => {
-        setIsReentry(false);
-      }, 5000);
     } else {
       sessionStorage.setItem('visited', 'true');
       setIsReentry(false);
@@ -463,10 +459,10 @@ const HomePageContent = () => {
       <Image
         src="/icons/home/spurt.svg"
         alt="SPURT"
-        width={50}
+        width={54}
         height={20}
         priority
-        className="w-[50px]"
+        className="w-[54px]"
       />
       <button onClick={handleNavigateToMyPage}>
         <Image
@@ -540,7 +536,7 @@ const HomePageContent = () => {
               {hasTodayAndInProgressTasks && (
                 <>
                   {/* 진행 중 섹션 */}
-                  <div className="mb-6">
+                  <div className="mb-7">
                     <h3 className="s2 mb-2 mt-2 text-text-neutral">진행 중</h3>
                     {inProgressTasks.map((task) => (
                       <InProgressTaskItem
@@ -643,7 +639,7 @@ const HomePageContent = () => {
               {hasInProgressTasksOnly && (
                 <>
                   {/* 진행 중 섹션 */}
-                  <div className="mb-6">
+                  <div className="mb-7">
                     <h3 className="s3 mb-2 text-text-neutral">진행 중</h3>
                     {inProgressTasks.map((task) => (
                       <InProgressTaskItem
@@ -1022,7 +1018,7 @@ const HomePageContent = () => {
           <div 
             className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none"
             style={{
-              background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%)'
+              background: 'linear-gradient(to bottom, rgba(15, 17, 20, 0) 0%, rgba(15, 17, 20, 1) 100%)'
             }}
           />
           
