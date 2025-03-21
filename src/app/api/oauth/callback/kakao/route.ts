@@ -3,7 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { authCode, deviceId, deviceType } = body;
+    const {
+      authCode,
+      deviceId = '0f365b39-c33d-39be-bdfc-74aaf55',
+      deviceType = 'IOS',
+    } = body;
 
     if (!authCode) {
       return NextResponse.json(
@@ -55,7 +59,7 @@ export async function POST(req: NextRequest) {
     });
 
     nextResponse.cookies.set('accessToken', accessToken, {
-      httpOnly: false,
+      httpOnly: true,
       secure: true, // ! TODO: 앱 심사 받을 때, true로 변경 / 로컬(웹)에서 테스트할 떄, true로 변경 / 로컬(앱)에서 테스트할 때, false로 변경
       sameSite: 'none',
       path: '/',
@@ -63,7 +67,7 @@ export async function POST(req: NextRequest) {
     });
 
     nextResponse.cookies.set('refreshToken', refreshToken, {
-      httpOnly: false,
+      httpOnly: true,
       secure: true,
       sameSite: 'none',
       path: '/',
