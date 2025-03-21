@@ -9,14 +9,14 @@ export async function PATCH(
 
   try {
     const body = await request.json();
-    
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
-    
+
     const response = await serverApi.patch(`v1/tasks/${taskId}/status`, {
       json: body,
     });
-    
+
     clearTimeout(timeoutId);
 
     if (!response.ok) {
@@ -26,8 +26,12 @@ export async function PATCH(
           { status: 404 },
         );
       }
-      
-      const errorData = (await response.json().catch(() => ({ message: '오류 내용을 읽을 수 없습니다' }))) as { message: string };
+
+      const errorData = (await response
+        .json()
+        .catch(() => ({ message: '오류 내용을 읽을 수 없습니다' }))) as {
+        message: string;
+      };
 
       throw new Error(`API 요청 실패: ${errorData.message}`);
     }
@@ -41,7 +45,7 @@ export async function PATCH(
         { status: 408 },
       );
     }
-    
+
     return NextResponse.json(
       { error: '할일 상태를 변경하는 중 오류가 발생했습니다.' },
       { status: 500 },
