@@ -159,6 +159,44 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
     return <TimeDisplay time={remainingTime} />;
   };
 
+  // 바텀시트 렌더링 (일반 및 긴급 케이스 모두 공통으로 사용)
+  const renderBottomSheet = () => {
+    if (!showBottomSheet || !isReentry) return null;
+    
+    return (
+      <div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
+        <div className="flex w-full flex-col items-center rounded-t-[28px] bg-component-gray-secondary p-4 pt-10">
+          <h2 className="t3 text-center text-text-strong">
+            {task.title}
+          </h2>
+          <p className="t3 mb-2 text-center text-text-strong">
+            하던 중이었어요. 이어서 몰입할까요?
+          </p>
+          <p
+            className={`b3 ${isExpired ? 'text-red-500' : 'text-text-neutral'} mb-7 text-center`}
+          >
+            {isExpired
+              ? '마감 시간이 지났습니다'
+              : `마감까지 ${remainingTime}`}
+          </p>
+          <button
+            className="l2 w-full rounded-[16px] bg-component-accent-primary py-4 text-white"
+            onClick={handleContinueToFocus}
+          >
+            이어서 몰입
+          </button>
+
+          <button
+            className="l2 w-full py-4 text-text-neutral"
+            onClick={handleCloseBottomSheet}
+          >
+            닫기
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   // 일반 진행 중 컴포넌트
   if (!isUrgent) {
     return (
@@ -167,7 +205,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
           className="mb-5 rounded-[12px] bg-component-gray-secondary p-4" 
           onClick={handleCardClick}
         >
-          <div className="mb-4 flex items-center gap-4">
+          <div className="mb-5 flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-[20px] bg-component-gray-tertiary p-2">
               <Image
                 src="/icons/home/happy-character.png"
@@ -195,39 +233,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
           </button>
         </div>
 
-        {/* 이어서 몰입 바텀시트 - 재진입 시에만 표시 */}
-        {showBottomSheet && isReentry && (
-          <div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
-            <div className="flex w-full flex-col items-center rounded-t-[28px] bg-component-gray-secondary p-4 pt-10">
-              <h2 className="t3 text-center text-text-strong">
-                {task.title}를
-              </h2>
-              <p className="t3 mb-2 text-center text-text-strong">
-                하던 중이었어요. 이어서 몰입할까요?
-              </p>
-              <p
-                className={`b3 ${isExpired ? 'text-red-500' : 'text-text-neutral'} mb-7 text-center`}
-              >
-                {isExpired
-                  ? '마감 시간이 지났습니다'
-                  : `마감까지 ${remainingTime}`}
-              </p>
-              <button
-                className="l2 w-full rounded-[16px] bg-component-accent-primary py-4 text-white"
-                onClick={handleContinueToFocus}
-              >
-                이어서 몰입
-              </button>
-
-              <button
-                className="l2 w-full py-4 text-text-neutral"
-                onClick={handleCloseBottomSheet}
-              >
-                닫기
-              </button>
-            </div>
-          </div>
-        )}
+        {renderBottomSheet()}
       </>
     );
   }
@@ -236,7 +242,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
   return (
     <>
       <div 
-        className="bg-gradient-component-01 mb-4 flex h-auto flex-col justify-between rounded-[24px] p-4"
+        className="bg-gradient-component-01 mb-5 flex h-auto flex-col justify-between rounded-[20px] p-4"
         onClick={handleCardClick}
       >
         <div>
@@ -262,37 +268,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
         </Button>
       </div>
 
-      {/* 이어서 몰입 바텀시트 - 재진입 시에만 표시 */}
-      {showBottomSheet && isReentry && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
-          <div className="flex w-full flex-col items-center rounded-t-[28px] bg-component-gray-secondary p-4 pt-10">
-            <h2 className="t3 text-center text-text-strong">{task.title}</h2>
-            <p className="t3 mb-2 text-center text-text-strong">
-              하던 중이었어요. 이어서 몰입할까요?
-            </p>
-            <p
-              className={`b3 ${isExpired ? 'text-red-500' : 'text-text-neutral'} mb-7 text-center`}
-            >
-              {isExpired
-                ? '마감 시간이 지났습니다'
-                : `마감까지 ${remainingTime}`}
-            </p>
-            <button
-              className="l2 w-full rounded-[16px] bg-component-accent-primary py-4 text-white"
-              onClick={handleContinueToFocus}
-            >
-              이어서 몰입
-            </button>
-
-            <button
-              className="l2 w-full py-4 text-text-neutral"
-              onClick={handleCloseBottomSheet}
-            >
-              닫기
-            </button>
-          </div>
-        </div>
-      )}
+      {renderBottomSheet()}
     </>
   );
 };

@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { parseDateAndTime, calculateRemainingTime } from '@/utils/dateFormat';
 import { Task } from '@/types/task';
 import { useTask } from '@/hooks/useTasks';
+import { useUserStore } from '@/store/useUserStore';
 import {
   Drawer,
   DrawerClose,
@@ -37,6 +38,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [remainingTime, setRemainingTime] = useState('');
   const [isUrgent, setIsUrgent] = useState(false);
+  const { userData } = useUserStore();
 
   // const { data: taskDetail, isLoading } = useTask(task.id);
 
@@ -179,6 +181,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   const isInProgress = task.status === 'inProgress';
   const personaName = task.persona?.name || '페르소나 없음';
   const personaTriggerAction = task.triggerAction || '노트북 켜기';
+  const userNickname = userData?.nickname || '';
 
   // 이미지 URL 처리
   const personaImageUrl = '/icons/home/happy-character.png';
@@ -189,7 +192,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
   return (
     <Drawer open={isOpen} onDrag={onClose} onAnimationEnd={() => onClose()}>
       <DrawerContent className="w-full rounded-t-[20px] border-0 bg-component-gray-secondary pb-[33px] pt-2">
-        <div className="relative mb-5 flex items-center justify-between pt-10">
+        <div className="relative mb-[30px] flex items-center justify-between pt-10">
           <DialogHeader className="absolute inset-x-0 text-center">
             <DialogTitle className="t3 text-text-normal">
               {task.title}
@@ -247,9 +250,8 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 
         <div className="px-5">
           <p className="b3 mb-5 text-center text-text-neutral">
-            '{task.persona?.taskKeywordsCombination?.taskType?.name || '일반'}
-            {task.persona?.taskKeywordsCombination?.taskMode?.name || '모드'}'
-            {formatNickname(personaName)}님!
+            {personaName}&nbsp;
+            {formatNickname(userNickname)}님!
             <br />
             미루지 말고 여유있게 시작해볼까요?
           </p>
@@ -269,7 +271,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
               size="sm"
               className="z-10 mb-6 h-[26px] w-auto rounded-[8px] px-[7px] py-[6px] text-text-inverse"
             >
-              <span className="l6 text-text-inverse">{personaName}</span>
+              <span className="l6 text-text-inverse">{personaName}&nbsp;{formatNickname(userNickname)}</span>
             </Button>
           </div>
 
