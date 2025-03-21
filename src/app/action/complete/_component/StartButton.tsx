@@ -14,6 +14,7 @@ export default function StartButton({
 
   const handleStart = async () => {
     try {
+      alert('몰입 시작');
       startTaskMutation(Number(currentTaskId));
       router.push(`/immersion/${currentTaskId}`);
     } catch (error) {
@@ -23,10 +24,14 @@ export default function StartButton({
 
   return (
     <div className="mt-auto flex w-full flex-col items-center px-5 py-6">
-      <div className="fixed bottom-0 left-0 right-0 h-[245px]" />
-      <Button variant="primary" className="mb-4 w-full" onClick={handleStart}>
+      <Button
+        variant="primary"
+        className="relative z-10 mb-4 w-full"
+        onClick={handleStart}
+      >
         몰입 시작하기
       </Button>
+      <div className="fixed bottom-0 left-0 right-0 h-[245px]" />
     </div>
   );
 }
