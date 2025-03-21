@@ -14,7 +14,6 @@ export default function StartButton({
 
   const handleStart = async () => {
     try {
-      alert('몰입 시작');
       startTaskMutation(Number(currentTaskId));
       router.push(`/immersion/${currentTaskId}`);
     } catch (error) {
