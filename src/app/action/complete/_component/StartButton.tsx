@@ -13,8 +13,12 @@ export default function StartButton({
   const { mutate: patchTaskStatus } = usePatchTaskStatus();
 
   const handleStart = async () => {
-    await patchTaskStatus({ taskId: currentTaskId, status: 'FOCUSED' });
-    router.push(`/immersion/${currentTaskId}`);
+    try {
+      await patchTaskStatus({ taskId: currentTaskId, status: 'FOCUSED' });
+      router.push(`/immersion/${currentTaskId}`);
+    } catch (error) {
+      console.error('Failed to start immersion:', error);
+    }
   };
 
   return (

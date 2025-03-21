@@ -93,5 +93,8 @@ export const usePatchTaskStatus = (): UseMutationResult<
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks', 'home'] });
     },
+    onError: (error) => {
+      console.error('usePatchTaskStatus onError', error);
+    },
   });
 };
