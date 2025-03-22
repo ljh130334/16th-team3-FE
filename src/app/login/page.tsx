@@ -133,6 +133,9 @@ const LoginPage = () => {
 				<Button variant="default" onClick={handlealertDeviceToken}>
 					디바이스 토큰 확인
 				</Button>
+				<Button variant="default" onClick={handlealertDeviceToken}>
+					디바이스 토큰 확인
+				</Button>
 				<Button
 					variant="default"
 					className="l2 gap-2 rounded-[16px] bg-[#FEE500] text-[#0f1114]"
