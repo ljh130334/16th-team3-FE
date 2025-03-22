@@ -34,28 +34,28 @@ export const useWebViewMessage = (router?: ReturnType<typeof useRouter>) => {
 					localStorage.setItem("capturedImage", data.payload.image);
 					router?.push("/action/complete");
 				}
-				if (data.type === "GET_DEVICE_TOKEN") {
-					alert(
-						`rn으로부터 수신한 메세지: ${data.payload.message}${data.payload.fcmToken}`,
-					);
-					localStorage.setItem("deviceToken", data.payload.fcmToken);
-					console.log("data.payload.message", data.payload.message);
-					console.log("data.payload.fcmToken", data.payload.fcmToken);
+				// if (data.type === "GET_DEVICE_TOKEN") {
+				// 	alert(
+				// 		`rn으로부터 수신한 메세지: ${data.payload.message}${data.payload.fcmToken}`,
+				// 	);
+				// 	localStorage.setItem("deviceToken", data.payload.fcmToken);
+				// 	console.log("data.payload.message", data.payload.message);
+				// 	console.log("data.payload.fcmToken", data.payload.fcmToken);
 
-					if (data.payload.fcmToken) {
-						Cookies.set("deviceId", data.payload.fcmToken, {
-							expires: 30, // 30일
-							path: "/",
-							secure: false,
-						});
+				// 	if (data.payload.fcmToken) {
+				// 		Cookies.set("deviceId", data.payload.fcmToken, {
+				// 			expires: 30, // 30일
+				// 			path: "/",
+				// 			secure: false,
+				// 		});
 
-						Cookies.set("deviceType", data.payload.deviceType, {
-							expires: 30,
-							path: "/",
-							secure: false,
-						});
-					}
-				}
+				// 		Cookies.set("deviceType", data.payload.deviceType, {
+				// 			expires: 30,
+				// 			path: "/",
+				// 			secure: false,
+				// 		});
+				// 	}
+				// }
 			} catch (error) {
 				console.error("메시지 파싱 에러:", error);
 			}
