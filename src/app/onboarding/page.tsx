@@ -4,10 +4,22 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import { useUserStore } from '@/store/useUserStore';
 
 export default function OnboardingPage() {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(0);
+  const { userData } = useUserStore();
+
+  const formatNickname = (name: string) => {
+    if (!name) return '';
+    if (name.length > 9) {
+      return name.substring(0, 9) + '...';
+    }
+    return name;
+  };
+
+  const userNickname = userData?.nickname || '';
 
   const onboardingPages = [
     {
@@ -27,7 +39,7 @@ export default function OnboardingPage() {
     {
       title: '캐릭터와 플레이리스트로\n몰입을 더 깊게!',
       description:
-        '작업 카워드를 기반으로 몰입 캐릭터를 활성화하여\n맞춤 환경과 음악을 제공합니다.',
+        '작업 키워드를 기반으로 몰입 캐릭터를 만들어\n맞춤 환경과 음악을 제공해요',
       image: '/icons/onboarding/onboarding3.svg',
       buttonText: '다음으로',
     },
@@ -65,6 +77,7 @@ export default function OnboardingPage() {
   const HologramTriangle = () => (
     <div className="absolute -bottom-[10px] left-[40px] z-0">
       <svg width="14" height="11" viewBox="0 0 14 11" fill="none">
+        <title>홀로그램 삼각형</title>
         <path 
           d="M5.73179 9.67742C6.32777 10.7097 7.8177 10.7097 8.41368 9.67742L14.0009 -8.53738e-07L0.14453 3.57628e-07L5.73179 9.67742Z" 
           fill="url(#hologram-gradient)"
@@ -91,7 +104,7 @@ export default function OnboardingPage() {
   const FirstPage = () => (
     <div className="relative h-full flex flex-col justify-between">
       {/* 블러 효과 배경 */}
-      <div 
+      <div
         className="absolute bottom-11 left-1/2 -translate-x-1/2 z-0"
         style={{
           width: '375px',
@@ -100,9 +113,9 @@ export default function OnboardingPage() {
           filter: 'blur(75px)',
           borderRadius: '50%'
         }}
-      ></div>
+      />
 
-      <div 
+      <div
         className="absolute bottom-[170px] left-[40%] -translate-x-1/2 z-0"
         style={{
           width: '376px',
@@ -112,7 +125,7 @@ export default function OnboardingPage() {
           mixBlendMode: 'color-dodge',
           filter: 'blur(62px)'
         }}
-      ></div>
+      />
 
       {/* 타이틀과 설명 */}
       <div className="mt-[48px] flex flex-col z-10">
@@ -184,7 +197,7 @@ export default function OnboardingPage() {
   // 두 번째 페이지 (1분 안에 작은 행동)
   const SecondPage = () => (
     <div className="relative h-full flex flex-col justify-between">
-      <div 
+      <div
         className="absolute bottom-11 left-1/2 -translate-x-1/2 z-0"
         style={{
           width: '375px',
@@ -193,7 +206,7 @@ export default function OnboardingPage() {
           filter: 'blur(75px)',
           borderRadius: '50%'
         }}
-      ></div>
+      />
       <div className="mt-[48px] flex flex-col z-10">
         <h1 className="t2 whitespace-pre-line text-gray-strong">
           {onboardingPages[1].title}
@@ -238,47 +251,115 @@ export default function OnboardingPage() {
   // 세 번째 페이지 (캐릭터와 플레이리스트)
   const ThirdPage = () => (
     <div className="relative h-full flex flex-col justify-between">
+      <div 
+        className="absolute bottom-11 left-1/2 -translate-x-1/2 z-0"
+        style={{
+          width: '375px',
+          height: '385px',
+          backgroundColor: 'rgba(65, 65, 137, 0.4)',
+          filter: 'blur(75px)',
+          borderRadius: '50%'
+        }}
+      />
       <div className="mt-[48px] flex flex-col z-10">
-        <h1 className="t2 whitespace-pre-line text-gray-strong">
-          {onboardingPages[2].title}
-        </h1>
-        <p className="b2 mt-3 whitespace-pre-line text-gray-neutral">
-          {onboardingPages[2].description}
-        </p>
-      </div>
+      <h1 className="t2 whitespace-pre-line text-gray-strong">
+        {onboardingPages[2].title}
+      </h1>
+      <p className="b2 mt-3 whitespace-pre-line text-gray-neutral">
+        {onboardingPages[2].description}
+      </p>
+    </div>
 
-      <div className="flex flex-1 flex-col justify-end z-10">
-        <div className="mb-5 flex justify-center">
+    <div className="flex flex-1 flex-col justify-end z-10">
+      <div className="mb-[80px] flex flex-col justify-center items-center relative">
+        {/* 메인 이미지 */}
+        <div className="relative">
           <Image
             src={onboardingPages[2].image}
             alt="온보딩 이미지 3"
-            width={292}
+            width={230}
             height={292}
             priority
+            className="relative z-10"
           />
+          
+          {/* 툴팁 추가 */}
+          <div className="absolute top-[-60px] left-1/2 -translate-x-1/2 z-20">
+            <div 
+              className="l4 rounded-[24px] text-[#BDBDF5] flex items-center justify-center shadow-lg whitespace-nowrap px-6 py-3"
+              style={{
+                background: 'rgba(107, 107, 225, 0.20)',
+                backdropFilter: 'blur(33.91713333129883px)'
+              }}
+            >
+              <Image
+                src="/icons/onboarding/clap.svg"
+                alt="박수"
+                width={20}
+                height={20}
+                className="mr-1"
+                priority
+              />
+              <span>과탑 DNA 깨어나는 중! 오늘도 앞서가요!</span>
+            </div>
+          </div>
         </div>
 
-        <Button
-          variant="primary"
-          className="w-full rounded-[16px] bg-component-accent-primary py-4 text-white"
-          onClick={handleNext}
-        >
-          {onboardingPages[2].buttonText}
-        </Button>
+        <div className="flex justify-center mt-5">
+            <Button
+              variant="hologram"
+              size="sm"
+              className="z-10 mb-6 h-[26px] w-auto rounded-[8px] px-[7px] py-[6px] text-text-inverse"
+            >
+              <span className="l6 text-text-inverse">에너지 만랩 과탑&nbsp;{formatNickname(userNickname)}</span>
+            </Button>
+          </div>
       </div>
+
+      <Button
+        variant="primary"
+        className="w-full rounded-[16px] bg-component-accent-primary py-4 text-white"
+        onClick={handleNext}
+      >
+        {onboardingPages[2].buttonText}
+      </Button>
     </div>
-  );
+  </div>
+);
 
   // 네 번째 페이지 (시작하기)
   const FourthPage = () => (
     <div className="relative h-full flex flex-col z-10">
-      <div className="flex flex-1 flex-col items-center justify-center">
+      <div 
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 z-0"
+        style={{
+          width: '375px',
+          height: '385px',
+          backgroundColor: 'rgba(65, 65, 137, 0.4)',
+          filter: 'blur(75px)',
+          borderRadius: '50%'
+        }}
+      />
+
+      <div
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 z-5"
+        style={{
+          width: '376px',
+          height: '149px',
+          opacity: 0.4,
+          background: 'conic-gradient(from 210deg at 50% 50%, #CCE4FF 0deg, #C1A4E8 50.06deg, #B8E2FB 85.94deg, #F2EFE8 134.97deg, #CCE4FF 172.05deg, #BDAFE3 224.67deg, #C7EDEB 259.36deg, #E7F5EB 298.82deg, #F2F0E7 328.72deg)',
+          mixBlendMode: 'color-dodge',
+          filter: 'blur(62px)'
+        }}
+      />
+
+      <div className="flex flex-1 flex-col items-center justify-center z-10">
         <Image
-          src="/icons/onboarding/onboarding4.png"
+          src="/icons/onboarding/onboarding4.svg"
           alt="온보딩 이미지 4"
           width={142}
           height={80}
-          className="mb-[60px]"
+          className="mb-[40px]"
           priority
         />
 
@@ -321,7 +402,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="flex h-full flex-col bg-background-primary px-5 pb-12 pt-2 overflow-hidden">
+    <div className="flex h-full flex-col bg-background-primary px-5 pb-[46px] pt-2 overflow-hidden">
       {/* 프로그레스 바 */}
       <ProgressBar />
       
