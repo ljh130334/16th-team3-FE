@@ -116,6 +116,12 @@ const LoginPage = () => {
 		alert(Cookies.get("deviceId"));
 		alert(Cookies.get("deviceType"));
 	};
+
+	const handleDeleteDeviceToken = () => {
+		Cookies.remove("deviceId");
+		Cookies.remove("deviceType");
+	};
+
 	return (
 		<div className="flex h-full flex-col justify-between bg-background-primary px-5 py-12">
 			<div className="mt-[144px]">
@@ -130,8 +136,8 @@ const LoginPage = () => {
 			</div>
 
 			<div className="flex w-full flex-col gap-4">
-				<Button variant="default" onClick={handlealertDeviceToken}>
-					디바이스 토큰 확인
+				<Button variant="default" onClick={handleDeleteDeviceToken}>
+					디바이스 토큰 제거
 				</Button>
 				<Button variant="default" onClick={handlealertDeviceToken}>
 					디바이스 토큰 확인
