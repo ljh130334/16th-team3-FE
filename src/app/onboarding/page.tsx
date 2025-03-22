@@ -20,7 +20,7 @@ export default function OnboardingPage() {
     {
       title: '1분 안에 작은 행동을 시작하면,\n미루기는 이제 그만!',
       description:
-        '작은 행동을 시작하는 데 1분이면 충분해요.\n완료할 때까지 진동이 울려 시작을 도와드립니다.',
+        '미룬 일을 시작하는 데 1분만 투자해요\n완료할 때까지 진동이 울려 시작을 도와줄게요',
       image: '/icons/onboarding/onboarding2.svg',
       buttonText: '다음으로',
     },
@@ -184,6 +184,16 @@ export default function OnboardingPage() {
   // 두 번째 페이지 (1분 안에 작은 행동)
   const SecondPage = () => (
     <div className="relative h-full flex flex-col justify-between">
+      <div 
+        className="absolute bottom-11 left-1/2 -translate-x-1/2 z-0"
+        style={{
+          width: '375px',
+          height: '385px',
+          backgroundColor: 'rgba(65, 65, 137, 0.4)',
+          filter: 'blur(75px)',
+          borderRadius: '50%'
+        }}
+      ></div>
       <div className="mt-[48px] flex flex-col z-10">
         <h1 className="t2 whitespace-pre-line text-gray-strong">
           {onboardingPages[1].title}
@@ -194,12 +204,22 @@ export default function OnboardingPage() {
       </div>
 
       <div className="flex flex-1 flex-col justify-end z-10">
-        <div className="mb-5 flex justify-center">
+        <div className="mb-[30px] flex justify-center relative">
+          <div className="absolute top-[-130px] w-full z-20 items-center flex justify-center">
+            <Image
+              src="/icons/onboarding/ox.svg"
+              alt="OX 아이콘"
+              width={350}
+              height={200}
+              priority
+            />
+          </div>
+          
           <Image
             src={onboardingPages[1].image}
             alt="온보딩 이미지 2"
-            width={292}
-            height={292}
+            width={245}
+            height={245}
             priority
           />
         </div>
