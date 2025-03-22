@@ -1,21 +1,21 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
-import { TaskResponse } from '@/types/task';
-import { CurrentTimeProvider } from '@/provider/CurrentTimeProvider';
-import { fetchServerTask } from '@/lib/serverTask';
-import ActionStartPageClient from './ActionStartPageClient';
+import { fetchServerTask } from "@/lib/serverTask";
+import { CurrentTimeProvider } from "@/provider/CurrentTimeProvider";
+import type { TaskResponse } from "@/types/task";
+import ActionStartPageClient from "./ActionStartPageClient";
 
 export default async function Start({
-  params,
+	params,
 }: {
-  params: Promise<{ taskId: string }>;
+	params: Promise<{ taskId: string }>;
 }) {
-  const { taskId } = await params;
+	const { taskId } = await params;
 
-  const task: TaskResponse = await fetchServerTask(taskId);
-  return (
-    <CurrentTimeProvider>
-      <ActionStartPageClient initialTask={task} />
-    </CurrentTimeProvider>
-  );
+	const task: TaskResponse = await fetchServerTask(taskId);
+	return (
+		<CurrentTimeProvider>
+			<ActionStartPageClient initialTask={task} />
+		</CurrentTimeProvider>
+	);
 }

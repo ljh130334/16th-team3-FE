@@ -3,284 +3,280 @@
 @tailwind utilities;
 
 @theme {
-  --font-pretendard: 'Pretendard Variable';
+	--font-pretendard: "Pretendard Variable";
 }
 
 :root {
-  --point-gradient: linear-gradient(
-    269deg,
-    #ddd9f8 6.08%,
-    #e4e4ff 31.42%,
-    #cce4ff 62.59%
-  );
+	--point-gradient: linear-gradient(
+		269deg,
+		#ddd9f8 6.08%,
+		#e4e4ff 31.42%,
+		#cce4ff 62.59%
+	);
 
-  --gradient-component-01: linear-gradient(
-      180deg,
-      rgba(121, 121, 235, 0.3) 0%,
-      rgba(121, 121, 235, 0.1) 29.17%,
-      rgba(121, 121, 235, 0) 100%
-    ),
-    #17191f;
+	--gradient-component-01: linear-gradient(
+			180deg,
+			rgba(121, 121, 235, 0.3) 0%,
+			rgba(121, 121, 235, 0.1) 29.17%,
+			rgba(121, 121, 235, 0) 100%
+		), #17191f;
 
-  --gradient-component-02: linear-gradient(
-    180deg,
-    rgba(121, 121, 235, 0.15) 0%,
-    rgba(121, 121, 235, 0.05) 29.17%,
-    rgba(121, 121, 235, 0) 100%
-  );
+	--gradient-component-02: linear-gradient(
+		180deg,
+		rgba(121, 121, 235, 0.15) 0%,
+		rgba(121, 121, 235, 0.05) 29.17%,
+		rgba(121, 121, 235, 0) 100%
+	);
 
-  --error: linear-gradient(
-    180deg,
-    var(--Red-400, #dd6875) 0%,
-    var(--Red-200, #ed98a2) 100%
-  );
+	--error: linear-gradient(
+		180deg,
+		var(--Red-400, #dd6875) 0%,
+		var(--Red-200, #ed98a2) 100%
+	);
 
-  --linear-black: linear-gradient(180deg, rgba(15, 17, 20, 0) 30%, #0f1114 80%);
+	--linear-black: linear-gradient(180deg, rgba(15, 17, 20, 0) 30%, #0f1114 80%);
 
-  --linear-black-inverse: linear-gradient(
-    180deg,
-    #0f1114 20%,
-    rgba(15, 17, 20, 0) 70%
-  );
-}
-
-html {
+	--linear-black-inverse: linear-gradient(
+		180deg,
+		#0f1114 20%,
+		rgba(15, 17, 20, 0) 70%
+	);
 }
 
 body {
-  @apply bg-background-primary text-text-normal;
-  font-family: var(--font-pretendard);
+	@apply bg-background-primary text-text-normal;
+	font-family: var(--font-pretendard);
 }
 
 /* 기본 헤더 스타일 */
 .h1 {
-  @apply text-h1;
+	@apply text-h1;
 }
 
 .h2 {
-  @apply text-h2;
+	@apply text-h2;
 }
 
 .h3 {
-  @apply text-h3;
+	@apply text-h3;
 }
 
 /* 기본 제목 스타일 */
 .t1 {
-  @apply text-t1;
+	@apply text-t1;
 }
 
 .t2 {
-  @apply text-t2;
+	@apply text-t2;
 }
 
 .t3 {
-  @apply text-t3;
+	@apply text-t3;
 }
 
 /* 기본 부제목 스타일 */
 .s1 {
-  @apply text-s1;
+	@apply text-s1;
 }
 
 .s2 {
-  @apply text-s2;
+	@apply text-s2;
 }
 
 .s3 {
-  @apply text-s3;
+	@apply text-s3;
 }
 
 /* 본문 스타일 */
 .b1 {
-  @apply text-b1;
+	@apply text-b1;
 }
 
 .b2 {
-  @apply text-b2;
+	@apply text-b2;
 }
 
 .b3 {
-  @apply text-b3;
+	@apply text-b3;
 }
 
 /* 캡션 스타일 */
 .c1 {
-  @apply text-c1;
+	@apply text-c1;
 }
 
 .c2 {
-  @apply text-c2;
+	@apply text-c2;
 }
 
 .c3 {
-  @apply text-c3;
+	@apply text-c3;
 }
 
 /* 라벨 스타일 */
 .l1 {
-  @apply text-l1;
+	@apply text-l1;
 }
 
 .l2 {
-  @apply text-l2;
+	@apply text-l2;
 }
 
 .l3 {
-  @apply text-l3;
+	@apply text-l3;
 }
 
 .l4 {
-  @apply text-l4;
+	@apply text-l4;
 }
 
 .l5 {
-  @apply text-l5;
+	@apply text-l5;
 }
 
 .l6 {
-  @apply text-l6;
+	@apply text-l6;
 }
 
 /* 버튼 스타일 */
 .button-primary {
-  @apply rounded-md bg-main-300 px-4 py-2 text-white;
+	@apply rounded-md bg-main-300 px-4 py-2 text-white;
 }
 
 .button-secondary {
-  @apply rounded-md bg-gray-300 px-4 py-2 text-gray-900;
+	@apply rounded-md bg-gray-300 px-4 py-2 text-gray-900;
 }
 
 .button-danger {
-  @apply rounded-md bg-red-300 px-4 py-2 text-white;
+	@apply rounded-md bg-red-300 px-4 py-2 text-white;
 }
 
 /* 아이콘 스타일 */
 .icon-primary {
-  @apply text-icon-primary;
+	@apply text-icon-primary;
 }
 
 .icon-inverse {
-  @apply text-icon-inverse;
+	@apply text-icon-inverse;
 }
 
 /* 엘리베이티드 컬러 */
 .elevated-primary {
-  @apply bg-elevated-primary;
+	@apply bg-elevated-primary;
 }
 
 .elevated-secondary {
-  @apply bg-elevated-secondary;
+	@apply bg-elevated-secondary;
 }
 
 /* 컴포넌트 컬러 */
 .component-primary {
-  @apply bg-component-accent-primary;
+	@apply bg-component-accent-primary;
 }
 
 .component-secondary {
-  @apply bg-component-accent-secondary;
+	@apply bg-component-accent-secondary;
 }
 
 .component-red {
-  @apply bg-component-accent-red;
+	@apply bg-component-accent-red;
 }
 
 /* 라인 컬러 */
 .line-primary {
-  @apply border-line-primary;
+	@apply border-line-primary;
 }
 
 .line-secondary {
-  @apply border-line-secondary;
+	@apply border-line-secondary;
 }
 
 .line-tertiary {
-  @apply border-line-tertiary;
+	@apply border-line-tertiary;
 }
 
 /* 텍스트 컬러 */
 .text-primary {
-  @apply text-text-primary;
+	@apply text-text-primary;
 }
 
 .text-red {
-  @apply text-text-red;
+	@apply text-text-red;
 }
 
 .text-secondary {
-  @apply text-text-secondary;
+	@apply text-text-secondary;
 }
 
 .text-inverse {
-  @apply text-text-inverse;
+	@apply text-text-inverse;
 }
 
 .text-disabled {
-  @apply text-text-disabled;
+	@apply text-text-disabled;
 }
 
 .text-strong {
-  @apply text-text-strong;
+	@apply text-text-strong;
 }
 
 .text-alternative {
-  @apply text-text-alternative;
+	@apply text-text-alternative;
 }
 
 .text-neutral {
-  @apply text-text-neutral;
+	@apply text-text-neutral;
 }
 
 .text-normal {
-  @apply text-text-normal;
+	@apply text-text-normal;
 }
 
 .bg-point-gradient {
-  background: var(--point-gradient);
+	background: var(--point-gradient);
 }
 
 .bg-gradient-component-01 {
-  background: var(--gradient-component-01);
+	background: var(--gradient-component-01);
 }
 
 .bg-gradient-component-02 {
-  background: var(--gradient-component-02);
+	background: var(--gradient-component-02);
 }
 
 .bg-gradient-error {
-  background: var(--error);
+	background: var(--error);
 }
 
 .bg-gradient-black {
-  background: var(--linear-black);
+	background: var(--linear-black);
 }
 
 .bg-gradient-black-inverse {
-  background: var(--linear-black-inverse);
+	background: var(--linear-black-inverse);
 }
 
 .bg-blur-purple {
-  @apply bg-background-purple;
+	@apply bg-background-purple;
 }
 
 .purple-blur-effect {
-  opacity: 0.4;
-  background: var(
-    --PurpleBlur-Light,
-    conic-gradient(
-      from 210deg at 50% 50%,
-      #cce4ff 0deg,
-      #c1a4e8 50.05925238132477deg,
-      #b8e2fb 85.93856155872345deg,
-      #f2efe8 134.97360706329346deg,
-      #cce4ff 172.04889178276062deg,
-      #bdafe3 224.6718692779541deg,
-      #c7edeb 259.35521364212036deg,
-      #e7f5eb 298.8224387168884deg,
-      #f2f0e7 328.72185945510864deg
-    )
-  );
-  mix-blend-mode: color-dodge;
-  filter: blur(62px);
+	opacity: 0.4;
+	background: var(
+		--PurpleBlur-Light,
+		conic-gradient(
+			from 210deg at 50% 50%,
+			#cce4ff 0deg,
+			#c1a4e8 50.05925238132477deg,
+			#b8e2fb 85.93856155872345deg,
+			#f2efe8 134.97360706329346deg,
+			#cce4ff 172.04889178276062deg,
+			#bdafe3 224.6718692779541deg,
+			#c7edeb 259.35521364212036deg,
+			#e7f5eb 298.8224387168884deg,
+			#f2f0e7 328.72185945510864deg
+		)
+	);
+	mix-blend-mode: color-dodge;
+	filter: blur(62px);
 }
