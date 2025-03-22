@@ -2,7 +2,6 @@
 
 import ProfileImage from "@/components/ProfileImage";
 import { useAuth } from "@/hooks/useAuth";
-import { api } from "@/lib/ky";
 import { useUserStore } from "@/store/useUserStore";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,7 +11,7 @@ import { useEffect, useState } from "react";
 export default function MyPage() {
 	const router = useRouter();
 
-	const { logout, loadUserProfile } = useAuth();
+	const { loadUserProfile } = useAuth();
 	const userData = useUserStore((state) => state.userData);
 	const clearUser = useUserStore((state) => state.clearUser);
 
@@ -31,10 +30,23 @@ export default function MyPage() {
 
 	const confirmLogout = async () => {
 		try {
-			await logout();
-			setShowLogoutModal(false);
-			router.push("/login");
+			const res = await fetch("/api/auth/logout", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+
+			const text = await res.text();
+			const response = text ? JSON.parse(text) : {};
+
+			if (response.success) {
+				clearUser();
+				setShowLogoutModal(false);
+				router.push("/login");
+			}
 		} catch (error) {
+			// TODO(prgmr99): Toast 메시지 추가
 			console.error("로그아웃 중 오류 발생:", error);
 			setShowLogoutModal(false);
 		}
@@ -48,30 +60,27 @@ export default function MyPage() {
 		setShowWithdrawModal(true);
 	};
 
+	// ! TODO(prgmr99): 회원 탈퇴 api routes 적용
 	const confirmWithdraw = async () => {
 		try {
-			// 회원 탈퇴 API 호출
-			const response = await api.post("v1/auth/withdraw");
+			const res = await fetch("/api/auth/withdraw", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
 
-			// 쿠키 삭제
-			document.cookie =
-				"accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-			document.cookie =
-				"refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; httpOnly; secure; sameSite=none;";
+			const text = await res.text();
+			const response = text ? JSON.parse(text) : {};
 
-			// 사용자 정보 초기화
-			clearUser();
-
-			setShowWithdrawModal(false);
-			// 로그인 페이지로 리다이렉트
-			router.push("/login");
+			if (response.success) {
+				clearUser();
+				setShowLogoutModal(false);
+				router.push("/login");
+			}
 		} catch (error) {
 			console.error("회원 탈퇴 중 오류 발생:", error);
-
-			// API 실패해도 로그아웃 처리는 진행
-			clearUser();
 			setShowWithdrawModal(false);
-			router.push("/login");
 		}
 	};
 
