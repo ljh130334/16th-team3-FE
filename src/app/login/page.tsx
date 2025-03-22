@@ -37,7 +37,6 @@ const LoginPage = () => {
   const { setUser } = useUserStore();
 
   const handleKakaoLogin = async () => {
-    handleGetDeviceToken();
     await new Promise((resolve) => setTimeout(resolve, 1000));
     if (!isKakaoLoaded || !window.Kakao?.Auth) {
       console.error('Kakao SDK not loaded');
