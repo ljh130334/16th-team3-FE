@@ -22,17 +22,6 @@ const COOKIE_OPTIONS = {
   secure: false,
 } as const;
 
-interface DeviceTokenPayload {
-  message: string;
-  fcmToken: string;
-  deviceType: string;
-}
-
-interface WebViewMessage {
-  type: string;
-  payload: DeviceTokenPayload;
-}
-
 const REDIRECT_URI_KAKAO =
   process.env.NODE_ENV === 'production'
     ? 'https://spurt.site/oauth/callback/kakao'
@@ -48,6 +37,8 @@ const LoginPage = () => {
   const { setUser } = useUserStore();
 
   const handleKakaoLogin = async () => {
+    handleGetDeviceToken();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     if (!isKakaoLoaded || !window.Kakao?.Auth) {
       console.error('Kakao SDK not loaded');
       return;
@@ -106,6 +97,7 @@ const LoginPage = () => {
       handleAppleLogin();
     }
   };
+
   const saveDeviceToken = (fcmToken: string, deviceType: string) => {
     Cookies.set('deviceId', fcmToken, COOKIE_OPTIONS);
     Cookies.set('deviceType', deviceType, COOKIE_OPTIONS);
@@ -118,10 +110,7 @@ const LoginPage = () => {
           typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
 
         if (data.type === 'GET_DEVICE_TOKEN' && data.payload.fcmToken) {
-          // 디바이스 토큰 저장
           saveDeviceToken(data.payload.fcmToken, data.payload.deviceType);
-
-          // 소셜 로그인 실행
           executeSocialLogin();
         }
       } catch (error) {
@@ -138,47 +127,70 @@ const LoginPage = () => {
     handleGetDeviceToken();
   };
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const { AppleID } = window as any;
-      if (AppleID) {
-        AppleID.auth.init({
-          clientId: process.env.NEXT_PUBLIC_APPLE_CLIENT_ID!,
-          scope: 'name email',
-          redirectURI: process.env.NEXT_PUBLIC_APPLE_REDIRECT_URI!,
-          usePopup: true,
-        });
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    const checkKakaoSDK = () => {
-      if (window.Kakao) {
-        if (!window.Kakao.isInitialized()) {
-          window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY);
-        }
-        setIsKakaoLoaded(true);
-      }
-    };
-
-    checkKakaoSDK();
-  }, []);
-
   return (
-    <div className="flex h-full flex-col justify-between bg-background-primary px-5 py-12">
-      <div className="mt-[144px]">
-        <div className="t2 text-strong">
-          <p>
-            미루는 당신을 위한
-            <br />
-            스퍼트에 오신 걸<br />
-            환영합니다!
-          </p>
-        </div>
+    <div className="flex h-full flex-col justify-between bg-background-primary px-5 pb-[42px] pt-20">
+      <div
+        className="absolute bottom-0 left-1/2 z-0 -translate-x-1/2"
+        style={{
+          width: '375px',
+          height: '385px',
+          backgroundColor: 'rgba(65, 65, 137, 0.4)',
+          filter: 'blur(75px)',
+          borderRadius: '50%',
+        }}
+      ></div>
+
+      <div
+        className="absolute bottom-10 left-1/2 z-0 -translate-x-1/2"
+        style={{
+          width: '376px',
+          height: '149px',
+          opacity: 0.4,
+          background:
+            'conic-gradient(from 210deg at 50% 50%, #CCE4FF 0deg, #C1A4E8 50.06deg, #B8E2FB 85.94deg, #F2EFE8 134.97deg, #CCE4FF 172.05deg, #BDAFE3 224.67deg, #C7EDEB 259.36deg, #E7F5EB 298.82deg, #F2F0E7 328.72deg)',
+          mixBlendMode: 'color-dodge',
+          filter: 'blur(62px)',
+        }}
+      ></div>
+
+      <div className="t2 text-strong pb-5">
+        <p>
+          미루는 당신을 위한
+          <br />
+          <span className="bg-hologram bg-clip-text text-transparent">
+            스퍼트
+          </span>
+          에 오신 걸<br />
+          환영합니다!
+        </p>
       </div>
 
-      <div className="flex w-full flex-col gap-4">
+      <div className="mt-5 flex flex-1 flex-col items-center justify-start">
+        <Image
+          src="/icons/login/login-character.svg"
+          alt="로그인 캐릭터"
+          width={300}
+          height={300}
+          priority
+        />
+      </div>
+
+      <div className="b3 absolute bottom-[192px] right-4 z-10 rounded-[12px] bg-component-accent-primary px-4 py-3 text-text-strong shadow-lg">
+        3초만에 바로 시작하기
+        <div
+          className="absolute h-0 w-0"
+          style={{
+            bottom: '-11px',
+            right: '3rem',
+            transform: 'translateX(50%)',
+            borderStyle: 'solid',
+            borderWidth: '12px 7px 0 7px',
+            borderColor: '#6B6BE1 transparent transparent transparent',
+          }}
+        ></div>
+      </div>
+
+      <div className="z-10 flex w-full flex-col gap-4">
         <Button
           variant="default"
           className="l2 gap-2 rounded-[16px] bg-[#FEE500] text-[#0f1114]"
@@ -187,8 +199,8 @@ const LoginPage = () => {
           <Image
             src="/icons/login/kakao.svg"
             alt="kakao"
-            width={18}
-            height={17}
+            width={24}
+            height={24}
           />
           <span className="pt-0.5">카카오로 계속하기</span>
         </Button>
@@ -201,8 +213,8 @@ const LoginPage = () => {
           <Image
             src="/icons/login/apple.svg"
             alt="apple"
-            width={15}
-            height={19}
+            width={24}
+            height={24}
           />
           <span className="pt-1">Apple로 계속하기</span>
         </Button>
