@@ -7,7 +7,7 @@ import type { AppleAuthorizationResponse } from '@/types/auth';
 import Cookies from 'js-cookie';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 declare global {
   interface Window {
@@ -36,8 +36,7 @@ const LoginPage = () => {
 
   const { setUser } = useUserStore();
 
-  const handleKakaoLogin = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  const handleKakaoLogin = useCallback(async () => {
     if (!isKakaoLoaded || !window.Kakao?.Auth) {
       console.error('Kakao SDK not loaded');
       return;
@@ -47,9 +46,9 @@ const LoginPage = () => {
       redirectUri: REDIRECT_URI_KAKAO,
       scope: SCOPE_KAKAO,
     });
-  };
+  }, [isKakaoLoaded]);
 
-  const handleAppleLogin = async () => {
+  const handleAppleLogin = useCallback(async () => {
     try {
       const response: AppleAuthorizationResponse =
         await window.AppleID.auth.signIn();
@@ -87,15 +86,15 @@ const LoginPage = () => {
     } catch (err) {
       console.error('Apple login error: ', err);
     }
-  };
+  }, [router, setUser]);
 
-  const executeSocialLogin = () => {
+  const executeSocialLogin = useCallback(() => {
     if (socialType === 'kakao') {
       handleKakaoLogin();
     } else {
       handleAppleLogin();
     }
-  };
+  }, [socialType, handleKakaoLogin, handleAppleLogin]);
 
   const saveDeviceToken = (fcmToken: string, deviceType: string) => {
     Cookies.set('deviceId', fcmToken, COOKIE_OPTIONS);
@@ -119,7 +118,7 @@ const LoginPage = () => {
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, []);
+  }, [executeSocialLogin]);
 
   const handleSocialLogin = (type: 'kakao' | 'apple') => {
     setSocialType(type);
