@@ -36,10 +36,10 @@ export const useWebViewMessage = (router?: ReturnType<typeof useRouter>) => {
 				}
 				if (data.type === "GET_DEVICE_TOKEN") {
 					alert(
-						`rn으로부터 수신한 메세지: ${data.payload.msg}${data.payload.fcmToken}`,
+						`rn으로부터 수신한 메세지: ${data.payload.message}${data.payload.fcmToken}`,
 					);
 					localStorage.setItem("deviceToken", data.payload.fcmToken);
-					console.log("data.payload.msg", data.payload.msg);
+					console.log("data.payload.message", data.payload.message);
 					console.log("data.payload.fcmToken", data.payload.fcmToken);
 
 					if (data.payload.fcmToken) {
