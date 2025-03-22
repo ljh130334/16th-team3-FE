@@ -202,7 +202,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
     return (
       <>
         <div 
-          className="mb-5 rounded-[12px] bg-component-gray-secondary p-4" 
+          className="mb-5 rounded-[20px] bg-component-gray-secondary p-4" 
           onClick={handleCardClick}
         >
           <div className="mb-5 flex items-center gap-4">
