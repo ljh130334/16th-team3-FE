@@ -1,37 +1,37 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
-import { useUserStore } from '@/store';
+import { useUserStore } from "@/store";
 
 interface AuthProviderProps {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }
 
 export default function AuthProvider({ children }: AuthProviderProps) {
-  const setUser = useUserStore((state) => state.setUser);
+	const setUser = useUserStore((state) => state.setUser);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch('/api/oauth/members/me');
+	useEffect(() => {
+		const fetchUser = async () => {
+			try {
+				const response = await fetch("/api/oauth/members/me");
 
-        if (!response.ok) {
-          setUser({});
-          return;
-        }
+				if (!response.ok) {
+					setUser({});
+					return;
+				}
 
-        const data = await response.json();
+				const data = await response.json();
 
-        setUser(data);
-      } catch (error) {
-        console.error('authProvider error:', error);
-        setUser({});
-      }
-    };
+				setUser(data);
+			} catch (error) {
+				console.error("authProvider error:", error);
+				setUser({});
+			}
+		};
 
-    fetchUser();
-  }, [setUser]);
+		fetchUser();
+	}, [setUser]);
 
-  return <>{children}</>;
+	return <>{children}</>;
 }
