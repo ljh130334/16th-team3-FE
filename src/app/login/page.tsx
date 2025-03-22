@@ -126,6 +126,33 @@ const LoginPage = () => {
     handleGetDeviceToken();
   };
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const { AppleID } = window as any;
+      if (AppleID) {
+        AppleID.auth.init({
+          clientId: process.env.NEXT_PUBLIC_APPLE_CLIENT_ID!,
+          scope: 'name email',
+          redirectURI: process.env.NEXT_PUBLIC_APPLE_REDIRECT_URI!,
+          usePopup: true,
+        });
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const checkKakaoSDK = () => {
+      if (window.Kakao) {
+        if (!window.Kakao.isInitialized()) {
+          window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY);
+        }
+        setIsKakaoLoaded(true);
+      }
+    };
+
+    checkKakaoSDK();
+  }, []);
+
   return (
     <div className="flex h-full flex-col justify-between bg-background-primary px-5 pb-[42px] pt-20">
       <div
