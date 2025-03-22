@@ -1,3 +1,12 @@
 {
-  "cSpell.words": ["appleid", "KAKAO", "pretendard", "rubberband"]
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"typescript.enablePromptUseWorkspaceTsdk": true,
+
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "biomejs.biome",
+	"editor.codeActionsOnSave": {
+		"source.organizeImports.biome": "explicit"
+	},
+
+	"cSpell.words": ["appleid", "KAKAO", "pretendard", "rubberband"]
 }

@@ -1,32 +1,24 @@
-import { fetchTask } from '@/lib/task';
-import { TaskResponse } from '@/types/task';
-import { cookies } from 'next/headers';
+import { fetchServerTask } from "@/lib/serverTask";
+import type { TaskResponse } from "@/types/task";
 
-import ActionPushPageClient from './ActionPushPageClient';
-import { CurrentTimeProvider } from '@/provider/CurrentTimeProvider';
+import { CurrentTimeProvider } from "@/provider/CurrentTimeProvider";
+import ActionPushPageClient from "./ActionPushPageClient";
 
 export default async function Push({
-  params,
-  searchParams,
+	params,
+	searchParams,
 }: {
-  params: Promise<{ taskId: string }>;
-  searchParams: Promise<{ left?: string }>;
+	params: Promise<{ taskId: string }>;
+	searchParams: Promise<{ left?: string }>;
 }) {
-  const { taskId } = await params;
-  const { left } = await searchParams;
+	const { taskId } = await params;
+	const { left } = await searchParams;
 
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get('accessToken')?.value;
+	const task: TaskResponse = await fetchServerTask(taskId);
 
-  if (!accessToken) {
-    throw new Error('Access token is not found');
-  }
-
-  const task: TaskResponse = await fetchTask(taskId, accessToken);
-
-  return (
-    <CurrentTimeProvider>
-      <ActionPushPageClient task={task} left={left} />
-    </CurrentTimeProvider>
-  );
+	return (
+		<CurrentTimeProvider>
+			<ActionPushPageClient task={task} left={left} />
+		</CurrentTimeProvider>
+	);
 }

@@ -1,22 +1,15 @@
-import Image from 'next/image';
-import ActionRemindPageClient from './ActionRemindPageClient';
-import { fetchTask } from '@/lib/task';
-import { TaskResponse } from '@/types/task';
-import { cookies } from 'next/headers';
+import { fetchServerTask } from "@/lib/serverTask";
+import type { TaskResponse } from "@/types/task";
+import Image from "next/image";
+import ActionRemindPageClient from "./ActionRemindPageClient";
 
 export default async function Remind({
-  params,
+	params,
 }: {
-  params: Promise<{ taskId: string }>;
+	params: Promise<{ taskId: string }>;
 }) {
-  const { taskId } = await params;
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get('accessToken')?.value;
+	const { taskId } = await params;
 
-  if (!accessToken) {
-    throw new Error('Access token is not found');
-  }
-
-  const task: TaskResponse = await fetchTask(taskId, accessToken);
-  return <ActionRemindPageClient initialTask={task} />;
+	const task: TaskResponse = await fetchServerTask(taskId);
+	return <ActionRemindPageClient initialTask={task} />;
 }
