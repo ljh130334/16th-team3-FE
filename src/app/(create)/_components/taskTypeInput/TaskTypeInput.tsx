@@ -1,11 +1,11 @@
 "use client";
 
+import Loader from "@/components/loader/Loader";
 import { Button } from "@/components/ui/button";
 import { MoodType, type ScheduledTaskType, TaskType } from "@/types/create";
 import { combineDeadlineDateTimeToDate } from "@/utils/dateFormat";
 import getBufferTime from "@/utils/getBufferTime";
 import { transformScheduledTaskData } from "@/utils/transformTaskData";
-import { Loader } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import type { TaskTypeInputType } from "../../context";

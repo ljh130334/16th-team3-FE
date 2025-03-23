@@ -4,7 +4,6 @@ import Loader from "@/components/loader/Loader";
 import { Button } from "@/components/ui/button";
 import { type InstantTaskType, MoodType, TaskType } from "@/types/create";
 import { transformInstantScheduledTaskData } from "@/utils/transformTaskData";
-import { LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import type { InstantTaskInputType } from "../../context";
