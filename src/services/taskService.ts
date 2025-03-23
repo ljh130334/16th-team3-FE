@@ -48,7 +48,6 @@ export const fetchHomeData = async (): Promise<{
 		const data: HomeResponse = await fetchWithError("/api/tasks/home");
 
 		// ! TODO(fr0gydev): 페이지 이동 시 매번 호출되는 것 확인
-		console.log("Home API 응답 데이터:", data);
 
 		// 각 배열이 없는 경우 빈 배열로, 있는 경우 변환 처리
 		const todayTasks = Array.isArray(data?.todayTasks)
@@ -110,7 +109,6 @@ export const fetchTodayTasksApi = async (): Promise<Task[]> => {
 	try {
 		// v1 API 경로로 요청
 		const data: TaskResponse[] = await fetchWithError("/v1/tasks/today");
-		console.log("오늘 할일 API 응답:", data);
 		return data.map((task: TaskResponse) => convertApiResponseToTask(task));
 	} catch (error) {
 		console.error("오늘 할일 API 호출 오류:", error);

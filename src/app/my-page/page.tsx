@@ -19,8 +19,6 @@ export default function MyPage() {
 	const [showLogoutModal, setShowLogoutModal] = useState(false);
 	const [showWithdrawModal, setShowWithdrawModal] = useState(false);
 
-	console.log("userData", userData);
-
 	const handleGoBack = () => {
 		router.push("/");
 	};
@@ -89,7 +87,6 @@ export default function MyPage() {
 		setShowWithdrawModal(false);
 	};
 
-	console.log("mypage loaded");
 	useEffect(() => {
 		const fetchUser = async () => {
 			try {
@@ -108,13 +105,10 @@ export default function MyPage() {
 
 					const data = await response.json();
 
-					console.log("data", data);
-
 					setUser(data);
 				}
 			} catch (error) {
 				console.error("사용자 정보 로드 실패:", error);
-
 				setUser({});
 			}
 
