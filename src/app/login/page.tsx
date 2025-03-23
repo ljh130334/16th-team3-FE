@@ -132,10 +132,11 @@ const LoginPage = () => {
 			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			return !!(window as any).ReactNativeWebView;
 		};
-
+		console.log("isWebView", isWebView());
+		alert(`웹뷰인가요?: ${isWebView()}`);
 		if (isWebView()) {
-			// 웹뷰 환경이면 네이티브 쪽에서 디바이스 토큰을 받아오도록 처리
 			handleGetDeviceToken();
+			// 웹뷰 환경이면 네이티브 쪽에서 디바이스 토큰을 받아오도록 처리
 		} else {
 			// 웹 환경이면 바로 소셜 로그인 함수를 실행
 			if (type === "kakao") {
