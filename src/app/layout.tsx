@@ -25,7 +25,7 @@ export default function RootLayout({
 	return (
 		<html lang="ko" className={pretendard.variable}>
 			<body
-				className={`${pretendard.className} mt-[44px] h-screen overflow-hidden antialiased`}
+				className={`${pretendard.className} mt-[44px] h-[calc(100vh-44px)] overflow-hidden antialiased`}
 			>
 				<Providers>
 					<AuthProvider>{children}</AuthProvider>
