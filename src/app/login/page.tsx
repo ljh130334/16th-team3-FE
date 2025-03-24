@@ -217,10 +217,10 @@ const LoginPage = () => {
 
 			<div className="mt-5 flex flex-1 flex-col items-center justify-start">
 				<Image
-					src="/icons/login/login-character.svg"
+					src="/icons/login/login-character.png"
 					alt="로그인 캐릭터"
-					width={300}
-					height={300}
+					width={348}
+					height={348}
 					priority
 				/>
 			</div>
