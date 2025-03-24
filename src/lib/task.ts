@@ -40,9 +40,13 @@ export const patchTaskHoldOff = async ({
 		headers: {
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify(data),
-	});
-	return response.json();
+    body: JSON.stringify(data),
+  });
+		if (!response.ok) {
+			const errorData = await response.json();
+			return errorData;
+		}
+  return response.json();
 };
 
 export const patchTaskStatus = async (taskId: string, data: string) => {

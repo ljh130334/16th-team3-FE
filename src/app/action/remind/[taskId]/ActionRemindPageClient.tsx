@@ -88,12 +88,13 @@ export default function ActionRemindPageClient({
   const handlePatch = () => {
     console.log(selectedInterval, count);
     console.log(initialTask.triggerActionAlarmTime);
+    console.log(formatTimestamp(initialTask.triggerActionAlarmTime));
     mutate({
       taskId: initialTask?.id.toString() ?? '',
       data: {
         remindInterval: selectedInterval,
         remindCount: count,
-        remindBaseTime: initialTask.triggerActionAlarmTime,
+        remindBaseTime: formatTimestamp(initialTask.triggerActionAlarmTime),
       },
     });
   };
