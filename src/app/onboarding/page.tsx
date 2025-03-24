@@ -111,7 +111,7 @@ export default function OnboardingPage() {
 	const FirstPage = () => (
 		<div className="relative h-full flex flex-col justify-between">
 			{/* 블러 효과 배경 */}
-			<div
+			{/* <div
 				className="absolute bottom-11 left-1/2 -translate-x-1/2 z-0"
 				style={{
 					width: "375px",
@@ -120,7 +120,8 @@ export default function OnboardingPage() {
 					filter: "blur(75px)",
 					borderRadius: "50%",
 				}}
-			/>
+			/> */}
+			<div className="bg-blur-purple absolute left-0 right-0 bottom-[120px] z-0 h-[240px] w-[100vw] blur-[75px]" />
 
 			<div
 				className="absolute bottom-[170px] left-[40%] -translate-x-1/2 z-0"
@@ -205,7 +206,7 @@ export default function OnboardingPage() {
 	// 두 번째 페이지 (1분 안에 작은 행동)
 	const SecondPage = () => (
 		<div className="relative h-full flex flex-col justify-between">
-			<div
+			{/* <div
 				className="absolute bottom-11 left-1/2 -translate-x-1/2 z-0"
 				style={{
 					width: "375px",
@@ -214,7 +215,8 @@ export default function OnboardingPage() {
 					filter: "blur(75px)",
 					borderRadius: "50%",
 				}}
-			/>
+			/> */}
+			<div className="bg-blur-purple absolute left-0 right-0 bottom-[120px] z-0 h-[240px] w-[100vw] blur-[75px]" />
 			<div className="mt-[48px] flex flex-col z-10">
 				<h1 className="t2 whitespace-pre-line text-gray-strong">
 					{onboardingPages[1].title}
@@ -259,7 +261,7 @@ export default function OnboardingPage() {
 	// 세 번째 페이지 (캐릭터와 플레이리스트)
 	const ThirdPage = () => (
 		<div className="relative h-full flex flex-col justify-between">
-			<div
+			{/* <div
 				className="absolute bottom-11 left-1/2 -translate-x-1/2 z-0"
 				style={{
 					width: "375px",
@@ -268,7 +270,8 @@ export default function OnboardingPage() {
 					filter: "blur(75px)",
 					borderRadius: "50%",
 				}}
-			/>
+			/> */}
+			<div className="bg-blur-purple absolute left-0 right-0 bottom-[120px] z-0 h-[240px] w-[100vw] blur-[75px]" />
 			<div className="mt-[48px] flex flex-col z-10">
 				<h1 className="t2 whitespace-pre-line text-gray-strong">
 					{onboardingPages[2].title}
@@ -340,7 +343,7 @@ export default function OnboardingPage() {
 	// 네 번째 페이지 (시작하기)
 	const FourthPage = () => (
 		<div className="relative h-full flex flex-col z-10">
-			<div
+			{/* <div
 				className="absolute bottom-0 left-1/2 -translate-x-1/2 z-0"
 				style={{
 					width: "375px",
@@ -349,7 +352,8 @@ export default function OnboardingPage() {
 					filter: "blur(75px)",
 					borderRadius: "50%",
 				}}
-			/>
+			/> */}
+			<div className="bg-blur-purple absolute left-0 right-0 bottom-[120px] z-0 h-[240px] w-[100vw] blur-[75px]" />
 
 			<div
 				className="absolute bottom-0 left-1/2 -translate-x-1/2 z-5"
