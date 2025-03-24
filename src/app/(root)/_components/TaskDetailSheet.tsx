@@ -342,7 +342,9 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 							<div className="b2 text-text-alternative">예상 소요시간</div>
 							<div className="flex items-center">
 								<span className="b2 mr-1 text-text-neutral">
-									{task.timeRequired || "-"}
+									{task.timeRequired
+										? task.timeRequired.replace(" 소요", "")
+										: "-"}
 								</span>
 								{showArrow && (
 									<Image
