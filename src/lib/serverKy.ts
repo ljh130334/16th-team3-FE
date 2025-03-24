@@ -1,6 +1,7 @@
 import ky from "ky";
 
 import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
 const REFRESH_ENDPOINT = "/v1/auth/token/refresh";
 const UNAUTHORIZED_CODE = 401;
@@ -44,7 +45,11 @@ export const serverApi = ky.create({
 						if (!refreshResponse.ok) {
 							const errText = await refreshResponse.text();
 							console.error("Refresh API 실패:", errText);
-							return response;
+
+							cookieStore.delete("accessToken");
+							cookieStore.delete("refreshToken");
+
+							return NextResponse.redirect(new URL("/login", request.url));
 						}
 
 						const {
@@ -74,7 +79,11 @@ export const serverApi = ky.create({
 						return serverApi(request, options);
 					} catch (error) {
 						console.error("refresh 요청 중 에러 발생:", error);
-						return response;
+
+						cookieStore.delete("accessToken");
+						cookieStore.delete("refreshToken");
+
+						return NextResponse.redirect(new URL("/login", request.url));
 					}
 				}
 
