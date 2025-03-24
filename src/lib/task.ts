@@ -47,7 +47,10 @@ export const patchTaskHoldOff = async ({
 		console.log(errorData);
 		return errorData;
 	}
-	return response.json();
+	
+	const text = await response.text();
+	const result = text ? JSON.parse(text) : {};
+	return result;
 };
 
 export const patchTaskStatus = async (taskId: string, data: string) => {
@@ -63,5 +66,7 @@ export const patchTaskStatus = async (taskId: string, data: string) => {
 		throw new Error("작업 상태 업데이트에 실패했습니다.");
 	}
 
-	return response.json();
+	const text = await response.text();
+	const result = text ? JSON.parse(text) : {};
+	return result;
 };
