@@ -26,14 +26,14 @@ export default function OnboardingPage() {
 			title: "여유 시간을 확보하고,\n후회 없이 끝내세요!",
 			description:
 				"여유 시간을 자동 추가하여 \n여유롭게 완료할 수 있도록 알림을 보낼게요",
-			image: "/icons/onboarding/onboarding1.svg",
+			image: "/icons/onboarding/onboarding1.png",
 			buttonText: "다음으로",
 		},
 		{
 			title: "1분 안에 작은 행동을 시작하면,\n미루기는 이제 그만!",
 			description:
 				"미룬 일을 시작하는 데 1분만 투자해요\n완료할 때까지 진동이 울려 시작을 도와줄게요",
-			image: "/icons/onboarding/onboarding2.svg",
+			image: "/icons/onboarding/onboarding2.png",
 			buttonText: "다음으로",
 		},
 		{
@@ -111,16 +111,6 @@ export default function OnboardingPage() {
 	const FirstPage = () => (
 		<div className="relative h-full flex flex-col justify-between">
 			{/* 블러 효과 배경 */}
-			{/* <div
-				className="absolute bottom-11 left-1/2 -translate-x-1/2 z-0"
-				style={{
-					width: "375px",
-					height: "385px",
-					backgroundColor: "rgba(65, 65, 137, 0.4)",
-					filter: "blur(75px)",
-					borderRadius: "50%",
-				}}
-			/> */}
 			<div className="bg-blur-purple absolute left-0 right-0 bottom-[120px] z-0 h-[240px] w-[100vw] blur-[75px]" />
 
 			<div
@@ -206,16 +196,6 @@ export default function OnboardingPage() {
 	// 두 번째 페이지 (1분 안에 작은 행동)
 	const SecondPage = () => (
 		<div className="relative h-full flex flex-col justify-between">
-			{/* <div
-				className="absolute bottom-11 left-1/2 -translate-x-1/2 z-0"
-				style={{
-					width: "375px",
-					height: "385px",
-					backgroundColor: "rgba(65, 65, 137, 0.4)",
-					filter: "blur(75px)",
-					borderRadius: "50%",
-				}}
-			/> */}
 			<div className="bg-blur-purple absolute left-0 right-0 bottom-[120px] z-0 h-[240px] w-[100vw] blur-[75px]" />
 			<div className="mt-[48px] flex flex-col z-10">
 				<h1 className="t2 whitespace-pre-line text-gray-strong">
@@ -261,16 +241,6 @@ export default function OnboardingPage() {
 	// 세 번째 페이지 (캐릭터와 플레이리스트)
 	const ThirdPage = () => (
 		<div className="relative h-full flex flex-col justify-between">
-			{/* <div
-				className="absolute bottom-11 left-1/2 -translate-x-1/2 z-0"
-				style={{
-					width: "375px",
-					height: "385px",
-					backgroundColor: "rgba(65, 65, 137, 0.4)",
-					filter: "blur(75px)",
-					borderRadius: "50%",
-				}}
-			/> */}
 			<div className="bg-blur-purple absolute left-0 right-0 bottom-[120px] z-0 h-[240px] w-[100vw] blur-[75px]" />
 			<div className="mt-[48px] flex flex-col z-10">
 				<h1 className="t2 whitespace-pre-line text-gray-strong">
@@ -343,16 +313,6 @@ export default function OnboardingPage() {
 	// 네 번째 페이지 (시작하기)
 	const FourthPage = () => (
 		<div className="relative h-full flex flex-col z-10">
-			{/* <div
-				className="absolute bottom-0 left-1/2 -translate-x-1/2 z-0"
-				style={{
-					width: "375px",
-					height: "385px",
-					backgroundColor: "rgba(65, 65, 137, 0.4)",
-					filter: "blur(75px)",
-					borderRadius: "50%",
-				}}
-			/> */}
 			<div className="bg-blur-purple absolute left-0 right-0 bottom-[120px] z-0 h-[240px] w-[100vw] blur-[75px]" />
 
 			<div
