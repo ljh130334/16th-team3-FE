@@ -23,7 +23,7 @@ export async function PATCH(
 
             const text = await response.text();
             const result = text ? JSON.parse(text) : {};
-            return result;
+            return  NextResponse.json(result);
 
 	} catch (error) {
 		return NextResponse.json(
