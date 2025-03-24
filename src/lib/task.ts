@@ -40,12 +40,12 @@ export const patchTaskHoldOff = async ({
 		headers: {
 			"Content-Type": "application/json",
 		},
-    body: JSON.stringify(data),
-  });
+		body: JSON.stringify(data),
+	});
 	if (!response.ok) {
 		const errorData = await response.json();
-		console.log(errorData);
-		return errorData;
+		console.error("API 에러:", errorData);
+		throw errorData;
 	}
 	return response.json();
 };
@@ -60,7 +60,12 @@ export const patchTaskStatus = async (taskId: string, data: string) => {
 	});
 
 	if (!response.ok) {
-		throw new Error("작업 상태 업데이트에 실패했습니다.");
+		const errorData = await response.json();
+		console.error("patchTaskStatus 에러:", errorData);
+		// 에러 메시지에 추가 정보를 포함시킬 수 있습니다.
+		throw new Error(
+			`작업 상태 업데이트에 실패했습니다. ${errorData.message || JSON.stringify(errorData)}`,
+		);
 	}
 
 	return response.json();

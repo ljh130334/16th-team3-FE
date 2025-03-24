@@ -16,7 +16,7 @@ export async function PATCH(
 		if (!response.ok) {
 			const errorData = await response.json();
 			return NextResponse.json(
-				{ error: "Failed to POST request", details: errorData },
+				{ error: "Failed to PATCH request", details: errorData },
 				{ status: response.status },
 			);
 		}

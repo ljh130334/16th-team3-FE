@@ -41,6 +41,7 @@ export const usePatchTaskHoldOff = (): UseMutationResult<
 		},
 		onError: (error) => {
 			console.error("usePatchTaskHoldOff onError", error);
+			alert("작업 미루기 처리에 실패했습니다. 홈으로 이동합니다.");
 			router.push("/");
 		},
 	});
