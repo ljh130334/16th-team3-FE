@@ -42,11 +42,12 @@ export const patchTaskHoldOff = async ({
 		},
     body: JSON.stringify(data),
   });
-		if (!response.ok) {
-			const errorData = await response.json();
-			return errorData;
-		}
-  return response.json();
+	if (!response.ok) {
+		const errorData = await response.json();
+		console.log(errorData);
+		return errorData;
+	}
+	return response.json();
 };
 
 export const patchTaskStatus = async (taskId: string, data: string) => {
