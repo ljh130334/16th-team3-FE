@@ -266,7 +266,7 @@ export default function MyPage() {
 									type="button"
 									className="l1 flex-1 rounded-[12px] bg-component-accent-primary p-[13.5px] text-gray-strong"
 									disabled={!isIdleLogout}
-									onClick={confirmLogout}
+									onClick={() => confirmLogout()}
 								>
 									{isIdleLogout ? (
 										"로그아웃"
@@ -300,7 +300,7 @@ export default function MyPage() {
 									type="button"
 									className="l1 flex-1 rounded-[12px] bg-component-accent-primary p-[13.5px] text-gray-strong"
 									disabled={!isIdleWithdraw}
-									onClick={confirmWithdraw}
+									onClick={() => confirmWithdraw()}
 								>
 									{isIdleWithdraw ? (
 										"탈퇴하기"
