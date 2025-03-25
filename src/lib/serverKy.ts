@@ -12,6 +12,11 @@ export const serverApi = ky.create({
 	headers: {
 		"Content-Type": "application/json",
 	},
+	retry: {
+		limit: 2,
+		methods: ["get", "post"],
+		statusCodes: [401, 408, 413, 429, 500, 502, 503, 504],
+	},
 	hooks: {
 		beforeRequest: [
 			async (request) => {
@@ -31,7 +36,7 @@ export const serverApi = ky.create({
 
 				if (response.status === UNAUTHORIZED_CODE || !currentAccessToken) {
 					try {
-						const refreshResponse = await ky.post(
+						const refreshResponse = await fetch(
 							`${process.env.NEXT_PUBLIC_API_URL}${REFRESH_ENDPOINT}`,
 							{
 								method: "POST",
@@ -44,12 +49,12 @@ export const serverApi = ky.create({
 
 						if (!refreshResponse.ok) {
 							const errText = await refreshResponse.text();
+
 							console.error("Refresh API 실패:", errText);
 
-							cookieStore.delete("accessToken");
-							cookieStore.delete("refreshToken");
-
-							return NextResponse.redirect(new URL("/login", request.url));
+							return NextResponse.redirect(
+								new URL("https://spurt.site/login", request.url),
+							);
 						}
 
 						const {
@@ -80,10 +85,9 @@ export const serverApi = ky.create({
 					} catch (error) {
 						console.error("refresh 요청 중 에러 발생:", error);
 
-						cookieStore.delete("accessToken");
-						cookieStore.delete("refreshToken");
-
-						return NextResponse.redirect(new URL("/login", request.url));
+						return NextResponse.redirect(
+							new URL("https://spurt.site/login", request.url),
+						);
 					}
 				}
 

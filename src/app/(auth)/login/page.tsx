@@ -132,8 +132,6 @@ const LoginPage = () => {
 			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			return !!(window as any).ReactNativeWebView;
 		};
-		console.log("isWebView", isWebView());
-		alert(`웹뷰인가요?: ${isWebView()}`);
 		if (isWebView()) {
 			handleGetDeviceToken();
 			// 웹뷰 환경이면 네이티브 쪽에서 디바이스 토큰을 받아오도록 처리
@@ -240,7 +238,7 @@ const LoginPage = () => {
 				/>
 			</div>
 
-			<div className="z-10 flex w-full flex-col gap-4 mb-[40px]">
+			<div className="z-10 mb-[40px] flex w-full flex-col gap-4">
 				<Button
 					variant="default"
 					className="l2 gap-2 rounded-[16px] bg-[#FEE500] text-[#0f1114]"

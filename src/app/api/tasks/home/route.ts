@@ -1,14 +1,13 @@
 import { serverApi } from "@/lib/serverKy";
-import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
 	try {
-		// AbortController를 사용하여 요청 시간이 10초를 초과하면 요청을 취소합니다.
+		// ! AbortController를 사용하여 요청 시간이 10초를 초과하면 요청을 취소합니다. - 이거 필요할까?
 		const controller = new AbortController();
 		const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-		const response = await serverApi.get(`v1/tasks/home`);
+		const response = await serverApi.get("v1/tasks/home");
 
 		clearTimeout(timeoutId);
 
@@ -24,25 +23,19 @@ export async function GET(request: NextRequest) {
 		const data = await response.json();
 		return NextResponse.json(data);
 	} catch (error: any) {
-		if (error.name === "AbortError") {
+		if (error instanceof Error && error.name === "AbortError") {
 			return NextResponse.json(
 				{ error: "요청 시간이 초과되었습니다." },
 				{ status: 408 },
 			);
 		}
 
-		// ! 지금 serverApi는 refresh token 로직이 돌지 않고 있음.
-		// const cookieStore = await cookies();
-		// const accessToken = cookieStore.get('accessToken')?.value;
-
-		// if (!accessToken) {
-		//   return NextResponse.json(
-		//     {
-		//       error: 'Unauthorized',
-		//     },
-		//     { status: 401 },
-		//   );
-		// }
+		if (error.response?.status === 401) {
+			console.log("이거 안찍히니?");
+			return NextResponse.redirect(
+				new URL("https://spurt.site/login", request.url),
+			);
+		}
 
 		return NextResponse.json(
 			{
