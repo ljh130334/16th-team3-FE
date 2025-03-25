@@ -12,6 +12,11 @@ export const serverApi = ky.create({
 	headers: {
 		"Content-Type": "application/json",
 	},
+	retry: {
+		limit: 2,
+		methods: ["get", "post"],
+		statusCodes: [401, 408, 413, 429, 500, 502, 503, 504],
+	},
 	hooks: {
 		beforeRequest: [
 			async (request) => {
@@ -31,6 +36,7 @@ export const serverApi = ky.create({
 
 				if (response.status === UNAUTHORIZED_CODE || !currentAccessToken) {
 					try {
+						alert(`currentRefreshToken: ${refreshToken}`);
 						const refreshResponse = await ky.post(
 							`${process.env.NEXT_PUBLIC_API_URL}${REFRESH_ENDPOINT}`,
 							{
@@ -65,7 +71,7 @@ export const serverApi = ky.create({
 							secure: true,
 							sameSite: "none",
 							path: "/",
-							maxAge: 60 * 60,
+							maxAge: 60 * 1,
 						});
 
 						cookieStore.set("refreshToken", newRefreshToken, {
