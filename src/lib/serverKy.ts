@@ -49,10 +49,8 @@ export const serverApi = ky.create({
 
 						if (!refreshResponse.ok) {
 							const errText = await refreshResponse.text();
-							console.error("Refresh API 실패:", errText);
 
-							console.error("accessToken: ", currentAccessToken);
-							console.error("refreshToken: ", refreshToken);
+							console.error("Refresh API 실패:", errText);
 
 							return NextResponse.redirect(
 								new URL("https://spurt.site/login", request.url),
@@ -67,15 +65,12 @@ export const serverApi = ky.create({
 							refreshToken: string;
 						};
 
-						console.log("새로운 accessToken: ", newAccessToken);
-						console.log("새로운 refreshToken: ", newRefreshToken);
-
 						cookieStore.set("accessToken", newAccessToken, {
 							httpOnly: true,
 							secure: true,
 							sameSite: "none",
 							path: "/",
-							maxAge: 60 * 1,
+							maxAge: 60 * 60,
 						});
 
 						cookieStore.set("refreshToken", newRefreshToken, {
@@ -89,9 +84,6 @@ export const serverApi = ky.create({
 						return serverApi(request, options);
 					} catch (error) {
 						console.error("refresh 요청 중 에러 발생:", error);
-
-						console.error("accessToken: ", currentAccessToken);
-						console.error("refreshToken: ", refreshToken);
 
 						return NextResponse.redirect(
 							new URL("https://spurt.site/login", request.url),

@@ -1,11 +1,9 @@
 import { serverApi } from "@/lib/serverKy";
 import { type NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
 	try {
 		const response = await serverApi.get("v1/members/me");
-
-		console.log("request", request);
 
 		if (!response.ok) {
 			if (response.status === 404) {
@@ -27,7 +25,11 @@ export async function GET(request: NextRequest) {
 			{
 				error: `사용자 정보를 가져오는 중 에러 발생: ${(error as Error).message || "알 수 없는 오류"}`,
 			},
-			{ status: (error as any).response?.status || 500 },
+			{
+				status:
+					(error as Error & { response?: { status: number } }).response
+						?.status || 500,
+			},
 		);
 	}
 }

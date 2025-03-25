@@ -1,7 +1,10 @@
 "use client";
 
 import ProfileImage from "@/components/ProfileImage";
+import Loader from "@/components/loader/Loader";
+import { Button } from "@/components/ui/button";
 import { useUserStore } from "@/store/useUserStore";
+import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -19,49 +22,40 @@ export default function MyPage() {
 	const [showLogoutModal, setShowLogoutModal] = useState(false);
 	const [showWithdrawModal, setShowWithdrawModal] = useState(false);
 
-	const handleGoBack = () => {
-		router.push("/");
-	};
-
 	const handleLogout = () => {
 		setShowLogoutModal(true);
 	};
 
-	const confirmLogout = async () => {
-		try {
+	const { mutate: confirmLogout, isIdle: isIdleLogout } = useMutation({
+		mutationFn: async () => {
 			const res = await fetch("/api/auth/logout", {
 				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
+				headers: { "Content-Type": "application/json" },
 			});
 
-			const text = await res.text();
-			const response = text ? JSON.parse(text) : {};
+			if (!res.ok) {
+				throw new Error(`Logout failed with status ${res.status}`);
+			}
 
-			if (response.success) {
+			const data = await res.json();
+			return data;
+		},
+		onSuccess: (data) => {
+			if (data.success) {
 				clearUser();
 				setShowLogoutModal(false);
 				router.push("/login");
 			}
-		} catch (error) {
-			// TODO(prgmr99): Toast 메시지 추가
+		},
+		onError: (error) => {
+			// TODO(prgmr99): 토스트 메세지 추가
 			console.error("로그아웃 중 오류 발생:", error);
 			setShowLogoutModal(false);
-		}
-	};
+		},
+	});
 
-	const cancelLogout = () => {
-		setShowLogoutModal(false);
-	};
-
-	const handleWithdraw = () => {
-		setShowWithdrawModal(true);
-	};
-
-	// ! TODO(prgmr99): 회원 탈퇴 api routes 적용
-	const confirmWithdraw = async () => {
-		try {
+	const { mutate: confirmWithdraw, isIdle: isIdleWithdraw } = useMutation({
+		mutationFn: async () => {
 			const res = await fetch("/api/auth/withdraw", {
 				method: "POST",
 				headers: {
@@ -69,18 +63,34 @@ export default function MyPage() {
 				},
 			});
 
+			if (!res.ok) {
+				throw new Error(`Withdraw failed with status ${res.status}`);
+			}
+
 			const text = await res.text();
 			const response = text ? JSON.parse(text) : {};
 
+			return response;
+		},
+		onSuccess: (response) => {
 			if (response.success) {
 				clearUser();
 				setShowLogoutModal(false);
 				router.push("/login");
 			}
-		} catch (error) {
+		},
+		onError: (error) => {
 			console.error("회원 탈퇴 중 오류 발생:", error);
 			setShowWithdrawModal(false);
-		}
+		},
+	});
+
+	const cancelLogout = () => {
+		setShowLogoutModal(false);
+	};
+
+	const handleWithdraw = () => {
+		setShowWithdrawModal(true);
 	};
 
 	const cancelWithdraw = () => {
@@ -121,21 +131,21 @@ export default function MyPage() {
 	return (
 		<div className="flex min-h-screen flex-col">
 			{/* 헤더 부분 */}
-			<div className="relative flex items-center px-5 py-[14px]">
-				<button
-					type="button"
-					className="absolute left-5"
-					onClick={handleGoBack}
-				>
-					<Image
-						src="/icons/ArrowLeft.svg"
-						alt="뒤로가기"
-						width={24}
-						height={24}
-					/>
-				</button>
-				<div className="s2 w-full text-center text-gray-normal">마이페이지</div>
-			</div>
+			<Link href="/">
+				<div className="relative flex items-center px-5 py-[14px]">
+					<button type="button" className="absolute left-5">
+						<Image
+							src="/icons/ArrowLeft.svg"
+							alt="뒤로가기"
+							width={24}
+							height={24}
+						/>
+					</button>
+					<div className="s2 w-full text-center text-gray-normal">
+						마이페이지
+					</div>
+				</div>
+			</Link>
 
 			{/* 프로필 정보 */}
 			{pageLoading ? (
@@ -252,13 +262,18 @@ export default function MyPage() {
 								>
 									닫기
 								</button>
-								<button
+								<Button
 									type="button"
 									className="l1 flex-1 rounded-[12px] bg-component-accent-primary p-[13.5px] text-gray-strong"
+									disabled={!isIdleLogout}
 									onClick={confirmLogout}
 								>
-									로그아웃
-								</button>
+									{isIdleLogout ? (
+										"로그아웃"
+									) : (
+										<Loader width={24} height={24} />
+									)}
+								</Button>
 							</div>
 						</div>
 					</div>
@@ -281,13 +296,18 @@ export default function MyPage() {
 								>
 									닫기
 								</button>
-								<button
+								<Button
 									type="button"
 									className="l1 flex-1 rounded-[12px] bg-component-accent-primary p-[13.5px] text-gray-strong"
+									disabled={!isIdleWithdraw}
 									onClick={confirmWithdraw}
 								>
-									탈퇴하기
-								</button>
+									{isIdleWithdraw ? (
+										"탈퇴하기"
+									) : (
+										<Loader width={24} height={24} />
+									)}
+								</Button>
 							</div>
 						</div>
 					</div>
