@@ -36,7 +36,6 @@ export const serverApi = ky.create({
 
 				if (response.status === UNAUTHORIZED_CODE || !currentAccessToken) {
 					try {
-						alert(`currentRefreshToken: ${refreshToken}`);
 						const refreshResponse = await ky.post(
 							`${process.env.NEXT_PUBLIC_API_URL}${REFRESH_ENDPOINT}`,
 							{
@@ -55,7 +54,9 @@ export const serverApi = ky.create({
 							cookieStore.delete("accessToken");
 							cookieStore.delete("refreshToken");
 
-							return NextResponse.redirect(new URL("/login", request.url));
+							return NextResponse.redirect(
+								new URL("https://spurt.site/login", request.url),
+							);
 						}
 
 						const {
@@ -89,7 +90,12 @@ export const serverApi = ky.create({
 						cookieStore.delete("accessToken");
 						cookieStore.delete("refreshToken");
 
-						return NextResponse.redirect(new URL("/login", request.url));
+						console.error("accessToken: ", currentAccessToken);
+						console.error("refreshToken: ", refreshToken);
+
+						return NextResponse.redirect(
+							new URL("https://spurt.site/login", request.url),
+						);
 					}
 				}
 

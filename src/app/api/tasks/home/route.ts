@@ -11,6 +11,8 @@ export async function GET(request: NextRequest) {
 
 		clearTimeout(timeoutId);
 
+		console.log("request", request);
+
 		if (!response.ok) {
 			const errorText = await response.text();
 
@@ -31,7 +33,10 @@ export async function GET(request: NextRequest) {
 		}
 
 		if (error.response?.status === 401) {
-			return NextResponse.redirect(new URL("/login", request.url));
+			console.log("이거 안찍히니?");
+			return NextResponse.redirect(
+				new URL("https://spurt.site/login", request.url),
+			);
 		}
 
 		return NextResponse.json(
