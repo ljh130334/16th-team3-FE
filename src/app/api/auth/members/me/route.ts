@@ -1,9 +1,11 @@
 import { serverApi } from "@/lib/serverKy";
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
 	try {
 		const response = await serverApi.get("v1/members/me");
+
+		console.log("request", request);
 
 		if (!response.ok) {
 			if (response.status === 404) {

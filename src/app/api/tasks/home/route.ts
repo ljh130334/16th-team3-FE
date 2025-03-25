@@ -1,4 +1,5 @@
 import { serverApi } from "@/lib/serverKy";
+import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -13,6 +14,8 @@ export async function GET(request: NextRequest) {
 
 		console.log("request", request);
 
+		console.log("response", response);
+
 		if (!response.ok) {
 			const errorText = await response.text();
 
@@ -25,6 +28,13 @@ export async function GET(request: NextRequest) {
 		const data = await response.json();
 		return NextResponse.json(data);
 	} catch (error: any) {
+		const cookieStore = await cookies();
+		const currentAccessToken = cookieStore.get("accessToken")?.value;
+		const refreshToken = cookieStore.get("refreshToken")?.value;
+
+		console.error("accessToken: ", currentAccessToken);
+		console.error("refreshToken: ", refreshToken);
+
 		if (error.name === "AbortError") {
 			return NextResponse.json(
 				{ error: "요청 시간이 초과되었습니다." },
