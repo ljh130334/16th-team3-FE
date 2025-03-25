@@ -8,17 +8,20 @@ import {
 	fetchHomeData,
 	fetchInProgressTasks,
 	fetchTaskById,
-	fetchTodayTasks,
 	fetchTodayTasksApi,
-	fetchWeeklyTasks,
 	reflectTask,
 	startTask,
 } from "@/services/taskService";
+import { useAuthStore } from "@/store";
 import type { Task } from "@/types/task";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // 홈 화면 데이터 조회 훅
 export const useHomeData = () => {
+	const isUserProfileLoaded = useAuthStore(
+		(state) => state.isUserProfileLoaded,
+	);
+
 	return useQuery<
 		{
 			todayTasks: Task[];
@@ -31,6 +34,7 @@ export const useHomeData = () => {
 	>({
 		queryKey: ["tasks", "home"],
 		queryFn: fetchHomeData,
+		enabled: isUserProfileLoaded,
 	});
 };
 

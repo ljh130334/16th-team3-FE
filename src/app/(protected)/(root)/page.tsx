@@ -19,7 +19,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState, useEffect, useMemo, Suspense } from "react";
 
 import Loader from "@/components/loader/Loader";
-import { Dialog } from "@/components/ui/dialog";
+import { useAuthStore } from "@/store";
 import CharacterDialog from "../(create)/_components/characterDialog/CharacterDialog";
 
 const HomePageContent = () => {
@@ -29,6 +29,10 @@ const HomePageContent = () => {
 		isLoading: isLoadingHome,
 		error: homeError,
 	} = useHomeData();
+
+	const isUserProfileLoading = useAuthStore(
+		(state) => state.isUserProfileLoading,
+	);
 
 	// 데이터 구조 분해
 	const allTasks = useMemo(
@@ -410,7 +414,7 @@ const HomePageContent = () => {
 	}, [searchParams, router]);
 
 	// 로딩 상태 처리
-	if (isLoadingHome) {
+	if (isLoadingHome || isUserProfileLoading) {
 		return (
 			<div className="flex min-h-screen flex-col items-center justify-center bg-background-primary">
 				<Loader />
