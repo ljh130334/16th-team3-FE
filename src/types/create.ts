@@ -50,3 +50,8 @@ export interface InstantTaskType {
 	taskType: string;
 	taskMode: string;
 }
+
+export interface FcmDeviceType {
+	fcmRegistrationToken: string;
+	deviceType: string;
+}
