@@ -205,7 +205,7 @@ export default function MyPage() {
 				</Link>
 
 				<Link
-					href={`browser://start?url=${encodeURIComponent("https://docs.google.com/forms/d/e/1FAIpQLSewine18Gw4dpEeT-NwN2M9Cuw6hRUiKVd3g0wrNOazW58GWA/viewform")}&webViewClose=true`}
+					href="https://docs.google.com/forms/d/e/1FAIpQLSewine18Gw4dpEeT-NwN2M9Cuw6hRUiKVd3g0wrNOazW58GWA/viewform"
 					target="_blank"
 					rel="noopener noreferrer"
 					className="flex items-center justify-between py-4"
