@@ -87,6 +87,7 @@ export default function OnboardingPage() {
     if (currentPage < onboardingPages.length - 1) {
       if (currentPage === 3) {
         // 알림 권한 허용 alert 창 띄우기
+        console.log('알림 권한 허용 alert 창 띄우기');
         handleClickAccess();
       }
       setCurrentPage(currentPage + 1);
@@ -455,6 +456,7 @@ export default function OnboardingPage() {
           typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
 
         if (data.type === 'GET_DEVICE_TOKEN' && data.payload.fcmToken) {
+          console.log('웹뷰 환경 토큰 전송');
           Cookies.set('deviceId', data.payload.fcmToken, COOKIE_OPTIONS);
           Cookies.set('deviceType', data.payload.deviceType, COOKIE_OPTIONS);
 
@@ -479,6 +481,7 @@ export default function OnboardingPage() {
     };
     if (isWebView()) {
       // 웹뷰 환경이면 네이티브 쪽에서 디바이스 토큰을 받아오도록 처리
+      console.log('웹뷰 환경');
       handleGetDeviceToken();
     } else {
       console.log('웹 환경');
