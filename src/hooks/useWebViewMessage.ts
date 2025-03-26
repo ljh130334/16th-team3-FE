@@ -32,6 +32,9 @@ export const useWebViewMessage = (router?: ReturnType<typeof useRouter>) => {
 
 				if (data.type === "CAPTURED_IMAGE") {
 					localStorage.setItem("capturedImage", data.payload.image);
+					console.log("capturedImage", data.payload.image);
+					console.log("data", data);
+					console.log("이미지 받음");
 					router?.push("/action/complete");
 				}
 				// if (data.type === "GET_DEVICE_TOKEN") {
