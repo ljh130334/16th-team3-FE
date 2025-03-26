@@ -44,10 +44,16 @@ export default function OnboardingPage() {
 			buttonText: "다음으로",
 		},
 		{
+			title: "모든 기능을 제대로 쓰려면, \n알림이 꼭 필요해요",
+			description: "딱 맞는 타이밍에 시작을 끊을 수 있어요!",
+			image: "/icons/onboarding/onboarding4.png",
+			buttonText: "권한 허용하기",
+		},
+		{
 			title: "미루지 않는 하루,\n지금부터 만들어볼까요?",
 			description:
 				"지금 당장 시작할 일과, 여유롭게 준비할 일을\n구분해 추가해보세요!",
-			image: "/icons/onboarding/onboarding4.png",
+			image: "/icons/onboarding/onboarding5.svg",
 			buttonText: "시작하기",
 		},
 	];
@@ -310,8 +316,43 @@ export default function OnboardingPage() {
 		</div>
 	);
 
-	// 네 번째 페이지 (시작하기)
+	// 네 번째 페이지 (알람설정)
 	const FourthPage = () => (
+		<div className="relative h-full flex flex-col z-10">
+			<div className="bg-blur-purple absolute left-0 right-0 bottom-[120px] z-0 h-[240px] w-[100vw] blur-[75px]" />
+
+			<div className="flex flex-1 flex-col items-center justify-center z-10">
+				<Image
+					src="/icons/onboarding/onboarding4.svg"
+					alt="온보딩 이미지 4"
+					width={375}
+					height={180}
+					className="mb-[36px]"
+					priority
+				/>
+
+				<h1 className="t1 mb-3 text-center text-gray-strong">
+					모든 기능을 제대로 쓰려면,
+					<br />
+					알림이 꼭 필요해요
+				</h1>
+				<p className="b2 text-center text-gray-neutral">
+					딱 맞는 타이밍에 시작을 끊을 수 있어요!
+				</p>
+			</div>
+
+			<Button
+				variant="primary"
+				className="w-full rounded-[16px] bg-component-accent-primary py-4 text-white"
+				onClick={handleNext}
+			>
+				{onboardingPages[3].buttonText}
+			</Button>
+		</div>
+	);
+
+	// 다섯 번째 페이지 (시작하기)
+	const FifthPage = () => (
 		<div className="relative h-full flex flex-col z-10">
 			<div className="bg-blur-purple absolute left-0 right-0 bottom-[120px] z-0 h-[240px] w-[100vw] blur-[75px]" />
 
@@ -371,6 +412,8 @@ export default function OnboardingPage() {
 				return <ThirdPage />;
 			case 3:
 				return <FourthPage />;
+			case 4:
+				return <FifthPage />;
 			default:
 				return <FirstPage />;
 		}
