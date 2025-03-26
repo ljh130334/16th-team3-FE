@@ -323,7 +323,7 @@ export default function OnboardingPage() {
 
 			<div className="flex flex-1 flex-col items-center justify-center z-10">
 				<Image
-					src="/icons/onboarding/onboarding4.svg"
+					src="/icons/onboarding/onboarding4.png"
 					alt="온보딩 이미지 4"
 					width={375}
 					height={180}
