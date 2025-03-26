@@ -371,8 +371,8 @@ export default function OnboardingPage() {
 
 			<div className="flex flex-1 flex-col items-center justify-center z-10">
 				<Image
-					src="/icons/onboarding/onboarding4.svg"
-					alt="온보딩 이미지 4"
+					src="/icons/onboarding/onboarding5.svg"
+					alt="온보딩 이미지 5"
 					width={142}
 					height={80}
 					className="mb-[40px]"
