@@ -321,19 +321,6 @@ export default function OnboardingPage() {
 		<div className="relative h-full flex flex-col z-10">
 			<div className="bg-blur-purple absolute left-0 right-0 bottom-[120px] z-0 h-[240px] w-[100vw] blur-[75px]" />
 
-			<div
-				className="absolute bottom-0 left-1/2 -translate-x-1/2 z-5"
-				style={{
-					width: "376px",
-					height: "149px",
-					opacity: 0.4,
-					background:
-						"conic-gradient(from 210deg at 50% 50%, #CCE4FF 0deg, #C1A4E8 50.06deg, #B8E2FB 85.94deg, #F2EFE8 134.97deg, #CCE4FF 172.05deg, #BDAFE3 224.67deg, #C7EDEB 259.36deg, #E7F5EB 298.82deg, #F2F0E7 328.72deg)",
-					mixBlendMode: "color-dodge",
-					filter: "blur(62px)",
-				}}
-			/>
-
 			<div className="flex flex-1 flex-col items-center justify-center z-10">
 				<Image
 					src="/icons/onboarding/onboarding4.svg"
