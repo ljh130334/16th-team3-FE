@@ -182,7 +182,7 @@ export const completeTask = async (taskId: number): Promise<Task> => {
 		headers: {
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify({ status: "COMPLETED" }),
+		body: JSON.stringify({ status: "COMPLETE" }),
 	};
 
 	const data: TaskResponse = await fetchWithError(

@@ -5,7 +5,7 @@ export type TaskStatus =
 	| "procrastinating"
 	| "inProgress"
 	| "PENDING"
-	| "COMPLETED"
+	| "COMPLETE"
 	| "REFLECTED"
 	| "PROCRASTINATING"
 	| "INPROGRESS"
@@ -154,7 +154,7 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
 		let status: TaskStatus = "pending";
 		if (response.status === "FOCUSED") {
 			status = "inProgress";
-		} else if (response.status === "COMPLETED") {
+		} else if (response.status === "COMPLETE") {
 			status = "completed";
 		} else if (response.status === "REFLECTED") {
 			status = "reflected";
