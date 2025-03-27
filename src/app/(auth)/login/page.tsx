@@ -151,6 +151,7 @@ const LoginPage = () => {
 					width={348}
 					height={348}
 					priority
+					className="relative z-10 h-[30vh] w-auto"
 				/>
 			</div>
 
