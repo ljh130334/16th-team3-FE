@@ -14,9 +14,9 @@ export default function RetrospectionPageClient({ task }: Props) {
   const router = useRouter();
   
   return (
-    <div className = "relative flex flex-col h-full bg-backgroud-primary px-5 mb-[34px]">
+    <div className = "flex flex-col h-full bg-backgroud-primary mx-5 mb-[34px]">
       {/* ===================== [START] 상단 헤더 ===================== */}
-      <header className="absolute relative w-full top-0 z-10 flex items-center bg-background-primary py-[14.5px]">
+      <div className="fixed left-0 right-0 top-0 z-10 mt-[44px] mx-5 flex items-center bg-background-primary py-[14.5px]">
         <button 
           className="absolute left-0"
           onClick={() => router.back()}>
@@ -27,25 +27,31 @@ export default function RetrospectionPageClient({ task }: Props) {
             height={16}
           />
         </button>
-        <h1 className="s2 flex-1 text-center text-lg font-semibold text-text-normal">
+        <h1 className="s2 w-full text-center text-lg font-semibold text-text-normal">
           {task.name}
         </h1>
-      </header>
+      </div>
       {/* --------------------- [END] 상단 헤더 ---------------------*/}
 
-      
-      {/* ===================== [START] 확인 버튼 ===================== */}
-      <div>
-        <Button
-          variant="primary"
-          className="my-3"
-          onClick={() => {}}
-          disabled={true}
-        >
-          확인
-        </Button>
+      {/* ===================== [START] Content ===================== */}
+      <div className="mt-[44px]">
+
+        {/* ===================== [START] 확인 버튼 ===================== */}
+        <div>
+          <Button
+            variant="primary"
+            className="my-3"
+            onClick={() => {}}
+            disabled={true}
+          >
+            확인
+          </Button>
+        </div>
+        {/* --------------------- [END] 확인 버튼 --------------------- */}
+
       </div>
-      {/* --------------------- [END] 확인 버튼 ---------------------*/}
+
+      {/* --------------------- [END] Content --------------------- */}
 
     </div>
   );
