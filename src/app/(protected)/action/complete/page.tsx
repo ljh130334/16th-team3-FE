@@ -39,8 +39,8 @@ export default function Complete() {
           <Image
             src="/icons/immersion/study.png"
             alt="모래시계"
-            width={48}
-            height={48}
+            width={160}
+            height={160}
           />
         </div>
       </div>
