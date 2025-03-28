@@ -245,14 +245,14 @@ export default function OnboardingPage() {
 			<div className="z-10 flex flex-1 flex-col justify-end">
 				<div className="relative mb-[30px] flex justify-center">
 					<div className="absolute top-[-130px] z-20 flex w-full items-center justify-center">
-						<Image
+						{/* <Image
 							src="/icons/onboarding/ox.svg"
 							alt="OX 아이콘"
 							width={350}
 							height={200}
 							priority
 							className="relative z-10 h-[25vh] w-auto"
-						/>
+						/> */}
 					</div>
 
 					<Image
