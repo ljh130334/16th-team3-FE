@@ -1,10 +1,11 @@
 "use client";
 
+import Toast from "@/components/toast/Toast";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DatePicker from "../../../../../components/datePicker/DatePicker";
 import {
 	Drawer,
@@ -25,15 +26,32 @@ const DateSelectedComponent = ({
 	handleDateChange,
 }: DateSelectedComponentProps) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const [temporaryDate, setTemporaryDate] = useState<Date | undefined>(
-		deadlineDate,
+	const [temporaryDate, setTemporaryDate] = useState<Date>(
+		deadlineDate ?? new Date(),
 	);
+	const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+	const today = new Date();
+	const todayStart = new Date(
+		today.getFullYear(),
+		today.getMonth(),
+		today.getDate(),
+	);
+
 	const handleToggle = () => {
 		setIsOpen((prev) => !prev);
 	};
 
 	const handleTemporaryDate = (date: Date) => {
+		if (date < todayStart) {
+			if (!toastMessage) {
+				setToastMessage("마감일은 오늘 날짜 이후로 설정할 수 있어요.");
+			}
+			return;
+		}
+
 		setTemporaryDate(date || new Date());
+		setToastMessage(null);
 	};
 
 	const handleConfirmButtonClick = () => {
@@ -41,12 +59,23 @@ const DateSelectedComponent = ({
 
 		handleDateChange(temporaryDate);
 		setIsOpen(false);
+		setToastMessage(null);
 	};
+
+	useEffect(() => {
+		if (toastMessage) {
+			const timer = setTimeout(() => {
+				setToastMessage(null);
+			}, 2500);
+			return () => clearTimeout(timer);
+		}
+	}, [toastMessage]);
 
 	return (
 		<Drawer open={isOpen} onDrag={() => setIsOpen(false)}>
 			<DrawerTrigger>
 				<div className="relative mt-2 w-full">
+					{/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
 					<div
 						className="relative flex w-full flex-col items-start border-b border-gray-300 pb-2"
 						onClick={handleToggle}
@@ -65,7 +94,7 @@ const DateSelectedComponent = ({
 									: format(deadlineDate, "M월 d일 (E)", { locale: ko })}
 							</span>
 							<ChevronDown
-								className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
+								className={`h-4 w-4 icon-primary transition-transform duration-200 ${
 									isOpen ? "rotate-180" : ""
 								}`}
 							/>
@@ -83,6 +112,7 @@ const DateSelectedComponent = ({
 					deadlineDate={temporaryDate}
 					handleDateChange={handleTemporaryDate}
 				/>
+				{toastMessage && <Toast message={toastMessage} />}
 				<DrawerFooter className="px-0">
 					<Button
 						variant="primary"

@@ -2,6 +2,7 @@
 
 import ClearableInput from "@/components/clearableInput/ClearableInput";
 import { Button } from "@/components/ui/button";
+import useInitialTime from "@/hooks/useInitialTime";
 import type { TimePickerType } from "@/types/create";
 import { useEffect, useRef, useState } from "react";
 import type { TaskInputType } from "../../context";
@@ -32,18 +33,24 @@ interface TaskInputProps {
 	}) => void;
 }
 
-const MAX_TASK_LENGTH = 15;
+const MAX_TASK_LENGTH = 16;
 const WAITING_TIME = 200;
 
 const TaskInput = ({ context, lastStep, onNext, onEdit }: TaskInputProps) => {
 	const inputRef = useRef<HTMLInputElement | null>(null);
 
+	const {
+		meridiem: meridiemString,
+		hour: hourString,
+		minute: minuteString,
+	} = useInitialTime();
+
 	const [task, setTask] = useState<string>("");
 	const [deadlineDate, setDeadlineDate] = useState<Date | undefined>(undefined);
 	const [deadlineTime, setDeadlineTime] = useState<TimePickerType>({
-		meridiem: "오전",
-		hour: "01",
-		minute: "00",
+		meridiem: meridiemString,
+		hour: hourString,
+		minute: minuteString,
 	});
 	const [isFocused, setIsFocused] = useState(true);
 	const [isTimePickerFirstTouched, setIsTimePickerFirstTouched] = useState(
@@ -113,7 +120,7 @@ const TaskInput = ({ context, lastStep, onNext, onEdit }: TaskInputProps) => {
 							handleInputFocus={handleInputFocus}
 						/>
 						{task.length > MAX_TASK_LENGTH && (
-							<p className="mt-2 text-sm text-red-500">
+							<p className="mt-2 text-sm text-line-error">
 								최대 16자 이내로 입력할 수 있어요.
 							</p>
 						)}
