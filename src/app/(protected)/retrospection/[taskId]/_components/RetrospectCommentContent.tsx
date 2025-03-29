@@ -1,12 +1,7 @@
-type Props = {
-    retrospectContent: RetrospectContent;
-    setRetrospectContent: React.Dispatch<React.SetStateAction<RetrospectContent>>;
-}
-
 const RetrospectCommentContent = ({
     retrospectContent,
     setRetrospectContent,
-} : Props) => {
+} : RetrospectContentProps) => {
     const MAX_LENGTH = 100;
 
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

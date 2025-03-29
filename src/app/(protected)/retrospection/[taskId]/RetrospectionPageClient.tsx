@@ -1,14 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import Header from "@/components/ui/header";
 import Image from "next/image";
 import { TaskResponse } from "@/types/task";
 import { useRouter } from "next/navigation";
 import RetrospectItem from "./_components/RetrospectItem";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import RetrospectFocusContent from "./_components/RetrospectFocusContent";
 import RetrospectCommentContent from "./_components/RetrospectCommentContent";
+import RetrospectResultContent from "./_components/RetrospectResultContent";
 
 type Props = {
     task: TaskResponse;
@@ -23,14 +23,6 @@ export default function RetrospectionPageClient({ task }: Props) {
         focus: 0,
         comment: "",
     });
-
-    const handleResultContentClick = (selected: number) => {
-        const selectedResult = selected as ResultContent;
-        setRetrospectContent((prev) => ({
-            ...prev,
-            result: prev.result === selectedResult ? NOT_SELECTED : selectedResult,
-        }));
-    };
 
     const hasSelectedResult = () => {
         return retrospectContent.result !== -1;
@@ -89,19 +81,10 @@ export default function RetrospectionPageClient({ task }: Props) {
 
                         {/* 몰입 결과 회고 */}
                         <RetrospectItem title={retrospectItems.result.title} required={retrospectItems.result.required}>
-                            <div className="flex gap-[18px]">
-                            {[0, 1, 2, 3, 4].map((num, i) => (
-                                <div key={i} onClick={() => handleResultContentClick(num)}>
-                                    <Image
-                                        src={`/retro1-${num}-${retrospectContent.result === num ? 1 : 0}.svg`}
-                                        alt="retro content index"
-                                        width={40}
-                                        height={40}
-                                    />
-                                </div>
-                                
-                            ))}
-                            </div>
+                            <RetrospectResultContent 
+                                retrospectContent={retrospectContent}
+                                setRetrospectContent={setRetrospectContent}
+                            />
                         </RetrospectItem>
 
                         {/* 몰입하는 동안 나의 집중력 */}

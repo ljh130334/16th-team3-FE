@@ -1,10 +1,5 @@
 import { useRef } from "react";
 
-type Props = {
-    retrospectContent: RetrospectContent;
-    setRetrospectContent: React.Dispatch<React.SetStateAction<RetrospectContent>>;
-}
-
 const BAR = {
     HEIGHT: 18,
     SLIDER_RADIUS: 12,
@@ -13,7 +8,7 @@ const BAR = {
 const RetrospectFocusContent = ({
     retrospectContent,
     setRetrospectContent,
-} : Props) => {
+} : RetrospectContentProps) => {
     const FOCUS_STEPS = [0, 1, 2, 3, 4, 5];
 
     const trackRef = useRef<HTMLDivElement>(null);

@@ -13,3 +13,8 @@ type RetrospectItems = {
       required: boolean;
     };
 };
+
+type RetrospectContentProps = {
+    retrospectContent: RetrospectContent;
+    setRetrospectContent: React.Dispatch<React.SetStateAction<RetrospectContent>>;
+}
