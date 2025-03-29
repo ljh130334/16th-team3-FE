@@ -202,8 +202,8 @@ export default function RetrospectionPageClient({ task }: Props) {
                                             key={i}
                                             className={`w-[6px] h-[6px] rounded-full transition-all duration-200 ${
                                                 retrospectContent.focus >= step
-                                                ? "bg-white opacity-90"
-                                                : "bg-white opacity-30"
+                                                ? "bg-background-skyblue opacity-90"
+                                                : "bg-background-skyblue opacity-30"
                                             }`}
                                             onClick={() => setFocusContent(i)}
                                             />

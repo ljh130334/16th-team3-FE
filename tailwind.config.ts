@@ -104,6 +104,7 @@ export default {
 				background: {
 					primary: "#0F1114",
 					purple: "rgba(65, 65, 137, 0.4)",
+					skyblue: "#D7E1EF",
 				},
 
 				elevated: {
