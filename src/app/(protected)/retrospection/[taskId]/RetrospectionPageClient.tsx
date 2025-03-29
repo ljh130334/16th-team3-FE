@@ -6,6 +6,7 @@ import Image from "next/image";
 import { TaskResponse } from "@/types/task";
 import { useRouter } from "next/navigation";
 import RetrospectItem from "./_components/RetrospectItem";
+import { useState } from "react";
 
 type Props = {
     task: TaskResponse;
@@ -18,8 +19,37 @@ type RetrospectItems = {
     };
 };
 
+type ResultContent = -1 | 0 | 1 | 2 | 3 | 4;
+
+type RetrospectContent = {
+    result: ResultContent;
+    focus?: number;
+    keepAndTry?: string;
+}
+
 export default function RetrospectionPageClient({ task }: Props) {
+    const NOT_SELECTED = -1;
+
     const router = useRouter();
+    const [ retrospectContent, setRetrospectContent ] = useState<RetrospectContent>({
+        result: NOT_SELECTED,
+    });
+
+    const handleResultContentClick = (selected: number) => {
+        const selectedResult = selected as ResultContent;
+        setRetrospectContent((prev) => ({
+            ...prev,
+            result: prev.result === selectedResult ? NOT_SELECTED : selectedResult,
+        }));
+    };
+
+    const hasSelectedResult = () => {
+        return retrospectContent.result !== -1;
+    }
+
+    const hasRequiredContent = hasSelectedResult()
+        && retrospectContent.focus !== undefined;
+
 
     const retrospectItems : RetrospectItems = {
         result: {
@@ -42,7 +72,8 @@ export default function RetrospectionPageClient({ task }: Props) {
             <div className="fixed left-0 right-0 top-0 z-10 mt-[44px] mx-5 flex items-center bg-background-primary py-[14.5px]">
             <button 
                 className="absolute left-0"
-                onClick={() => router.back()}> {/* TODO: 뒤로가기가 아니라 팝업이 떠야함. */}
+                onClick={() => router.back()}
+            > {/* TODO: 뒤로가기가 아니라 팝업이 떠야함. */}
                 <Image
                 src="/icons/home/arrow-left.svg"
                 alt="Back"
@@ -69,7 +100,19 @@ export default function RetrospectionPageClient({ task }: Props) {
 
                         {/* 몰입 결과 회고 */}
                         <RetrospectItem title={retrospectItems.result.title} required={retrospectItems.result.required}>
-                            <p>몰입 결과 입력</p>
+                            <div className="flex gap-[18px]">
+                            {[0, 1, 2, 3, 4].map((num) => (
+                                <div onClick={() => handleResultContentClick(num)}>
+                                    <Image
+                                        src={`/retro1-${num}-${retrospectContent.result === num ? 1 : 0}.svg`}
+                                        alt="retro content index"
+                                        width={40}
+                                        height={40}
+                                    />
+                                </div>
+                                
+                            ))}
+                            </div>
                         </RetrospectItem>
 
                         {/* 몰입하는 동안 나의 집중력 */}
@@ -89,7 +132,7 @@ export default function RetrospectionPageClient({ task }: Props) {
                     variant="primary"
                     className="my-3"
                     onClick={() => {}}
-                    disabled={true}
+                    disabled={!hasRequiredContent}
                     >
                     확인
                     </Button>
