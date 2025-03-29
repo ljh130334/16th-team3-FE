@@ -77,7 +77,7 @@ export default function RetrospectionPageClient({ task }: Props) {
             {/* --------------------- [END] 상단 헤더 ---------------------*/}
 
             {/* ===================== [START] Content ===================== */}
-            <div className="mt-[44px]">
+            <div className="mt-[44px] overflow-y-auto">
 
                 <div className="flex flex-col"> {/* 회고 내용 */}
                     <div className="flex flex-col gap-3 pt-5 pb-8"> {/* 상단 텍스트 */}
