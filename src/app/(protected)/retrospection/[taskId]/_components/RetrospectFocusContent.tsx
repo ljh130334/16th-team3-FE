@@ -15,7 +15,6 @@ const RetrospectFocusContent = ({
     setRetrospectContent,
 } : Props) => {
     const FOCUS_STEPS = [0, 1, 2, 3, 4, 5];
-    //TODO: 슬라이더 핸들 반지름 상수화
 
     const trackRef = useRef<HTMLDivElement>(null);
     const isDragging = useRef(false);
