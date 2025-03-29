@@ -63,7 +63,7 @@ const RetrospectFocusContent = ({
     };
 
     return (
-        <div className="w-full mx-2">
+        <div className="w-full mx-2 mt-1">
             <div 
                 ref={trackRef}
                 className="relative h-6 flex items-center"
@@ -71,7 +71,7 @@ const RetrospectFocusContent = ({
             >
                 {/* 전체 바 배경 */}
                 <div 
-                    className="absolute h-6 rounded-full bg-gray-600"
+                    className="absolute h-6 rounded-full bg-line-tertiary"
                     style={{
                         width: "calc(100% + 24px)", // 16px 양쪽 추가
                         left: "-12px",              // 왼쪽으로 16px 이동
