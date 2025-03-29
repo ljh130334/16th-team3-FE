@@ -5,6 +5,11 @@ type Props = {
     setRetrospectContent: React.Dispatch<React.SetStateAction<RetrospectContent>>;
 }
 
+const BAR = {
+    HEIGHT: 18,
+    SLIDER_RADIUS: 12,
+}
+
 const RetrospectFocusContent = ({
     retrospectContent,
     setRetrospectContent,
@@ -67,24 +72,24 @@ const RetrospectFocusContent = ({
         <div className="w-full mx-2 mt-1">
             <div 
                 ref={trackRef}
-                className="relative h-6 flex items-center"
+                className={`relative h-[${BAR.HEIGHT}px] flex items-center`}
                 onMouseDown={handleMouseDown}
             >
                 {/* 전체 바 배경 */}
                 <div 
-                    className="absolute h-6 rounded-full bg-line-tertiary"
+                    className={`absolute h-[${BAR.HEIGHT}px] rounded-full bg-line-tertiary`}
                     style={{
-                        width: "calc(100% + 24px)", // 16px 양쪽 추가
-                        left: "-12px",              // 왼쪽으로 16px 이동
+                        width: `calc(100% + ${BAR.SLIDER_RADIUS*2}px)`, // 16px 양쪽 추가
+                        left: `-${BAR.SLIDER_RADIUS}px`,              // 왼쪽으로 16px 이동
                     }}
                 ></div>
 
                 {/* 선택된 채워진 부분 */}
                 <div
-                className="absolute h-6 rounded-full bg-gradient-to-r from-blue-200 to-purple-200 transition-all duration-200"
+                className={`absolute h-[${BAR.HEIGHT}px] rounded-full bg-gradient-to-r from-blue-200 to-purple-200 transition-all duration-200`}
                 style={{
-                    width: `calc(${(retrospectContent.focus / 5) * 100}% + 24px)`,
-                    left: `-12px`,
+                    width: `calc(${(retrospectContent.focus / 5) * 100}% + ${BAR.SLIDER_RADIUS*2}px)`,
+                    left: `-${BAR.SLIDER_RADIUS}px`,
                 }}
                 ></div>
 
@@ -105,19 +110,19 @@ const RetrospectFocusContent = ({
 
                 {/* 슬라이더 핸들 */}
                 <div
-                className="absolute m-3 z-20 w-6 h-6 rounded-full border-2 border-white bg-white shadow"
+                className={`absolute m-3 z-20 w-${BAR.SLIDER_RADIUS*2/4} h-${BAR.SLIDER_RADIUS*2/4} rounded-full border-2 border-white bg-white shadow`}
                 style={{
-                    left: `calc(${(retrospectContent.focus / 5) * 100}% - 24px)`,
+                    left: `calc(${(retrospectContent.focus / 5) * 100}% - ${BAR.SLIDER_RADIUS*2}px)`,
                     transition: "left 0.2s ease",
                 }}
                 />
                 </div>
 
                 {/* 아래 숫자 레이블 */}
-                <div className="mt-1 flex justify-between text-gray-400 text-sm font-medium">
+                <div className="mt-1.5 flex justify-between c3 text-gray-alternative font-medium">
                     {FOCUS_STEPS.map((step, i) => (
                         <div key={i} className="w-[6px] flex justify-center">
-                            <span key={i} className={retrospectContent.focus === step ? "text-white" : ""}>
+                            <span key={i} className={retrospectContent.focus === step ? "text-gray-alternative" : ""}>
                                 {`${step*20}`}
                             </span>
                         </div>
