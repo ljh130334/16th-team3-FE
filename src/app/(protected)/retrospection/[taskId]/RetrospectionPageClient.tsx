@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import RetrospectItem from "./_components/RetrospectItem";
 import { useRef, useState } from "react";
 import RetrospectFocusContent from "./_components/RetrospectFocusContent";
+import RetrospectCommentContent from "./_components/RetrospectCommentContent";
 
 type Props = {
     task: TaskResponse;
@@ -15,16 +16,13 @@ type Props = {
 
 export default function RetrospectionPageClient({ task }: Props) {
     const NOT_SELECTED = -1;
-    const FOCUS_STEPS = [0, 1, 2, 3, 4, 5];
 
     const router = useRouter();
     const [ retrospectContent, setRetrospectContent ] = useState<RetrospectContent>({
         result: NOT_SELECTED,
         focus: 0,
+        comment: "",
     });
-
-    const trackRef = useRef<HTMLDivElement>(null);
-    const isDragging = useRef(false);
 
     const handleResultContentClick = (selected: number) => {
         const selectedResult = selected as ResultContent;
@@ -92,8 +90,8 @@ export default function RetrospectionPageClient({ task }: Props) {
                         {/* 몰입 결과 회고 */}
                         <RetrospectItem title={retrospectItems.result.title} required={retrospectItems.result.required}>
                             <div className="flex gap-[18px]">
-                            {[0, 1, 2, 3, 4].map((num) => (
-                                <div onClick={() => handleResultContentClick(num)}>
+                            {[0, 1, 2, 3, 4].map((num, i) => (
+                                <div key={i} onClick={() => handleResultContentClick(num)}>
                                     <Image
                                         src={`/retro1-${num}-${retrospectContent.result === num ? 1 : 0}.svg`}
                                         alt="retro content index"
@@ -116,7 +114,10 @@ export default function RetrospectionPageClient({ task }: Props) {
 
                         {/* 몰입 회고 텍스트 */}
                         <RetrospectItem title={retrospectItems.keepAndTry.title} required={retrospectItems.keepAndTry.required}>
-                            <p>몰입 결과 입력</p>
+                            <RetrospectCommentContent 
+                                retrospectContent={retrospectContent}
+                                setRetrospectContent={setRetrospectContent}
+                            />
                         </RetrospectItem>
                     </div>
                 </div>
