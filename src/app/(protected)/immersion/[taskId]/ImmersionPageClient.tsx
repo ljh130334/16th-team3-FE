@@ -97,6 +97,11 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 		return diffInHours < 1 && diffInHours > 0;
 	};
 
+	// 전체 작업 중 긴급 작업이 있는지 확인하는 함수
+	const hasUrgentTask = () => {
+		return inProgressTasks.some((task) => isUrgent(task));
+	};
+
 	// 작업 클릭 핸들러
 	const handleTaskClick = (taskId: number) => {
 		router.push(`/immersion/${taskId}`);
@@ -151,14 +156,14 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 				<div id="dropdown-container" className="relative">
 					{/* 드롭다운 버튼 */}
 					<div
-						className={`bg-component-gray-tertiary rounded-t-[8px] ${!isDropdownOpen ? "rounded-b-[8px]" : "rounded-t-[16px]"} overflow-hidden`}
+						className={`bg-component-gray-tertiary rounded-t-[8px] ${!isDropdownOpen ? "rounded-b-[8px]" : "rounded-t-[8px]"} overflow-hidden`}
 						style={{
 							width: isDropdownOpen ? "243px" : "175px",
 							transition: "width 0.3s ease-out",
 						}}
 					>
 						<button
-							className="flex w-full items-center justify-center px-[25px] py-[9.5px] cursor-pointer"
+							className="flex w-full items-center justify-center px-[14px] py-[8px] cursor-pointer"
 							onClick={toggleDropdown}
 							onKeyDown={(e) => handleKeyDown(e, toggleDropdown)}
 							aria-expanded={isDropdownOpen}
@@ -169,10 +174,21 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 						>
 							<span className="text-center">
 								<span className="l4 text-gray-strong">진행 중인 일</span>{" "}
-								<span className="l5 text-gray-neutral">
+								<span
+									className={`l5 ${hasUrgentTask() ? "c1 text-component-accent-red" : "text-gray-neutral"}`}
+								>
 									총 {inProgressTasks.length}개
 								</span>
 							</span>
+							{hasUrgentTask() && (
+								<Image
+									src="/icons/immersion/emergency.svg"
+									alt="긴급"
+									width={16}
+									height={16}
+									className="ml-1"
+								/>
+							)}
 							<Image
 								src={
 									isDropdownOpen
@@ -180,7 +196,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 										: "/icons/immersion/chevron-down.svg"
 								}
 								alt="화살표"
-								width={8}
+								width={10}
 								height={6}
 								className="ml-2"
 							/>
@@ -190,7 +206,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 					{/* 드롭다운 리스트 */}
 					{isDropdownOpen && (
 						<div
-							className="absolute bg-component-gray-tertiary rounded-b-[16px] overflow-hidden z-10"
+							className="absolute bg-component-gray-tertiary rounded-b-[8px] overflow-hidden z-10"
 							style={{
 								width: "243px",
 								left: "50%",
@@ -228,7 +244,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 											className={`flex items-center px-[9.5px] py-[3px] rounded-[8px] ml-2 ${
 												isUrgent(task)
 													? "c2 text-gray-strong"
-													: "c2 bg-component-gray-secondary text-gray-neutral"
+													: "c2 bg-component-gray-primary text-gray-neutral"
 											}`}
 											style={
 												isUrgent(task)
