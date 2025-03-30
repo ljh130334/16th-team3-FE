@@ -9,6 +9,9 @@ export default {
 	],
 	theme: {
 		extend: {
+			height: {
+				20: "5rem",
+			},
 			fontFamily: {
 				pretendard: ["var(--font-pretendard)"],
 			},
