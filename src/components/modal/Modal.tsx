@@ -25,7 +25,6 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
       {/* 배경 흐림 + 어두운 투명도 */}
       <div
         className="absolute inset-0 bg-elevated-secondary opacity-70"
-        onClick={onClose}
       />
 
       {/* 모달 콘텐츠 */}

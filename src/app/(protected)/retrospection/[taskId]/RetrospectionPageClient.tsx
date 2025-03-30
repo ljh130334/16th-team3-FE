@@ -10,6 +10,7 @@ import RetrospectFocusContent from "./_components/RetrospectFocusContent";
 import RetrospectCommentContent from "./_components/RetrospectCommentContent";
 import RetrospectResultContent from "./_components/RetrospectResultContent";
 import Modal from "@/components/modal/Modal";
+import RetrospectLeaveModalContent from "./_components/RetrospectLeaveModalContent";
 
 type Props = {
     task: TaskResponse;
@@ -77,7 +78,10 @@ export default function RetrospectionPageClient({ task }: Props) {
                     isOpen={openLeaveModal}
                     onClose={() => setOpenLeaveModal(false)}
                 >
-                    <p>모달이다!</p>
+                    <RetrospectLeaveModalContent 
+                        setOpenLeaveModal={setOpenLeaveModal}
+                        router={router}
+                    />
                 </Modal>
             )}
             {/* --------------------- [END] 저장하지 않고 떠나기 모달 ---------------------*/}
@@ -121,12 +125,12 @@ export default function RetrospectionPageClient({ task }: Props) {
 
                 <div> {/* 확인 버튼 */}
                     <Button
-                    variant="primary"
-                    className="my-3"
-                    onClick={() => {}}
-                    disabled={!hasRequiredContent}
+                        variant="primary"
+                        className="my-3"
+                        onClick={() => {}}
+                        disabled={!hasRequiredContent}
                     >
-                    확인
+                        확인
                     </Button>
                 </div>
 
