@@ -66,13 +66,17 @@ const RetrospectFocusContent = ({
         <div className="w-full mx-2 mt-1">
             <div 
                 ref={trackRef}
-                className={`relative h-[${BAR.HEIGHT}px] flex items-center`}
+                className={`relative flex items-center`}
+                style={{
+                    height: `${BAR.HEIGHT}px`,
+                }}
                 onMouseDown={handleMouseDown}
             >
                 {/* 전체 바 배경 */}
                 <div 
-                    className={`absolute h-[${BAR.HEIGHT}px] rounded-full bg-line-tertiary`}
+                    className={`absolute rounded-full bg-line-tertiary`}
                     style={{
+                        height: `${BAR.HEIGHT}px`,
                         width: `calc(100% + ${BAR.SLIDER_RADIUS*2}px)`, // 16px 양쪽 추가
                         left: `-${BAR.SLIDER_RADIUS}px`,              // 왼쪽으로 16px 이동
                     }}
@@ -80,8 +84,9 @@ const RetrospectFocusContent = ({
 
                 {/* 선택된 채워진 부분 */}
                 <div
-                className={`absolute h-[${BAR.HEIGHT}px] rounded-full bg-gradient-to-r from-blue-200 to-purple-200 transition-all duration-200`}
+                className={`absolute rounded-full bg-gradient-to-r from-blue-200 to-purple-200 transition-all duration-200`}
                 style={{
+                    height: `${BAR.HEIGHT}px`,
                     width: `calc(${(retrospectContent.focus / 5) * 100}% + ${BAR.SLIDER_RADIUS*2}px)`,
                     left: `-${BAR.SLIDER_RADIUS}px`,
                 }}
