@@ -15,6 +15,7 @@ export type TaskType = "today" | "weekly" | "future";
 export interface Task {
 	id: number;
 	title: string;
+	name?: string;
 	dueDate: string;
 	dueDay: string;
 	dueTime: string;
