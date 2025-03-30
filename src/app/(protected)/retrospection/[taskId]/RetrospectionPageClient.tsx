@@ -9,6 +9,7 @@ import { useState } from "react";
 import RetrospectFocusContent from "./_components/RetrospectFocusContent";
 import RetrospectCommentContent from "./_components/RetrospectCommentContent";
 import RetrospectResultContent from "./_components/RetrospectResultContent";
+import Modal from "@/components/modal/Modal";
 
 type Props = {
     task: TaskResponse;
@@ -23,6 +24,8 @@ export default function RetrospectionPageClient({ task }: Props) {
         focus: 0,
         comment: "",
     });
+
+    const [ openLeaveModal, setOpenLeaveModal ] = useState(false);
 
     const hasSelectedResult = () => {
         return retrospectContent.result !== -1;
@@ -53,8 +56,8 @@ export default function RetrospectionPageClient({ task }: Props) {
             <div className="fixed left-0 right-0 top-0 z-10 mt-[44px] mx-5 flex items-center bg-background-primary py-[14.5px]">
             <button 
                 className="absolute left-0"
-                onClick={() => router.back()}
-            > {/* TODO: 뒤로가기가 아니라 팝업이 떠야함. */}
+                onClick={() => setOpenLeaveModal(true)}
+            > {/* TODO: 뒤로가기가 아니라 모달이 떠야함. (여기서부터) */}
                 <Image
                 src="/icons/home/arrow-left.svg"
                 alt="Back"
@@ -67,6 +70,17 @@ export default function RetrospectionPageClient({ task }: Props) {
             </h1>
             </div>
             {/* --------------------- [END] 상단 헤더 ---------------------*/}
+
+            {/* ===================== [START] 저장하지 않고 떠나기 모달 ===================== */}
+            {openLeaveModal && (
+                <Modal 
+                    isOpen={openLeaveModal}
+                    onClose={() => setOpenLeaveModal(false)}
+                >
+                    <p>모달이다!</p>
+                </Modal>
+            )}
+            {/* --------------------- [END] 저장하지 않고 떠나기 모달 ---------------------*/}
 
             {/* ===================== [START] Content ===================== */}
             <div className="mt-[44px] overflow-y-auto">

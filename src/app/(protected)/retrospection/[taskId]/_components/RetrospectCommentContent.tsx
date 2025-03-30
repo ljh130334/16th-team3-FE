@@ -23,6 +23,7 @@ const RetrospectCommentContent = ({
                 className="w-full h-40 bg-component-gray-tertiary b3 text-gray-normal placeholder-text-gray-normal rounded-xl px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
 
+            {/* TODO: 초과로 입력하면 빨간 메시지  */}
             <div className="c2 text-right text-gray-alternative">
                 {retrospectContent.comment.length} / {MAX_LENGTH}자
             </div>
