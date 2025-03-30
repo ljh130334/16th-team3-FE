@@ -127,7 +127,7 @@ export default function RetrospectionPageClient({ task }: Props) {
                     <Button
                         variant="primary"
                         className="my-3"
-                        onClick={() => {}}
+                        onClick={() => {router.push("/retrospection/complete")}}
                         disabled={!hasRequiredContent}
                     >
                         확인
