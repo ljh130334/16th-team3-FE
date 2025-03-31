@@ -196,6 +196,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 								alt="페르소나 이미지"
 								width={165}
 								height={165}
+								className="floating-character"
 							/>
 						</div>
 						<Badge>
@@ -294,6 +295,22 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 						width: 243px;
 					}
 				}
+
+				@keyframes floating {
+					0% {
+						transform: translateY(8px);
+					}
+					50% {
+						transform: translateY(-8px);
+					}
+					100% {
+						transform: translateY(8px);
+					}
+					}
+
+					.floating-character {
+					animation: floating 3s ease-in-out infinite;
+					}
 			`}</style>
 		</div>
 	);
