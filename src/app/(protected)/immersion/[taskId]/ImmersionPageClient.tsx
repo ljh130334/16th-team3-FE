@@ -123,36 +123,24 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			{/* 스크롤 영역이 될 중간 부분 */}
 			<div className="flex-1 overflow-y-auto">
 				{/* 배경 블러 효과들 */}
-				<div
-					className="fixed left-0 right-0 top-[280px] h-[200px] z-[1]"
-					style={{
-						opacity: 0.3,
-						background: "rgba(65, 65, 137, 0.40)",
-						filter: "blur(75px)",
-					}}
-				/>
-
-				<div
-					className="fixed left-0 right-0 top-[295px] h-[185px] z-[2]"
-					style={{
-						opacity: 0.4,
-						background:
-							"conic-gradient(from 210deg at 50% 50%, #CCE4FF 0deg, #C1A4E8 50.05deg, #B8E2FB 85.93deg, #F2EFE8 134.97deg, #CCE4FF 172.04deg, #BDAFE3 224.67deg, #C7EDEB 259.35deg, #E7F5EB 298.82deg, #F2F0E7 328.72deg)",
-						mixBlendMode: "color-dodge",
-						filter: "blur(62px)",
-					}}
-				/>
-
-				{isUrgent(initialTask) && (
-					<div
-						className="fixed left-0 right-0 top-[285px] h-[195px] z-[3]"
-						style={{
-							opacity: 0.25,
-							background: "#DD6875",
-							mixBlendMode: "color-dodge",
-							filter: "blur(62px)",
-						}}
-					/>
+				{isUrgent(initialTask) ? (
+					<div className="fixed left-0 right-0 top-[160px] h-[400px] z-[1]">
+						<Image
+							src="/icons/immersion/redblur.png"
+							alt="긴급 배경 효과"
+							layout="fill"
+							objectFit="cover"
+						/>
+					</div>
+				) : (
+					<div className="fixed left-0 right-0 top-[160px] h-[400px] z-[1]">
+						<Image
+							src="/icons/immersion/defaultblur.png"
+							alt="기본 배경 효과"
+							layout="fill"
+							objectFit="cover"
+						/>
+					</div>
 				)}
 
 				<div className="relative z-10">
