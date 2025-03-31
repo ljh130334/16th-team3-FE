@@ -1,35 +1,41 @@
 "use client";
 
+import {
+	useCreateSubtask,
+	useDeleteSubtask,
+	useSubtasks,
+	useUpdateSubtask,
+} from "@/hooks/useSubtasks";
+import type { Subtask } from "@/types/subtask";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-
-interface DetailGoal {
-	id: number;
-	title: string;
-	completed: boolean;
-}
 
 interface DetailGoalsProps {
 	taskId: number;
 }
 
 const MAX_DETAIL_GOAL_LENGTH = 40;
-const LINE_BREAK_AT = 20; // 20자마다 줄바꿈
-const MAX_DETAIL_GOALS_COUNT = 10; // 최대 세부 목표 개수
+const LINE_BREAK_AT = 20;
+const MAX_DETAIL_GOALS_COUNT = 10;
 
 export default function DetailGoals({ taskId }: DetailGoalsProps) {
-	const [detailGoals, setDetailGoals] = useState<DetailGoal[]>([]);
 	const [isAddingGoal, setIsAddingGoal] = useState(false);
 	const [newGoalTitle, setNewGoalTitle] = useState("");
 	const [editingGoalId, setEditingGoalId] = useState<number | null>(null);
 	const [showLengthWarning, setShowLengthWarning] = useState(false);
 	const [editShowLengthWarning, setEditShowLengthWarning] = useState(false);
-	const [showMaxCountWarning, setShowMaxCountWarning] = useState(false); // 최대 개수 경고 상태 추가
+	const [showMaxCountWarning, setShowMaxCountWarning] = useState(false);
 
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const editInputRef = useRef<HTMLTextAreaElement>(null);
 
-	// 입력 필드 포커스 처리를 위한 단일 useEffect
+	// API 연동 훅 사용
+	const { data: subtasks = [], isLoading } = useSubtasks(taskId);
+	const { mutate: createSubtaskMutation } = useCreateSubtask();
+	const { mutate: updateSubtaskMutation } = useUpdateSubtask();
+	const { mutate: deleteSubtaskMutation } = useDeleteSubtask();
+
+	// 입력 필드 포커스 처리
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			if (isAddingGoal && inputRef.current) {
@@ -44,11 +50,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 
 	// 글자수 경고 메시지 표시 관리
 	useEffect(() => {
-		if (newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH) {
-			setShowLengthWarning(true);
-		} else {
-			setShowLengthWarning(false);
-		}
+		setShowLengthWarning(newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH);
 	}, [newGoalTitle]);
 
 	// 최대 개수 토스트 자동 닫기
@@ -56,7 +58,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 		if (showMaxCountWarning) {
 			const timer = setTimeout(() => {
 				setShowMaxCountWarning(false);
-			}, 3000); // 3초 후 자동으로 닫힘
+			}, 3000);
 
 			return () => clearTimeout(timer);
 		}
@@ -64,8 +66,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 
 	// 세부 목표 추가 핸들러
 	const handleAddGoal = () => {
-		// 최대 개수 체크
-		if (detailGoals.length >= MAX_DETAIL_GOALS_COUNT) {
+		if (subtasks.length >= MAX_DETAIL_GOALS_COUNT) {
 			setShowMaxCountWarning(true);
 			return;
 		}
@@ -80,16 +81,18 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 			trimmedTitle.length >= 1 &&
 			trimmedTitle.length <= MAX_DETAIL_GOAL_LENGTH
 		) {
-			setDetailGoals([
-				...detailGoals,
+			createSubtaskMutation(
 				{
-					id: Date.now(),
-					title: trimmedTitle,
-					completed: false,
+					taskId,
+					name: trimmedTitle,
 				},
-			]);
-			setNewGoalTitle("");
-			setIsAddingGoal(false);
+				{
+					onSuccess: () => {
+						setNewGoalTitle("");
+						setIsAddingGoal(false);
+					},
+				},
+			);
 		}
 	};
 
@@ -101,32 +104,42 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 
 	// 완료 상태 토글 핸들러
 	const handleToggleComplete = (goalId: number) => {
-		setDetailGoals(
-			detailGoals.map((goal) =>
-				goal.id === goalId ? { ...goal, completed: !goal.completed } : goal,
-			),
-		);
+		const goal = subtasks.find((subtask) => subtask.id === goalId);
+		if (goal) {
+			updateSubtaskMutation({
+				id: goalId,
+				taskId,
+				isCompleted: !goal.isCompleted,
+			});
+		}
 	};
 
 	// 목표 텍스트 업데이트 핸들러
 	const handleUpdateGoalTitle = (goalId: number, newTitle: string) => {
 		if (newTitle.length <= MAX_DETAIL_GOAL_LENGTH) {
-			setDetailGoals(
-				detailGoals.map((goal) =>
-					goal.id === goalId ? { ...goal, title: newTitle } : goal,
-				),
-			);
+			updateSubtaskMutation({
+				id: goalId,
+				taskId,
+				name: newTitle,
+			});
 			setEditShowLengthWarning(false);
 		} else {
 			setEditShowLengthWarning(true);
 		}
 	};
 
+	// 목표 삭제 핸들러
+	const handleDeleteGoal = (goalId: number) => {
+		deleteSubtaskMutation({
+			id: goalId,
+			taskId,
+		});
+	};
+
 	// 텍스트에 20자 이후 줄바꿈 적용하는 함수
 	const formatGoalText = (text: string) => {
 		if (text.length <= LINE_BREAK_AT) return text;
 
-		// 문자열에 실제 줄바꿈 문자 추가
 		const firstLine = text.slice(0, LINE_BREAK_AT);
 		const secondLine = text.slice(LINE_BREAK_AT);
 
@@ -153,8 +166,8 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 	};
 
 	// 완료되지 않은 목표와 완료된 목표를 분리하여 정렬
-	const sortedGoals = [...detailGoals].sort((a, b) =>
-		a.completed === b.completed ? 0 : a.completed ? 1 : -1,
+	const sortedGoals = [...subtasks].sort((a, b) =>
+		a.isCompleted === b.isCompleted ? 0 : a.isCompleted ? 1 : -1,
 	);
 
 	// 체크박스 컴포넌트들
@@ -315,6 +328,21 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 	const deleteButtonStyles =
 		"absolute right-0 top-1/2 transform -translate-y-1/2";
 
+	if (isLoading) {
+		return (
+			<div
+				className="w-full p-4"
+				style={{
+					borderRadius: "var(--16, 16px)",
+					background:
+						"linear-gradient(180deg, rgba(121, 121, 235, 0.30) 0%, rgba(121, 121, 235, 0.10) 29.17%, rgba(121, 121, 235, 0.00) 100%), var(--Component-Gray-Primary, #17191F)",
+				}}
+			>
+				<div className="py-4 text-center text-gray-disabled">로딩 중...</div>
+			</div>
+		);
+	}
+
 	return (
 		<div
 			className="w-full p-4"
@@ -341,7 +369,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 				</button>
 			</div>
 
-			{detailGoals.length === 0 && !isAddingGoal ? (
+			{subtasks.length === 0 && !isAddingGoal ? (
 				<button
 					type="button"
 					className="py-2 text-start text-gray-disabled cursor-pointer w-full"
@@ -356,21 +384,23 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 						<li key={goal.id} className="flex items-start py-2">
 							<div className="mr-3 mt-1">
 								<CheckboxWithGradientBorder
-									checked={goal.completed}
+									checked={goal.isCompleted}
 									onChange={() => handleToggleComplete(goal.id)}
 								/>
 							</div>
 							{editingGoalId === goal.id ? (
 								<div className="relative flex-grow pr-8">
 									<textarea
-										value={goal.title}
+										value={goal.name}
 										onChange={(e) =>
 											handleTextareaInput(e, MAX_DETAIL_GOAL_LENGTH, (value) =>
 												handleUpdateGoalTitle(goal.id, value),
 											)
 										}
 										className={`text-b2 break-words w-full border-none bg-transparent p-0 outline-none resize-none overflow-hidden ${
-											goal.completed ? "text-gray-neutral" : "text-gray-normal"
+											goal.isCompleted
+												? "text-gray-neutral"
+												: "text-gray-normal"
 										}`}
 										style={{
 											wordBreak: "break-word",
@@ -383,14 +413,14 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 										ref={editInputRef}
 										aria-label="세부 목표 수정"
 										onKeyDown={(e) => {
-											if (e.key === "Enter" && goal.title.trim().length >= 1) {
+											if (e.key === "Enter" && goal.name.trim().length >= 1) {
 												e.preventDefault();
 												setEditingGoalId(null);
 											}
 										}}
 										rows={1}
 									/>
-									{goal.title && (
+									{goal.name && (
 										<button
 											onClick={() => {
 												handleUpdateGoalTitle(goal.id, "");
@@ -412,7 +442,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 							) : (
 								<button
 									type="button"
-									className={`text-b2 break-words cursor-text text-left w-full ${goal.completed ? "text-gray-neutral" : "text-gray-normal"}`}
+									className={`text-b2 break-words cursor-text text-left w-full ${goal.isCompleted ? "text-gray-neutral" : "text-gray-normal"}`}
 									style={{
 										wordBreak: "break-word",
 										display: "block",
@@ -422,9 +452,9 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 										margin: 0,
 									}}
 									onClick={() => setEditingGoalId(goal.id)}
-									aria-label={`${goal.title} 편집하기`}
+									aria-label={`${goal.name} 편집하기`}
 								>
-									{formatGoalText(goal.title)}
+									{formatGoalText(goal.name)}
 								</button>
 							)}
 						</li>
@@ -444,13 +474,14 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 								onChange={(e) =>
 									handleTextareaInput(
 										e,
-										MAX_DETAIL_GOAL_LENGTH + 1, // +1 허용하여 경고 토스트를 표시할 수 있도록 함
+										MAX_DETAIL_GOAL_LENGTH + 1,
 										setNewGoalTitle,
 									)
 								}
 								onKeyDown={(e) => {
 									if (
 										e.key === "Enter" &&
+										!e.shiftKey &&
 										newGoalTitle.trim().length >= 1 &&
 										newGoalTitle.length <= MAX_DETAIL_GOAL_LENGTH
 									) {
