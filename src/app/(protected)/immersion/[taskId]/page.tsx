@@ -1,7 +1,7 @@
 import { fetchServerTask } from "@/lib/serverTask";
-import type { TaskResponse } from "@/types/task";
-
 import { CurrentTimeProvider } from "@/provider/CurrentTimeProvider";
+import type { TaskResponse } from "@/types/task";
+import type { Task } from "@/types/task";
 import ImmersionPageClient from "./ImmersionPageClient";
 
 export default async function Immersion({
@@ -14,7 +14,7 @@ export default async function Immersion({
 
 	return (
 		<CurrentTimeProvider>
-			<ImmersionPageClient initialTask={task} />
+			<ImmersionPageClient initialTask={task as unknown as Task} />
 		</CurrentTimeProvider>
 	);
 }
