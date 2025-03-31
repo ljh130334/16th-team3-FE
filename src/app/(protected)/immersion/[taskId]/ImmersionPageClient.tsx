@@ -8,8 +8,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import DetailGoals from "@/components/DetailGoals/DetailGoals";
-import TasksDropdown from "@/components/TasksDropdown/TasksDropdown";
+import DetailGoals from "@/app/(protected)/immersion/_components/DetailGoals/DetailGoals";
+import TasksDropdown from "@/app/(protected)/immersion/_components/TasksDropdown/TasksDropdown";
 import { Badge } from "@/components/component/Badge";
 import { Button } from "@/components/ui/button";
 import { useCompleteTask, useInProgressTasks } from "@/hooks/useTasks";
