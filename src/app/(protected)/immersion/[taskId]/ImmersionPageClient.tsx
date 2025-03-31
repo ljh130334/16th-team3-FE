@@ -33,9 +33,9 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			if (initialTask?.dueDatetime) {
 				const targetDate = new Date(initialTask.dueDatetime);
 				const timeStr = calculateRemainingTime(targetDate);
-				const formattedTime = timeStr.replace(" 남음", "");
 
-				setRemainingTime(formattedTime);
+				// 포맷 변경: n분 n초 남음, n시간 n분 남음, n일 n시간 n분 남음 형식 유지
+				setRemainingTime(timeStr);
 			} else {
 				setRemainingTime("시간 정보 없음");
 			}
@@ -51,7 +51,13 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 		return () => clearInterval(intervalId);
 	}, [initialTask?.dueDatetime]);
 
+	const [showBottomSheet, setShowBottomSheet] = useState(false);
+
 	const handleComplete = () => {
+		setShowBottomSheet(true);
+	};
+
+	const handleConfirmComplete = () => {
 		completeTask(Number(initialTask.id));
 		router.push("/immersion/complete");
 	};
@@ -198,12 +204,44 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			<div className="relative flex flex-col items-center px-5 py-3 mb-[37px] z-40">
 				<Button
 					variant={isUrgent(initialTask) ? "hologram" : "primary"}
-					className={`relative w-full ${isUrgent(initialTask) ? "l2 h-[56px] rounded-[16px] px-[18.5px] text-center text-gray-inverse" : ""}`}
+					className={`relative w-full ${isUrgent(initialTask) ? "l2 h-[56px] rounded-[16px] px-[18.5] text-center text-gray-inverse" : ""}`}
 					onClick={handleComplete}
 				>
 					다했어요!
 				</Button>
 			</div>
+
+			{/* 바텀시트 */}
+			{showBottomSheet && (
+				<div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
+					<div className="flex w-full flex-col items-center rounded-t-[28px] bg-component-gray-secondary px-4 pt-10 pb-[34px]">
+						<h2 className="t3 text-center text-gray-normal">
+							{initialTask.name}
+						</h2>
+						<p className="t3 mb-2 text-center text-gray-normal">
+							정말 다 끝내셨나요?
+						</p>
+						<p className="b3 text-text-neutral mb-7 text-center">
+							마감까지 {remainingTime}
+						</p>
+						<button
+							type="button"
+							className="l2 w-full rounded-[16px] bg-component-accent-primary py-4 text-gray-strong"
+							onClick={handleConfirmComplete}
+						>
+							할일 끝내기
+						</button>
+
+						<button
+							type="button"
+							className="b2 w-full pt-4 pb-2 text-text-neutral"
+							onClick={() => setShowBottomSheet(false)}
+						>
+							몰입으로 돌아가기
+						</button>
+					</div>
+				</div>
+			)}
 
 			{/* CSS Animations */}
 			<style jsx global>{`
