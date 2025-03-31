@@ -105,8 +105,6 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 		};
 	}, []);
 
-	if (!isOpen) return null;
-
 	// 닉네임 문자열 처리 (9자 초과시 말줄임표)
 	const formatNickname = (name: string) => {
 		if (!name) return "";
@@ -117,12 +115,10 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 	};
 
 	const handleStartTask = () => {
-		// task.id가 있고 onStart 함수가 제공된 경우 태스크 상태 변경
 		if (task.id && onStart) {
 			onStart(task.id);
 		}
 
-		// 몰입 화면으로 이동
 		router.push(`/immersion/${task.id}`);
 		onClose();
 	};
@@ -133,8 +129,11 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 	};
 
 	const handleEditTitle = () => {
+		if (!isInProgress) {
+			router.push(`/edit/deadline-date/${task.id}`);
+		}
+
 		setShowMenu(false);
-		// 이름 변경 로직 추가
 	};
 
 	const handleDelete = () => {
@@ -200,7 +199,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 							{task.title}
 						</DialogTitle>
 					</DialogHeader>
-					<div className="w-6"></div>
+					<div className="w-6" />
 					<button
 						ref={buttonRef}
 						className="z-10 px-5"
@@ -280,6 +279,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 					</div>
 
 					<div>
+						{/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
 						<div
 							className="flex items-center justify-between py-2.5 pt-0"
 							onClick={() => {

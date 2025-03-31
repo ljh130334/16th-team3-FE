@@ -61,10 +61,10 @@ const InstantTaskCreate = () => {
 		},
 		onSuccess: (response) => {
 			if (response.success) {
-				const { personaName, taskMode, taskType } = response;
+				const { personaName, taskId } = response;
 				queryClient.invalidateQueries({ queryKey: ["tasks", "home"] });
 				router.push(
-					`/?dialog=success&task=${funnel.context.task}&personaName=${personaName}&taskMode=${taskMode}&taskType=${taskType}`,
+					`/?dialog=success&task=${funnel.context.task}&personaName=${personaName}&type=instant&taskId=${taskId}`,
 				);
 			}
 		},
@@ -86,7 +86,11 @@ const InstantTaskCreate = () => {
 				deadlineTime: funnel.context.deadlineTime,
 			});
 		} else {
-			router.push("/");
+			if (confirm("홈 화면으로 돌아가시겠습니까?")) {
+				router.push("/");
+			} else {
+				return;
+			}
 		}
 	};
 

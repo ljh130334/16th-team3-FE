@@ -181,10 +181,10 @@ const HomePageContent = () => {
 	const searchParams = useSearchParams();
 	const [taskName, setTaskName] = useState("");
 	const [personaName, setPersonaName] = useState("");
-	const [personaType, setPersonaType] = useState({
-		taskType: "",
-		taskMode: "",
-	});
+	const [taskType, setTaskType] = useState("");
+	const [urgentTaskId, setUrgentTaskId] = useState<number | undefined>(
+		undefined,
+	);
 
 	// 다른 페이지에서 돌아올 때 재진입으로 간주
 	useEffect(() => {
@@ -310,6 +310,14 @@ const HomePageContent = () => {
 		setIsCreateSheetOpen(false);
 	};
 
+	const handleCharacterDialogButtonClick = () => {
+		if (taskType === "instant") {
+			router.push(`/immersion/${urgentTaskId}`);
+		}
+
+		setIsDialogOpen(false);
+	};
+
 	// 툴팁 표시 관련 로직
 	useEffect(() => {
 		const hasVisited = localStorage.getItem("hasVisitedBefore");
@@ -375,17 +383,28 @@ const HomePageContent = () => {
 			setPersonaId(personaId);
 		}
 
-		if (searchParams.get("taskType") && searchParams.get("taskMode")) {
-			setPersonaType({
-				taskType: searchParams.get("taskType") || "",
-				taskMode: searchParams.get("taskMode") || "",
-			});
+		const taskTypeParam = searchParams.get("type");
+		if (taskTypeParam) {
+			setTaskType(taskTypeParam);
+		}
+
+		const taskIdParam = searchParams.get("taskId");
+		if (taskIdParam) {
+			setUrgentTaskId(Number(taskIdParam));
 		}
 
 		if (isDialogOpen) {
 			router.replace("/", { scroll: false });
 		}
 	}, [searchParams, router, isDialogOpen]);
+
+	useEffect(() => {
+		if (searchParams.get("tab") === "all") {
+			setActiveTab("all");
+		} else if (searchParams.get("tab") === "today") {
+			setActiveTab("today");
+		}
+	}, [searchParams]);
 
 	// 로딩 상태 처리
 	if (isLoadingHome || isUserProfileLoading) {
@@ -458,7 +477,13 @@ const HomePageContent = () => {
 				</div>
 				<div className="px-[20px] py-[11px]">
 					<div className="flex space-x-4">
-						<div onClick={() => handleTabChange("today")}>
+						{/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+						<div
+							onClick={() => {
+								handleTabChange("today");
+								router.replace("/?tab=today", { scroll: true });
+							}}
+						>
 							<span
 								className={`t3 ${activeTab === "today" ? "text-text-normal" : "text-text-disabled"}`}
 							>
@@ -470,7 +495,13 @@ const HomePageContent = () => {
 								{todayTasks.length + inProgressTasks.length}
 							</span>
 						</div>
-						<div onClick={() => handleTabChange("all")}>
+						{/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+						<div
+							onClick={() => {
+								handleTabChange("all");
+								router.replace("/?tab=all", { scroll: true });
+							}}
+						>
 							<span
 								className={`t3 ${activeTab === "all" ? "text-text-normal" : "text-text-disabled"}`}
 							>
@@ -1078,10 +1109,10 @@ const HomePageContent = () => {
 			<CharacterDialog
 				isOpen={isDialogOpen}
 				task={taskName}
+				taskType={taskType}
 				personaName={personaName}
 				personaId={personaId}
-				personaType={personaType}
-				onClick={() => setIsDialogOpen(false)}
+				onClick={handleCharacterDialogButtonClick}
 			/>
 
 			<CreateTaskSheet
