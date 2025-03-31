@@ -21,6 +21,8 @@ interface Props {
 export default function ImmersionPageClient({ initialTask }: Props) {
 	const router = useRouter();
 	const [remainingTime, setRemainingTime] = useState("");
+	const [showBottomSheet, setShowBottomSheet] = useState(false);
+	const [showTimeExpiredSheet, setShowTimeExpiredSheet] = useState(false);
 
 	const nickname = useUserStore((state) => state.userData.nickname);
 	const { data: inProgressTasks = [] } = useInProgressTasks();
@@ -32,6 +34,13 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 		const updateRemainingTime = () => {
 			if (initialTask?.dueDatetime) {
 				const targetDate = new Date(initialTask.dueDatetime);
+				const now = new Date();
+
+				// 마감시간이 지났는지 확인
+				if (now > targetDate && !showTimeExpiredSheet) {
+					setShowTimeExpiredSheet(true);
+				}
+
 				const timeStr = calculateRemainingTime(targetDate);
 
 				// 포맷 변경: n분 n초 남음, n시간 n분 남음, n일 n시간 n분 남음 형식 유지
@@ -49,9 +58,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 		// 컴포넌트 언마운트 시 인터벌 정리
 		return () => clearInterval(intervalId);
-	}, [initialTask?.dueDatetime]);
-
-	const [showBottomSheet, setShowBottomSheet] = useState(false);
+	}, [initialTask?.dueDatetime, showTimeExpiredSheet]);
 
 	const handleComplete = () => {
 		setShowBottomSheet(true);
@@ -62,6 +69,20 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 		router.push("/immersion/complete");
 	};
 
+	const handleReflection = () => {
+		router.push(`/reflection?taskId=${initialTask.id}`);
+	};
+
+	// 마감 시간 지남 확인
+	const isExpired = (task: Task) => {
+		if (!task.dueDatetime) return false;
+
+		const now = new Date();
+		const dueDate = new Date(task.dueDatetime);
+
+		return now > dueDate;
+	};
+
 	// 긴급 작업 판단 함수
 	const isUrgent = (task: Task) => {
 		if (!task.dueDatetime) return false;
@@ -70,8 +91,8 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 		const dueDate = new Date(task.dueDatetime);
 		const diffInHours = (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60);
 
-		// 마감이 1시간 미만으로 남은 경우 긴급으로 처리
-		return diffInHours < 1 && diffInHours > 0;
+		// 마감이 1시간 미만으로 남았거나 이미 시간이 다 된 경우에도 긴급으로 처리
+		return diffInHours <= 1;
 	};
 
 	return (
@@ -204,17 +225,17 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			<div className="relative flex flex-col items-center px-5 py-3 mb-[37px] z-40">
 				<Button
 					variant={isUrgent(initialTask) ? "hologram" : "primary"}
-					className={`relative w-full ${isUrgent(initialTask) ? "l2 h-[56px] rounded-[16px] px-[18.5] text-center text-gray-inverse" : ""}`}
+					className={`relative w-full ${isUrgent(initialTask) ? "l2 h-[56px] rounded-[16px] px-[18.5px] text-center text-gray-inverse" : ""}`}
 					onClick={handleComplete}
 				>
 					다했어요!
 				</Button>
 			</div>
 
-			{/* 바텀시트 */}
+			{/* 할일 완료 바텀시트 */}
 			{showBottomSheet && (
 				<div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
-					<div className="flex w-full flex-col items-center rounded-t-[28px] bg-component-gray-secondary px-4 pt-10 pb-[34px]">
+					<div className="flex w-full flex-col items-center rounded-t-[28px] bg-component-gray-secondary px-5 pt-10 pb-[34px]">
 						<h2 className="t3 text-center text-gray-normal">
 							{initialTask.name}
 						</h2>
@@ -238,6 +259,27 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 							onClick={() => setShowBottomSheet(false)}
 						>
 							몰입으로 돌아가기
+						</button>
+					</div>
+				</div>
+			)}
+
+			{/* 시간 만료 바텀시트 */}
+			{showTimeExpiredSheet && (
+				<div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
+					<div className="flex w-full flex-col items-center rounded-t-[28px] bg-component-gray-secondary px-5 pt-6 pb-[34px]">
+						<h2 className="t3 mt-4 text-center text-gray-normal">
+							{initialTask.name}
+						</h2>
+						<p className="t3 mb-4 text-center text-gray-normal">
+							설정했던 마감일이 끝났어요!
+						</p>
+						<button
+							type="button"
+							className="l2 w-full rounded-[16px] bg-component-accent-primary py-4 my-3 text-gray-strong"
+							onClick={handleReflection}
+						>
+							회고하기
 						</button>
 					</div>
 				</div>
