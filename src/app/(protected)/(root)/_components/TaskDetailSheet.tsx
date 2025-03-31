@@ -12,6 +12,7 @@ import { useTask } from "@/hooks/useTasks";
 import { useUserStore } from "@/store/useUserStore";
 import type { Task } from "@/types/task";
 import { calculateRemainingTime, parseDateAndTime } from "@/utils/dateFormat";
+import { getPersonaImage } from "@/utils/getPersonaImage";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -40,6 +41,9 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 	const [remainingTime, setRemainingTime] = useState("");
 	const [isUrgent, setIsUrgent] = useState(false);
 	const { userData } = useUserStore();
+
+	const personaId = task.persona?.id;
+	const personaImageUrl = getPersonaImage(personaId);
 
 	// const { data: taskDetail, isLoading } = useTask(task.id);
 
@@ -183,9 +187,6 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 	const personaName = task.persona?.name || "페르소나 없음";
 	const personaTriggerAction = task.triggerAction || "노트북 켜기";
 	const userNickname = userData?.nickname || "";
-
-	// 이미지 URL 처리
-	const personaImageUrl = "/icons/home/happy-character.png";
 
 	// 미리 시작 상태일 때만 화살표 표시 (지금 시작 또는 이어서 몰입일 때는 표시 안함)
 	const showArrow = !isInProgress;

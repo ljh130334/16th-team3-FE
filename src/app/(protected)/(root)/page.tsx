@@ -20,6 +20,7 @@ import React, { useState, useEffect, useMemo, Suspense } from "react";
 
 import Loader from "@/components/loader/Loader";
 import { useAuthStore } from "@/store";
+import { getPersonaImage } from "@/utils/getPersonaImage";
 import Link from "next/link";
 import CharacterDialog from "../(create)/_components/characterDialog/CharacterDialog";
 
@@ -176,7 +177,7 @@ const HomePageContent = () => {
 	const [expiredTask, setExpiredTask] = useState<Task | null>(null);
 	const [isReentry, setIsReentry] = useState(false);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
-
+	const [personaId, setPersonaId] = useState<number | undefined>(undefined);
 	const searchParams = useSearchParams();
 	const [taskName, setTaskName] = useState("");
 	const [personaName, setPersonaName] = useState("");
@@ -367,8 +368,11 @@ const HomePageContent = () => {
 
 		const personaParam = searchParams.get("personaName");
 
-		if (personaParam) {
-			setPersonaName(personaParam);
+		const personaIdParam = searchParams.get("personaId");
+		const personaId = personaIdParam ? parseInt(personaIdParam, 10) : undefined;
+
+		if (personaId) {
+			setPersonaId(personaId);
 		}
 
 		if (searchParams.get("taskType") && searchParams.get("taskMode")) {
@@ -1075,6 +1079,7 @@ const HomePageContent = () => {
 				isOpen={isDialogOpen}
 				task={taskName}
 				personaName={personaName}
+				personaId={personaId}
 				personaType={personaType}
 				onClick={() => setIsDialogOpen(false)}
 			/>

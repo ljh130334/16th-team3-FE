@@ -9,12 +9,14 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { useUserStore } from "@/store";
+import { getPersonaImage } from "@/utils/getPersonaImage";
 import Image from "next/image";
 
 interface CharacterDialogProps {
 	isOpen: boolean;
 	task: string;
 	personaName: string;
+	personaId: number;
 	personaType: {
 		taskType: string;
 		taskMode: string;
@@ -26,10 +28,12 @@ const CharacterDialog = ({
 	isOpen,
 	task,
 	personaName,
+	personaId,
 	personaType,
 	onClick,
 }: CharacterDialogProps) => {
 	const { userData } = useUserStore();
+	const personaImageSrc = getPersonaImage(personaId);
 
 	return (
 		<Dialog open={isOpen} onOpenChange={onClick}>
@@ -51,8 +55,8 @@ const CharacterDialog = ({
 				<div className="mb-1 flex flex-col items-center gap-5">
 					<div className="flex h-20 w-20 items-center justify-center rounded-[28px] bg-component-gray-tertiary">
 						<Image
-							src="/icons/home/happy-character.png"
-							alt="happy-character"
+							src={personaImageSrc}
+							alt={`${personaName}-character`}
 							width={54}
 							height={54}
 						/>

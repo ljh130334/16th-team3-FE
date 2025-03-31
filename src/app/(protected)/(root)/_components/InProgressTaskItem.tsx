@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import type { Task } from "@/types/task";
 import { calculateRemainingTime, parseDateAndTime } from "@/utils/dateFormat";
+import { getPersonaImage } from "@/utils/getPersonaImage";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -27,6 +28,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 	const [timeLeftMs, setTimeLeftMs] = useState(0);
 	const [showBottomSheet, setShowBottomSheet] = useState(false);
 	const [isExpired, setIsExpired] = useState(false);
+	const personaImageUrl = getPersonaImage(task.persona?.id);
 
 	// 남은 시간 계산 함수 개선
 	const calculateRemainingTimeLocal = useCallback(() => {
@@ -207,12 +209,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 				>
 					<div className="mb-5 flex items-center gap-4">
 						<div className="flex h-12 w-12 items-center justify-center rounded-[20px] bg-component-gray-tertiary p-2">
-							<Image
-								src="/icons/home/happy-character.png"
-								alt="Task"
-								width={32}
-								height={32}
-							/>
+							<Image src={personaImageUrl} alt="Task" width={32} height={32} />
 						</div>
 						<div className="flex-1">
 							<p className="b3 text-text-neutral">{formatDueTime()}</p>
@@ -260,10 +257,10 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 						}}
 					/>
 					<Image
-						src="/icons/home/happy-character.png"
+						src={personaImageUrl}
 						alt="Character"
-						width={87}
-						height={87}
+						width={136}
+						height={136}
 						className="relative z-10"
 					/>
 				</div>

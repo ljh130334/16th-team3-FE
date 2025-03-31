@@ -13,6 +13,7 @@ import TasksDropdown from "@/app/(protected)/immersion/_components/TasksDropdown
 import { Badge } from "@/components/component/Badge";
 import { Button } from "@/components/ui/button";
 import { useCompleteTask, useInProgressTasks } from "@/hooks/useTasks";
+import { getPersonaImage } from "@/utils/getPersonaImage";
 
 interface Props {
 	initialTask: Task;
@@ -23,6 +24,8 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 	const [remainingTime, setRemainingTime] = useState("");
 	const [showBottomSheet, setShowBottomSheet] = useState(false);
 	const [showTimeExpiredSheet, setShowTimeExpiredSheet] = useState(false);
+	const personaId = initialTask.persona?.id;
+	const personaImageSrc = getPersonaImage(personaId);
 
 	const nickname = useUserStore((state) => state.userData.nickname);
 	const { data: inProgressTasks = [] } = useInProgressTasks();
@@ -192,7 +195,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 						<div className="relative z-10 flex items-center gap-2">
 							<Image
-								src="/icons/immersion/study.png"
+								src={personaImageSrc}
 								alt="페르소나 이미지"
 								width={165}
 								height={165}
