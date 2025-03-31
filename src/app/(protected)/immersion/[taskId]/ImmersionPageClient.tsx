@@ -66,7 +66,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 	const handleConfirmComplete = () => {
 		completeTask(Number(initialTask.id));
-		router.push("/immersion/complete");
+		router.push(`/immersion/complete?taskId=${initialTask.id}`);
 	};
 
 	const handleReflection = () => {
