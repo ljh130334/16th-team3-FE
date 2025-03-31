@@ -7,6 +7,7 @@ import DateSelectedComponent from "@/app/(protected)/(create)/_components/dateSe
 import HeaderTitle from "@/app/(protected)/(create)/_components/headerTitle/HeaderTitle";
 import TimeSelectedComponent from "@/app/(protected)/(create)/_components/timeSelectedComponent/TimeSelectedComponent";
 import ClearableInput from "@/components/clearableInput/ClearableInput";
+import Loader from "@/components/loader/Loader";
 import { Button } from "@/components/ui/button";
 import {
 	Drawer,
@@ -16,7 +17,7 @@ import {
 	DrawerHeader,
 	DrawerTitle,
 } from "@/components/ui/drawer";
-import { api } from "@/lib/ky";
+import useInitialTime from "@/hooks/useInitialTime";
 import { fetchSingleTask } from "@/services/taskService";
 import type { TimePickerType } from "@/types/create";
 import type { TaskResponse } from "@/types/task";
@@ -33,7 +34,7 @@ import getBufferTime from "@/utils/getBufferTime";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { EditPageProps } from "../../context";
 
-const MAX_TASK_LENGTH = 15;
+const MAX_TASK_LENGTH = 16;
 const WAITING_TIME = 200;
 
 const DeadlineDateEditPage = ({ params }: EditPageProps) => {
@@ -43,18 +44,24 @@ const DeadlineDateEditPage = ({ params }: EditPageProps) => {
 	const queryClient = useQueryClient();
 	const inputRef = useRef<HTMLInputElement | null>(null);
 
+	const {
+		meridiem: meridiemString,
+		hour: hourString,
+		minute: minuteString,
+	} = useInitialTime();
+
 	const [task, setTask] = useState<string>("");
 	const [isFocused, setIsFocused] = useState<boolean>(true);
 	const [isUrgent, setIsUrgent] = useState<boolean>(false);
 	const [isUrgentDrawerOpen, setIsUrgentDrawerOpen] = useState<boolean>(false);
 	const [deadlineDate, setDeadlineDate] = useState<Date | undefined>(undefined);
 	const [deadlineTime, setDeadlineTime] = useState<TimePickerType>({
-		meridiem: "오전",
-		hour: "01",
-		minute: "00",
+		meridiem: meridiemString,
+		hour: hourString,
+		minute: minuteString,
 	});
 
-	const { data: taskData } = useQuery<TaskResponse>({
+	const { data: taskData, isFetching } = useQuery<TaskResponse>({
 		queryKey: ["singleTask", taskId],
 		queryFn: () => fetchSingleTask(taskId),
 	});
@@ -206,42 +213,49 @@ const DeadlineDateEditPage = ({ params }: EditPageProps) => {
 			setBackgroundColorOnScale
 			onOpenChange={setIsUrgentDrawerOpen}
 		>
-			<div className="flex h-screen w-full flex-col justify-between">
+			<div className="relative flex h-full w-full flex-col">
 				<div>
 					<HeaderTitle title="어떤 일의 마감이 급하신가요?" />
-					<div className="flex flex-col gap-6">
-						<div>
-							<ClearableInput
-								value={task}
-								ref={inputRef}
-								title="할 일 입력"
-								isFocused={isFocused}
-								onChange={handleTaskChange}
-								handleInputFocus={handleInputFocus}
+
+					{isFetching ? (
+						<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center">
+							<Loader />
+						</div>
+					) : (
+						<div className="flex flex-col gap-6">
+							<div>
+								<ClearableInput
+									value={task}
+									ref={inputRef}
+									title="할 일 입력"
+									isFocused={isFocused}
+									onChange={handleTaskChange}
+									handleInputFocus={handleInputFocus}
+								/>
+								{task.length > MAX_TASK_LENGTH && (
+									<p className="mt-2 text-sm text-line-error">
+										최대 16자 이내로 입력할 수 있어요.
+									</p>
+								)}
+							</div>
+
+							<DateSelectedComponent
+								deadlineDate={deadlineDate}
+								handleDateChange={handleDateChange}
 							/>
-							{task.length > MAX_TASK_LENGTH && (
-								<p className="mt-2 text-sm text-red-500">
-									최대 16자 이내로 입력할 수 있어요.
-								</p>
+
+							{deadlineDate !== undefined && (
+								<TimeSelectedComponent
+									deadlineTime={deadlineTime}
+									deadlineDate={deadlineDate}
+									handleTimeChange={handleTimeChange}
+								/>
 							)}
 						</div>
-
-						<DateSelectedComponent
-							deadlineDate={deadlineDate}
-							handleDateChange={handleDateChange}
-						/>
-
-						{deadlineDate !== undefined && (
-							<TimeSelectedComponent
-								deadlineTime={deadlineTime}
-								deadlineDate={deadlineDate}
-								handleTimeChange={handleTimeChange}
-							/>
-						)}
-					</div>
+					)}
 				</div>
 
-				<div className="pb-[46px]">
+				<div className="fixed bottom-10 w-[100%] mt-auto transition-all duration-300 pr-10">
 					<Button
 						variant="primary"
 						className="mt-6"
