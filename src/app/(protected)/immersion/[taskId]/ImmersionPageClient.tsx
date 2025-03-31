@@ -197,8 +197,8 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			{/* 하단 영역 */}
 			<div className="relative flex flex-col items-center px-5 py-3 mb-[37px] z-40">
 				<Button
-					variant="primary"
-					className="relative w-full"
+					variant={isUrgent(initialTask) ? "hologram" : "primary"}
+					className={`relative w-full ${isUrgent(initialTask) ? "l2 h-[56px] rounded-[16px] px-[18.5px] text-center text-gray-inverse" : ""}`}
 					onClick={handleComplete}
 				>
 					다했어요!
