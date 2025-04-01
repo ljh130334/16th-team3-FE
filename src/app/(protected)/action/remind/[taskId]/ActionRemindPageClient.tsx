@@ -11,6 +11,7 @@ import CountSelector from './_component/CountSelector';
 import Header from './_component/Header';
 import TaskDetails from './_component/TaskDetails';
 import TimesList from './_component/TimesList';
+import Toast from '@/components/toast/Toast';
 
 const REMINDER_LIMITS = {
   MIN: 1,
@@ -53,6 +54,7 @@ const calculateReminderTimes = (
 // 리마인더 카운트 관리 커스텀 훅
 const useReminderCount = (initialCount: number = DEFAULT_VALUES.COUNT) => {
   const [count, setCount] = useState(initialCount);
+  const [toastMessage, setToastMessage] = useState<string>('');
 
   const handleCountChange = (action: 'increase' | 'decrease') => {
     setCount((prev) => {
@@ -60,9 +62,15 @@ const useReminderCount = (initialCount: number = DEFAULT_VALUES.COUNT) => {
       if (action === 'decrease' && prev > REMINDER_LIMITS.MIN) return prev - 1;
       return prev;
     });
+    if (action === 'decrease' && count === 1) {
+      setToastMessage('최소 1회 이상 설정해주세요.');
+    }
+    if (action === 'increase' && count === REMINDER_LIMITS.MAX) {
+      setToastMessage('최대 3개까지만 설정할 수 있어요.');
+    }
   };
 
-  return { count, handleCountChange };
+  return { count, handleCountChange, toastMessage, setToastMessage };
 };
 
 function formatTimestamp(timestamp: string): string {
@@ -72,7 +80,8 @@ function formatTimestamp(timestamp: string): string {
 export default function ActionRemindPageClient({
   initialTask,
 }: ActionRemindPageClientProps) {
-  const { count, handleCountChange } = useReminderCount();
+  const { count, handleCountChange, toastMessage, setToastMessage } =
+    useReminderCount();
   const [selectedInterval, setSelectedInterval] = useState<number>(
     DEFAULT_VALUES.INTERVAL,
   );
@@ -120,6 +129,7 @@ export default function ActionRemindPageClient({
       />
       <TimesList times={reminderTimes} />
       <CompleteButton onClick={handlePatch} />
+      {toastMessage && <Toast message={toastMessage} />}
     </div>
   );
 }
