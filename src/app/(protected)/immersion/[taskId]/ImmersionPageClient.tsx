@@ -129,7 +129,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 				{isUrgent(initialTask) ? (
 					<div className="fixed left-0 right-0 top-[160px] h-[400px] z-[1]">
 						<Image
-							src="/icons/immersion/redblur.png"
+							src="/icons/immersion/redblur2.png"
 							alt="긴급 배경 효과"
 							layout="fill"
 							objectFit="cover"
@@ -138,7 +138,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 				) : (
 					<div className="fixed left-0 right-0 top-[160px] h-[400px] z-[1]">
 						<Image
-							src="/icons/immersion/defaultblur.png"
+							src="/icons/immersion/defaultblur2.png"
 							alt="기본 배경 효과"
 							layout="fill"
 							objectFit="cover"

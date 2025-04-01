@@ -186,13 +186,13 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 						</DrawerTitle>
 						<DrawerDescription className="t3 text-center text-text-strong">
 							하던 중이었어요. 이어서 몰입할까요?
-							<p
-								className={`b3 ${isExpired ? "text-red-500" : "text-text-neutral"} mt-2 text-center`}
+							<span
+								className={`b3 ${isExpired ? "text-red-500" : "text-text-neutral"} mt-2 text-center block`}
 							>
 								{isExpired
 									? "마감 시간이 지났습니다"
 									: `마감까지 ${remainingTime}`}
-							</p>
+							</span>
 						</DrawerDescription>
 					</DrawerHeader>
 					<button

@@ -6,6 +6,7 @@ import {
 } from "@/services/subtaskService";
 import type { Subtask } from "@/types/subtask";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
 
 // 서브태스크 목록 조회 훅
 export const useSubtasks = (taskId: number) => {
@@ -20,23 +21,34 @@ export const useSubtasks = (taskId: number) => {
 // 서브태스크 생성 훅
 export const useCreateSubtask = () => {
 	const queryClient = useQueryClient();
+	const pendingRequestRef = useRef<Set<string>>(new Set());
 
 	return useMutation({
-		mutationFn: ({ taskId, name }: { taskId: number; name: string }) =>
-			createSubtask(taskId, name),
-		onSuccess: (data, variables) => {
-			queryClient.setQueryData(
-				["subtasks", variables.taskId],
-				(oldData: Subtask[] | undefined) => [...(oldData || []), data],
-			);
+		mutationFn: ({ taskId, name }: { taskId: number; name: string }) => {
+			const requestKey = `${taskId}-${name}`;
+			if (pendingRequestRef.current.has(requestKey)) {
+				return Promise.resolve({ id: 0, taskId, name, isCompleted: false });
+			}
 
-			queryClient.invalidateQueries({
-				queryKey: ["subtasks", variables.taskId] as const,
-				refetchActive: true,
+			pendingRequestRef.current.add(requestKey);
+
+			return createSubtask(taskId, name).finally(() => {
+				pendingRequestRef.current.delete(requestKey);
 			});
 		},
+
+		// 요청 성공 시 캐시 업데이트
+		onSuccess: (data, variables) => {
+			if (data.id === 0) return;
+
+			// 캐시 무효화 방식으로 변경
+			queryClient.invalidateQueries({
+				queryKey: ["subtasks", variables.taskId] as const,
+			});
+		},
+
 		onError: (error) => {
-			// 오류 핸들링
+			console.error("서브태스크 생성 오류:", error);
 		},
 	});
 };

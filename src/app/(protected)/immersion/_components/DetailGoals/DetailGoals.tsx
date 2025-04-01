@@ -25,7 +25,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 	const [showLengthWarning, setShowLengthWarning] = useState(false);
 	const [editShowLengthWarning, setEditShowLengthWarning] = useState(false);
 	const [showMaxCountWarning, setShowMaxCountWarning] = useState(false);
-
+	const [editingText, setEditingText] = useState<string>("");
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const editInputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -114,18 +114,45 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 		}
 	};
 
-	// 목표 텍스트 업데이트 핸들러
 	const handleUpdateGoalTitle = (goalId: number, newTitle: string) => {
 		if (newTitle.length <= MAX_DETAIL_GOAL_LENGTH) {
-			updateSubtaskMutation({
-				id: goalId,
-				taskId,
-				name: newTitle,
-			});
+			setEditingText(newTitle);
 			setEditShowLengthWarning(false);
 		} else {
 			setEditShowLengthWarning(true);
 		}
+	};
+
+	const handleStartEditing = (goalId: number, originalText: string) => {
+		setEditingGoalId(goalId);
+		setEditingText(originalText);
+	};
+
+	const handleEditTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		const value = e.target.value;
+		setEditingText(value);
+
+		// 글자 수 제한 경고 표시
+		setEditShowLengthWarning(value.length > MAX_DETAIL_GOAL_LENGTH);
+
+		// 자동 높이 조절
+		e.target.style.height = "auto";
+		e.target.style.height = `${e.target.scrollHeight}px`;
+	};
+
+	const handleFinishEditing = () => {
+		if (
+			editingGoalId !== null &&
+			editingText.trim().length >= 1 &&
+			editingText.length <= MAX_DETAIL_GOAL_LENGTH
+		) {
+			updateSubtaskMutation({
+				id: editingGoalId,
+				taskId,
+				name: editingText,
+			});
+		}
+		setEditingGoalId(null);
 	};
 
 	// 목표 삭제 핸들러
@@ -382,7 +409,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 				<ul className="flex flex-col">
 					{sortedGoals.map((goal) => (
 						<li key={goal.id} className="flex items-start py-2">
-							<div className="mr-3 mt-1">
+							<div className="mr-3">
 								<CheckboxWithGradientBorder
 									checked={goal.isCompleted}
 									onChange={() => handleToggleComplete(goal.id)}
@@ -391,10 +418,12 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 							{editingGoalId === goal.id ? (
 								<div className="relative flex-grow pr-8">
 									<textarea
-										value={goal.name}
+										value={editingText}
 										onChange={(e) =>
-											handleTextareaInput(e, MAX_DETAIL_GOAL_LENGTH, (value) =>
-												handleUpdateGoalTitle(goal.id, value),
+											handleTextareaInput(
+												e,
+												MAX_DETAIL_GOAL_LENGTH,
+												setEditingText,
 											)
 										}
 										className={`text-b2 break-words w-full border-none bg-transparent p-0 outline-none resize-none overflow-hidden ${
@@ -413,17 +442,18 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 										ref={editInputRef}
 										aria-label="세부 목표 수정"
 										onKeyDown={(e) => {
-											if (e.key === "Enter" && goal.name.trim().length >= 1) {
+											if (e.key === "Enter" && editingText.trim().length >= 1) {
 												e.preventDefault();
-												setEditingGoalId(null);
+												handleFinishEditing();
 											}
 										}}
+										onBlur={handleFinishEditing}
 										rows={1}
 									/>
-									{goal.name && (
+									{editingText && (
 										<button
 											onClick={() => {
-												handleUpdateGoalTitle(goal.id, "");
+												setEditingText("");
 												setTimeout(() => editInputRef.current?.focus(), 0);
 											}}
 											className={deleteButtonStyles}
@@ -451,7 +481,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 										padding: 0,
 										margin: 0,
 									}}
-									onClick={() => setEditingGoalId(goal.id)}
+									onClick={() => handleStartEditing(goal.id, goal.name)}
 									aria-label={`${goal.name} 편집하기`}
 								>
 									{formatGoalText(goal.name)}
@@ -465,7 +495,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 			{isAddingGoal && (
 				<div>
 					<div className="flex items-start py-2">
-						<div className="mr-3 mt-1">
+						<div className="mr-3 mt-[1px]">
 							<GradientCheckbox />
 						</div>
 						<div className="relative flex-grow pr-8">
