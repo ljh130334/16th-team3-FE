@@ -15,7 +15,7 @@ import {
 import type { Task } from "@/types/task";
 import { parseDateAndTime } from "@/utils/dateFormat";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useState, useEffect, useMemo, Suspense } from "react";
 
 import Loader from "@/components/loader/Loader";
@@ -24,11 +24,12 @@ import Link from "next/link";
 import CharacterDialog from "../(create)/_components/characterDialog/CharacterDialog";
 
 const HomePageContent = () => {
-	// 홈 API를 통해 모든 데이터 한번에 가져오기
+	const pathname = usePathname();
 	const {
 		data: homeData,
 		isLoading: isLoadingHome,
 		error: homeError,
+		isPending,
 	} = useHomeData();
 
 	const isUserProfileLoading = useAuthStore(
@@ -156,8 +157,6 @@ const HomePageContent = () => {
 		});
 	}, [allTasks]);
 
-	const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
-
 	// StartTask 뮤테이션 훅
 	const { mutate: startTaskMutation } = useStartTask();
 	const { mutate: deleteTaskMutation } = useDeleteTask();
@@ -176,6 +175,7 @@ const HomePageContent = () => {
 	const [expiredTask, setExpiredTask] = useState<Task | null>(null);
 	const [isReentry, setIsReentry] = useState(false);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
 
 	const searchParams = useSearchParams();
 	const [taskName, setTaskName] = useState("");
@@ -184,38 +184,6 @@ const HomePageContent = () => {
 	const [urgentTaskId, setUrgentTaskId] = useState<number | undefined>(
 		undefined,
 	);
-
-	// 다른 페이지에서 돌아올 때 재진입으로 간주
-	useEffect(() => {
-		const handleRouteChange = (url: string) => {
-			if (url === "/" || url === "/home") {
-				setIsReentry(true);
-				setTimeout(() => {
-					setIsReentry(false);
-				}, 1000);
-			}
-		};
-		window.addEventListener("popstate", () =>
-			handleRouteChange(window.location.pathname),
-		);
-
-		return () => {
-			window.removeEventListener("popstate", () =>
-				handleRouteChange(window.location.pathname),
-			);
-		};
-	}, []);
-
-	// 세션 스토리지를 사용해 더 확실한 재진입 감지
-	useEffect(() => {
-		const isFirstVisit = sessionStorage.getItem("visited");
-		if (isFirstVisit) {
-			setIsReentry(true);
-		} else {
-			sessionStorage.setItem("visited", "true");
-			setIsReentry(false);
-		}
-	}, []);
 
 	// TODO: 회고 페이지로 이동
 	const handleGoToReflection = (taskId: number) => {
@@ -248,24 +216,6 @@ const HomePageContent = () => {
 		}
 		return [];
 	}, [allTasks, isLoadingHome]);
-
-	// 앱 재진입과 만료된 작업 확인 연결
-	useEffect(() => {
-		// 재진입 상태이고, 만료된 작업이 있을 때 바텀시트 표시
-		if (isReentry && expiredTasks.length > 0) {
-			setExpiredTask(expiredTasks[0]);
-			setShowExpiredTaskSheet(true);
-		}
-	}, [isReentry, expiredTasks]);
-
-	// 앱 진입 시 마감 지난 태스크 확인
-	useEffect(() => {
-		// 마감 지난 태스크가 있으면 첫 번째 태스크로 바텀시트 표시
-		if (expiredTasks.length > 0) {
-			setExpiredTask(expiredTasks[0]);
-			setShowExpiredTaskSheet(true);
-		}
-	}, [expiredTasks]);
 
 	// 이벤트 핸들러 함수
 	const handleCloseExpiredSheet = () => {
@@ -312,20 +262,10 @@ const HomePageContent = () => {
 	const handleCharacterDialogButtonClick = () => {
 		if (taskType === "instant") {
 			router.push(`/immersion/${urgentTaskId}`);
-		}
-
-		setIsDialogOpen(false);
-	};
-
-	// 툴팁 표시 관련 로직
-	useEffect(() => {
-		const hasVisited = localStorage.getItem("hasVisitedBefore");
-		if (hasVisited) {
-			setShowTooltip(false);
 		} else {
-			localStorage.setItem("hasVisitedBefore", "true");
+			setIsDialogOpen(false);
 		}
-	}, []);
+	};
 
 	// 진행 중인 작업 계속하기
 	const handleContinueTask = (taskId: number) => {
@@ -401,8 +341,86 @@ const HomePageContent = () => {
 		}
 	}, [searchParams]);
 
+	useEffect(() => {
+		const handleVisibilityChange = () => {
+			if (document.visibilityState === "visible" && pathname === "/") {
+				// 앱이 포그라운드로 돌아오고 현재 경로가 홈일 때 실행할 로직
+				setIsReentry(true);
+			}
+		};
+
+		document.addEventListener("visibilitychange", handleVisibilityChange);
+		return () => {
+			document.removeEventListener("visibilitychange", handleVisibilityChange);
+			setIsReentry(false);
+		};
+	}, [pathname]);
+
+	// 툴팁 표시 관련 로직
+	useEffect(() => {
+		const hasVisited = localStorage.getItem("hasVisitedBefore");
+		if (hasVisited) {
+			setShowTooltip(false);
+		} else {
+			localStorage.setItem("hasVisitedBefore", "true");
+		}
+	}, []);
+
+	// 앱 재진입과 만료된 작업 확인 연결
+	// useEffect(() => {
+	// 	// 재진입 상태이고, 만료된 작업이 있을 때 바텀시트 표시
+	// 	if (isReentry && expiredTasks.length > 0) {
+	// 		setExpiredTask(expiredTasks[0]);
+	// 		setShowExpiredTaskSheet(true);
+	// 	}
+	// }, [isReentry, expiredTasks]);
+
+	// 앱 진입 시 마감 지난 태스크 확인
+	// ! 위의 코드와 중복됨
+	// useEffect(() => {
+	// 	// 마감 지난 태스크가 있으면 첫 번째 태스크로 바텀시트 표시
+	// 	if (expiredTasks.length > 0) {
+	// 		setExpiredTask(expiredTasks[0]);
+	// 		setShowExpiredTaskSheet(true);
+	// 	}
+	// }, [expiredTasks]);
+
+	// ! 이 로직도 필요한지 검토 필요
+	// 다른 페이지에서 돌아올 때 재진입으로 간주
+	// useEffect(() => {
+	// 	const handleRouteChange = (url: string) => {
+	// 		if (url === "/" || url === "/home") {
+	// 			setIsReentry(true);
+	// 			setTimeout(() => {
+	// 				setIsReentry(false);
+	// 			}, 1000);
+	// 		}
+	// 	};
+	// 	window.addEventListener("popstate", () =>
+	// 		handleRouteChange(window.location.pathname),
+	// 	);
+
+	// 	return () => {
+	// 		window.removeEventListener("popstate", () =>
+	// 			handleRouteChange(window.location.pathname),
+	// 		);
+	// 	};
+	// }, []);
+
+	// ! 이 로직도 필요한지 검토 필요
+	// 세션 스토리지를 사용해 더 확실한 재진입 감지
+	useEffect(() => {
+		const isFirstVisit = sessionStorage.getItem("visited");
+		if (isFirstVisit) {
+			setIsReentry(true);
+		} else {
+			sessionStorage.setItem("visited", "true");
+			setIsReentry(false);
+		}
+	}, []);
+
 	// 로딩 상태 처리
-	if (isLoadingHome || isUserProfileLoading) {
+	if (isUserProfileLoading || isPending) {
 		return (
 			<div className="flex min-h-screen flex-col items-center justify-center bg-background-primary">
 				<Loader />
@@ -551,7 +569,6 @@ const HomePageContent = () => {
 										<InProgressTaskItem
 											key={task.id}
 											task={task}
-											onContinue={handleContinueTask}
 											isReentry={isReentry}
 											onShowDetails={() => handleDetailTask(task)}
 										/>
@@ -663,7 +680,6 @@ const HomePageContent = () => {
 										<InProgressTaskItem
 											key={task.id}
 											task={task}
-											onContinue={handleContinueTask}
 											isReentry={isReentry}
 											onShowDetails={() => handleDetailTask(task)}
 										/>
@@ -1098,8 +1114,6 @@ const HomePageContent = () => {
 					onStart={handleStartTask}
 				/>
 			)}
-
-			{/* TODO(prgmr99): 모달 띄워지는 애니메이션 확인 필요 */}
 
 			<CharacterDialog
 				isOpen={isDialogOpen}
