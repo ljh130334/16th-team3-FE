@@ -125,88 +125,87 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 			{/* 스크롤 영역이 될 중간 부분 */}
 			<div className="flex-1 overflow-y-auto">
-				{/* 배경 블러 효과들 */}
-				{isUrgent(initialTask) ? (
-					<div className="fixed left-0 right-0 top-[160px] h-[400px] z-[1]">
-						<Image
-							src="/icons/immersion/redblur2.png"
-							alt="긴급 배경 효과"
-							layout="fill"
-							objectFit="cover"
-						/>
-					</div>
-				) : (
-					<div className="fixed left-0 right-0 top-[160px] h-[400px] z-[1]">
-						<Image
-							src="/icons/immersion/defaultblur2.png"
-							alt="기본 배경 효과"
-							layout="fill"
-							objectFit="cover"
-						/>
-					</div>
-				)}
-
 				<div className="relative z-10">
-					<div className="mt-5 flex flex-col items-center justify-center">
-						<div className="text-s2">{initialTask.name} 마감까지</div>
-						<div
-							className={`whitespace-pre-line text-center ${isUrgent(initialTask) ? "text-h2" : "text-h3"} ${!isUrgent(initialTask) ? "bg-hologram bg-clip-text text-transparent" : ""}`}
-							style={
-								isUrgent(initialTask)
-									? {
-											background:
-												"var(--Error, linear-gradient(180deg, var(--Red-400, #DD6875) 0%, var(--Red-200, #ED98A2) 100%))",
-											backgroundClip: "text",
-											WebkitBackgroundClip: "text",
-											WebkitTextFillColor: "transparent",
-										}
-									: {}
-							}
-						>
-							{remainingTime}
+					<div className="relative">
+						<div className="absolute inset-0 top-5 h-[400px]">
+							<Image
+								src={
+									isUrgent(initialTask)
+										? "/icons/immersion/redblur2.png"
+										: "/icons/immersion/defaultblur2.png"
+								}
+								alt={
+									isUrgent(initialTask) ? "긴급 배경 효과" : "기본 배경 효과"
+								}
+								layout="fill"
+								objectFit="cover"
+							/>
 						</div>
-					</div>
 
-					<div className="relative mt-4 flex flex-col items-center justify-center gap-4">
-						<div className="z-20">
+						{/* 시간 정보 */}
+						<div className="relative z-10 mt-5 flex flex-col items-center justify-center">
+							<div className="text-s2">{initialTask.name} 마감까지</div>
 							<div
-								className="s3 flex items-center justify-center whitespace-nowrap rounded-[999px] px-[14px] py-[10px] text-[#BDBDF5]"
-								style={{
-									background:
-										"var(--Elevated-PointPriamry, rgba(107, 107, 225, 0.20))",
-									backdropFilter: "blur(30px)",
-								}}
+								className={`whitespace-pre-line text-center ${isUrgent(initialTask) ? "text-h2" : "text-h3"} ${!isUrgent(initialTask) ? "bg-hologram bg-clip-text text-transparent" : ""}`}
+								style={
+									isUrgent(initialTask)
+										? {
+												background:
+													"var(--Error, linear-gradient(180deg, var(--Red-400, #DD6875) 0%, var(--Red-200, #ED98A2) 100%))",
+												backgroundClip: "text",
+												WebkitBackgroundClip: "text",
+												WebkitTextFillColor: "transparent",
+											}
+										: {}
+								}
 							>
-								<Image
-									src="/icons/onboarding/clap.svg"
-									alt="박수"
-									width={16}
-									height={15}
-									className="mr-1"
-									priority
-								/>
-								<span>
-									{isUrgent(initialTask)
-										? "마지막 1시간! 스퍼트 올려서 눈물 닦고 끝까지!"
-										: "한 줄만 써봐요! 표지만 완성은 안 돼요!"}
-								</span>
+								{remainingTime}
 							</div>
 						</div>
 
-						<div className="relative z-10 flex items-center gap-2">
-							<Image
-								src={personaImageSrc}
-								alt="페르소나 이미지"
-								width={165}
-								height={165}
-								className="floating-character"
-							/>
+						{/* 캐릭터 및 배지 영역 */}
+						<div className="relative mt-4 flex flex-col items-center justify-center gap-4">
+							<div className="z-20">
+								<div
+									className="s3 flex items-center justify-center whitespace-nowrap rounded-[999px] px-[14px] py-[10px] text-[#BDBDF5]"
+									style={{
+										background:
+											"var(--Elevated-PointPriamry, rgba(107, 107, 225, 0.20))",
+										backdropFilter: "blur(30px)",
+									}}
+								>
+									<Image
+										src="/icons/onboarding/clap.svg"
+										alt="박수"
+										width={16}
+										height={15}
+										className="mr-1"
+										priority
+									/>
+									<span>
+										{isUrgent(initialTask)
+											? "마지막 1시간! 스퍼트 올려서 눈물 닦고 끝까지!"
+											: "한 줄만 써봐요! 표지만 완성은 안 돼요!"}
+									</span>
+								</div>
+							</div>
+
+							<div className="relative z-10 flex items-center gap-2">
+								<Image
+									src={personaImageSrc}
+									alt="페르소나 이미지"
+									width={165}
+									height={165}
+									className="floating-character"
+								/>
+							</div>
+							<Badge>
+								{initialTask.persona?.name} {nickname}
+							</Badge>
 						</div>
-						<Badge>
-							{initialTask.persona?.name} {nickname}
-						</Badge>
 					</div>
 
+					{/* 디테일 목표 영역 */}
 					<div className="px-5 mt-8 w-full max-w-lg mx-auto relative z-30">
 						<DetailGoals taskId={initialTask.id} />
 					</div>
@@ -309,11 +308,11 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 					100% {
 						transform: translateY(8px);
 					}
-					}
+				}
 
-					.floating-character {
+				.floating-character {
 					animation: floating 3s ease-in-out infinite;
-					}
+				}
 			`}</style>
 		</div>
 	);
