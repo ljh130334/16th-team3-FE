@@ -11,7 +11,7 @@ export default function CompleteContent() {
 
 	const handleReflection = () => {
 		if (taskId) {
-			router.push(`/reflection?taskId=${taskId}`);
+			router.push(`/retrospection/${taskId}`);
 		} else {
 			router.push("/reflection");
 		}

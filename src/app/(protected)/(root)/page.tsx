@@ -220,7 +220,7 @@ const HomePageContent = () => {
 
 	// TODO: 회고 페이지로 이동
 	const handleGoToReflection = (taskId: number) => {
-		router.push(`/reflection?taskId=${taskId}`);
+		router.push(`/retrospection/${taskId}`);
 		setShowExpiredTaskSheet(false);
 	};
 

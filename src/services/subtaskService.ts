@@ -18,10 +18,10 @@ const fetchWithError = async <T>(
 	return response.json();
 };
 
-// 서브태스크 목록 조회
+// 서브태스크 목록 조회 (새로운 API 주소 적용)
 export const fetchSubtasks = async (taskId: number): Promise<Subtask[]> => {
 	try {
-		return await fetchWithError<Subtask[]>(`/api/subtasks?taskId=${taskId}`);
+		return await fetchWithError<Subtask[]>(`/api/tasks/${taskId}/subtasks`);
 	} catch (error) {
 		console.error("서브태스크 조회 오류:", error);
 		return [];
@@ -44,7 +44,7 @@ export const createSubtask = async (
 		}),
 	};
 
-	return fetchWithError<Subtask>("/api/subtasks", options);
+	return fetchWithError<Subtask>(`/api/subtasks`, options);
 };
 
 // 서브태스크 수정
