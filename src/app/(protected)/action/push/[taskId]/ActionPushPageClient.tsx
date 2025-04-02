@@ -34,7 +34,7 @@ const SCREEN_CONTENT = {
     subMessage: '작업을 더 미루기 전에 얼른 시작해보세요!',
   },
   [PushScreenState.FINAL_WARNING]: {
-    icon: '/dynamite.svg',
+    icon: '/icons/push/Bomb.svg',
     message: '이제 마지막 기회에요',
     subMessage: '더 이상 미룰 수 없어요 당장 시작하세요!',
   },
@@ -90,6 +90,8 @@ export default function ActionPushPageClient({
           onTakePicture={handleTakePicture}
         />
       </div>
+      <div className="absolute bottom-0 left-1/2 aspect-[424/647] h-[250px] w-full max-w-md -translate-x-1/2 bg-red-500/15 mix-blend-color-dodge blur-[62px]"></div>
+      <div className="relative flex flex-col gap-4 px-5"></div>
 
       {screenState !== PushScreenState.FINAL_WARNING && (
         <button
