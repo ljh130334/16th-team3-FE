@@ -65,7 +65,7 @@ export default function RetrospectionPageClient({ task }: Props) {
             <button 
                 className="absolute left-0"
                 onClick={() => setOpenLeaveModal(true)}
-            > {/* TODO: 뒤로가기가 아니라 모달이 떠야함. (여기서부터) */}
+            >
                 <Image
                 src="/icons/home/arrow-left.svg"
                 alt="Back"
