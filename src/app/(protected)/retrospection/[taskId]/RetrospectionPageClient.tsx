@@ -11,6 +11,7 @@ import RetrospectCommentContent from "./_components/RetrospectCommentContent";
 import RetrospectResultContent from "./_components/RetrospectResultContent";
 import Modal from "@/components/modal/Modal";
 import RetrospectLeaveModalContent from "./_components/RetrospectLeaveModalContent";
+import { createRetrospect } from "@/services/taskService";
 
 type Props = {
     task: TaskResponse;
@@ -34,6 +35,12 @@ export default function RetrospectionPageClient({ task }: Props) {
 
     const hasRequiredContent = hasSelectedResult()
         && retrospectContent.focus !== undefined;
+
+    const handleComplete = async () => {
+        await createRetrospect(task.id, retrospectContent)
+        router.push("/retrospection/complete");
+    }
+
 
 
     const retrospectItems : RetrospectItems = {
@@ -127,7 +134,7 @@ export default function RetrospectionPageClient({ task }: Props) {
                     <Button
                         variant="primary"
                         className="my-3"
-                        onClick={() => {router.push("/retrospection/complete")}}
+                        onClick={handleComplete}
                         disabled={!hasRequiredContent}
                     >
                         확인
