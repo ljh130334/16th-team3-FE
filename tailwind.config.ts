@@ -9,6 +9,9 @@ export default {
 	],
 	theme: {
 		extend: {
+			height: {
+				20: "5rem",
+			},
 			fontFamily: {
 				pretendard: ["var(--font-pretendard)"],
 			},
@@ -104,6 +107,7 @@ export default {
 				background: {
 					primary: "#0F1114",
 					purple: "rgba(65, 65, 137, 0.4)",
+					skyblue: "#D7E1EF",
 				},
 
 				elevated: {

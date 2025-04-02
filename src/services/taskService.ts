@@ -230,3 +230,19 @@ export const fetchSingleTask = async (taskId: string) => {
 	}
 	return response.json();
 };
+
+// 회고 생성
+export const createRetrospect = async (taskId: number, retrospection: RetrospectContent): Promise<void> => {
+	const options = {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(retrospection),
+	};
+
+	const data = await fetchWithError(
+		`/api/tasks/${taskId}/retrospectives`,
+		options,
+	);
+};
