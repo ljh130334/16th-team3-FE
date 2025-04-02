@@ -1,14 +1,23 @@
 "use client";
 
-import BackHeader from "@/components/backHeader/BackHeader";
 import useMount from "@/hooks/useMount";
 import type { InstantTaskType, TimePickerType } from "@/types/create";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFunnelSteps, useFunnel } from "@use-funnel/browser";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import InstantTaskTypeInput from "../_components/instantTaskTypeInput/InstantTaskTypeInput";
-import TaskInput from "../_components/taskInput/TaskInput";
 import type { InstantTaskInputType, TaskInputType } from "../context";
+
+const BackHeader = dynamic(() => import("@/components/backHeader/BackHeader"));
+const TaskInput = dynamic(
+	() => import("@/app/(protected)/(create)/_components/taskInput/TaskInput"),
+);
+const InstantTaskTypeInput = dynamic(
+	() =>
+		import(
+			"@/app/(protected)/(create)/_components/instantTaskTypeInput/InstantTaskTypeInput"
+		),
+);
 
 type FormState = {
 	task?: string;
@@ -61,10 +70,10 @@ const InstantTaskCreate = () => {
 		},
 		onSuccess: (response) => {
 			if (response.success) {
-				const { personaName, taskMode, taskType } = response;
+				const { personaName, taskId } = response;
 				queryClient.invalidateQueries({ queryKey: ["tasks", "home"] });
 				router.push(
-					`/?dialog=success&task=${funnel.context.task}&personaName=${personaName}&taskMode=${taskMode}&taskType=${taskType}`,
+					`/?dialog=success&task=${funnel.context.task}&personaName=${personaName}&type=instant&taskId=${taskId}`,
 				);
 			}
 		},
@@ -86,7 +95,11 @@ const InstantTaskCreate = () => {
 				deadlineTime: funnel.context.deadlineTime,
 			});
 		} else {
-			router.push("/");
+			if (confirm("홈 화면으로 돌아가시겠습니까?")) {
+				router.push("/");
+			} else {
+				return;
+			}
 		}
 	};
 

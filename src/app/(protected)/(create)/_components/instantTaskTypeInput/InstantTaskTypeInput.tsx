@@ -53,12 +53,6 @@ const InstantTaskTypeInput = ({
 		moodType: moodType || "",
 	});
 
-	const handleClick = () => {
-		if (!taskType || !moodType || !isIdle) return;
-
-		onClick(convertedData);
-	};
-
 	return (
 		<div className="relative flex h-full w-full flex-col justify-between">
 			<div>
@@ -74,7 +68,7 @@ const InstantTaskTypeInput = ({
 					</div>
 					<span className="text-strong t2 mt-1">정말 마지막단계에요!</span>
 					<div className="flex flex-col">
-						<span className="b2 text-neutral">몰입을 도울</span>
+						<span className="b2 text-neutral">즉시, 몰입을 도울</span>
 						<span className="b2 text-neutral">
 							캐릭터와 플레이리스트를 만들어 드릴게요.
 						</span>
@@ -120,8 +114,8 @@ const InstantTaskTypeInput = ({
 				<Button
 					variant="primary"
 					className="w-full"
-					// disabled={!taskType || !moodType || !isIdle}
-					onClick={handleClick}
+					disabled={!taskType || !moodType || !isIdle}
+					onClick={() => onClick(convertedData)}
 				>
 					{isIdle ? "확인" : <Loader width={24} height={24} />}
 				</Button>

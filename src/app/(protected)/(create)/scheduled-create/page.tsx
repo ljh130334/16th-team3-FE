@@ -1,15 +1,10 @@
 "use client";
 
-import BackHeader from "@/components/backHeader/BackHeader";
 import useMount from "@/hooks/useMount";
 import type { ScheduledTaskType, TimePickerType } from "@/types/create";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFunnelSteps, useFunnel } from "@use-funnel/browser";
-import BufferTime from "../_components/bufferTime/BufferTime";
-import EstimatedTimeInput from "../_components/estimatedTimeInput/EstimatedTimeInput";
-import SmallActionInput from "../_components/smallActionInput/SmallActionInput";
-import TaskInput from "../_components/taskInput/TaskInput";
-import TaskTypeInput from "../_components/taskTypeInput/TaskTypeInput";
+
 import type {
 	BufferTimeType,
 	EstimatedTimeInputType,
@@ -18,7 +13,23 @@ import type {
 	TaskTypeInputType,
 } from "../context";
 
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+
+const BackHeader = dynamic(() => import("@/components/backHeader/BackHeader"));
+const BufferTime = dynamic(
+	() => import("../_components/bufferTime/BufferTime"),
+);
+const EstimatedTimeInput = dynamic(
+	() => import("../_components/estimatedTimeInput/EstimatedTimeInput"),
+);
+const SmallActionInput = dynamic(
+	() => import("../_components/smallActionInput/SmallActionInput"),
+);
+const TaskInput = dynamic(() => import("../_components/taskInput/TaskInput"));
+const TaskTypeInput = dynamic(
+	() => import("../_components/taskTypeInput/TaskTypeInput"),
+);
 
 type FormState = {
 	task?: string;
@@ -95,12 +106,10 @@ const ScheduledTaskCreate = () => {
 		onSuccess: (response) => {
 			if (response.success) {
 				const personaName = response.personaName;
-				const taskMode = response.taskMode;
-				const taskType = response.taskType;
 
 				queryClient.invalidateQueries({ queryKey: ["tasks", "home"] });
 				router.push(
-					`/?dialog=success&task=${funnel.context.task}&personaName=${personaName}&taskMode=${taskMode}&taskType=${taskType}`,
+					`/?dialog=success&task=${funnel.context.task}&personaName=${personaName}&type=scheduled`,
 				);
 			}
 		},
@@ -110,30 +119,7 @@ const ScheduledTaskCreate = () => {
 	});
 
 	const handleHistoryBack = () => {
-		if (funnel.step === "smallActionInput") {
-			funnel.history.push("taskForm", {
-				task: funnel.context.task,
-				deadlineDate: funnel.context.deadlineDate,
-				deadlineTime: funnel.context.deadlineTime,
-			});
-		} else if (funnel.step === "estimatedTimeInput") {
-			funnel.history.push("smallActionInput", {
-				task: funnel.context.task,
-				deadlineDate: funnel.context.deadlineDate,
-				deadlineTime: funnel.context.deadlineTime,
-				smallAction: funnel.context.smallAction,
-			});
-		} else if (funnel.step === "bufferTime") {
-			funnel.history.push("estimatedTimeInput", {
-				task: funnel.context.task,
-				deadlineDate: funnel.context.deadlineDate,
-				deadlineTime: funnel.context.deadlineTime,
-				smallAction: funnel.context.smallAction,
-				estimatedHour: funnel.context.estimatedHour,
-				estimatedMinute: funnel.context.estimatedMinute,
-				estimatedDay: funnel.context.estimatedDay,
-			});
-		} else if (funnel.step === "taskTypeInput") {
+		if (lastStep === "bufferTime") {
 			funnel.history.push("bufferTime", {
 				task: funnel.context.task,
 				deadlineDate: funnel.context.deadlineDate,
@@ -144,7 +130,46 @@ const ScheduledTaskCreate = () => {
 				estimatedDay: funnel.context.estimatedDay,
 			} as BufferTimeType);
 		} else {
-			router.push("/");
+			if (funnel.step === "smallActionInput") {
+				funnel.history.push("taskForm", {
+					task: funnel.context.task,
+					deadlineDate: funnel.context.deadlineDate,
+					deadlineTime: funnel.context.deadlineTime,
+				});
+			} else if (funnel.step === "estimatedTimeInput") {
+				funnel.history.push("smallActionInput", {
+					task: funnel.context.task,
+					deadlineDate: funnel.context.deadlineDate,
+					deadlineTime: funnel.context.deadlineTime,
+					smallAction: funnel.context.smallAction,
+				});
+			} else if (funnel.step === "bufferTime") {
+				funnel.history.push("estimatedTimeInput", {
+					task: funnel.context.task,
+					deadlineDate: funnel.context.deadlineDate,
+					deadlineTime: funnel.context.deadlineTime,
+					smallAction: funnel.context.smallAction,
+					estimatedHour: funnel.context.estimatedHour,
+					estimatedMinute: funnel.context.estimatedMinute,
+					estimatedDay: funnel.context.estimatedDay,
+				});
+			} else if (funnel.step === "taskTypeInput") {
+				funnel.history.push("bufferTime", {
+					task: funnel.context.task,
+					deadlineDate: funnel.context.deadlineDate,
+					deadlineTime: funnel.context.deadlineTime,
+					smallAction: funnel.context.smallAction,
+					estimatedHour: funnel.context.estimatedHour,
+					estimatedMinute: funnel.context.estimatedMinute,
+					estimatedDay: funnel.context.estimatedDay,
+				} as BufferTimeType);
+			} else if (funnel.step === "taskForm") {
+				if (confirm("홈 화면으로 돌아가시겠습니까?")) {
+					router.push("/");
+				} else {
+					return;
+				}
+			}
 		}
 	};
 
