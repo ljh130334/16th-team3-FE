@@ -21,14 +21,9 @@ const fetchWithError = async <T>(
 // 서브태스크 목록 조회
 export const fetchSubtasks = async (taskId: number): Promise<Subtask[]> => {
 	try {
-		// API 명세서에서 이 형식을 사용하고 있다면 유지
-		const data = await fetchWithError<Subtask[]>(
-			`/api/tasks/${taskId}/subtasks`,
-		);
-		return data;
+		return await fetchWithError<Subtask[]>(`/api/subtasks?taskId=${taskId}`);
 	} catch (error) {
 		console.error("서브태스크 조회 오류:", error);
-		console.error("오류 상세:", error instanceof Error ? error.message : error);
 		return [];
 	}
 };
@@ -49,8 +44,7 @@ export const createSubtask = async (
 		}),
 	};
 
-	// 이미지에서 볼 수 있듯이 /v1/subtasks 사용
-	return fetchWithError<Subtask>("/v1/subtasks", options);
+	return fetchWithError<Subtask>("/api/subtasks", options);
 };
 
 // 서브태스크 수정
@@ -59,15 +53,14 @@ export const updateSubtask = async (
 	data: { name?: string; isCompleted?: boolean },
 ): Promise<Subtask> => {
 	const options = {
-		method: "PUT",
+		method: "PATCH",
 		headers: {
 			"Content-Type": "application/json",
 		},
 		body: JSON.stringify(data),
 	};
 
-	// v1 경로 사용
-	return fetchWithError<Subtask>(`/v1/subtasks/${id}`, options);
+	return fetchWithError<Subtask>(`/api/subtasks/${id}`, options);
 };
 
 // 서브태스크 삭제
@@ -79,6 +72,5 @@ export const deleteSubtask = async (id: number): Promise<void> => {
 		},
 	};
 
-	// v1 경로 사용
-	await fetchWithError(`/v1/subtasks/${id}`, options);
+	await fetchWithError(`/api/subtasks/${id}`, options);
 };
