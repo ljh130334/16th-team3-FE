@@ -33,7 +33,7 @@ const TimePicker = ({
 	};
 
 	return (
-		<div className="background-primary flex h-[180px] justify-center gap-6">
+		<div className="background-primary flex h-[200px] justify-center gap-6">
 			<div className="h-[180px] w-[100px]">
 				<Wheel
 					initIdx={meridiemInitIdx}

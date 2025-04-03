@@ -43,7 +43,7 @@
 	width: 100%;
 	position: relative;
 	margin-top: -2px;
-	/* z-index: 5; */
+	z-index: 5;
 }
 
 .wheel__shadow-bottom {
