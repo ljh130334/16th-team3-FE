@@ -51,8 +51,11 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 
 	// 글자수 경고 메시지 표시 관리
 	useEffect(() => {
-		setShowLengthWarning(newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH);
-	}, [newGoalTitle]);
+		setShowLengthWarning(
+			newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH ||
+				editingText.length > MAX_DETAIL_GOAL_LENGTH,
+		);
+	}, [newGoalTitle, editingText]);
 
 	// 최대 개수 토스트 자동 닫기
 	useEffect(() => {
@@ -97,12 +100,6 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 		}
 	};
 
-	// 텍스트 지우기 핸들러
-	const handleClearText = () => {
-		setNewGoalTitle("");
-		setTimeout(() => inputRef.current?.focus(), 0);
-	};
-
 	// 완료 상태 토글 핸들러
 	const handleToggleComplete = (goalId: number) => {
 		const goal = subtasks.find((subtask) => subtask.id === goalId);
@@ -115,30 +112,9 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 		}
 	};
 
-	const handleUpdateGoalTitle = (goalId: number, newTitle: string) => {
-		if (newTitle.length <= MAX_DETAIL_GOAL_LENGTH) {
-			setEditingText(newTitle);
-			setEditShowLengthWarning(false);
-		} else {
-			setEditShowLengthWarning(true);
-		}
-	};
-
 	const handleStartEditing = (goalId: number, originalText: string) => {
 		setEditingGoalId(goalId);
 		setEditingText(originalText);
-	};
-
-	const handleEditTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		const value = e.target.value;
-		setEditingText(value);
-
-		// 글자 수 제한 경고 표시
-		setEditShowLengthWarning(value.length > MAX_DETAIL_GOAL_LENGTH);
-
-		// 자동 높이 조절
-		e.target.style.height = "auto";
-		e.target.style.height = `${e.target.scrollHeight}px`;
 	};
 
 	const handleFinishEditing = () => {
@@ -152,8 +128,8 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 				taskId,
 				name: editingText,
 			});
+			setEditingGoalId(null);
 		}
-		setEditingGoalId(null);
 	};
 
 	// 목표 삭제 핸들러
@@ -197,6 +173,10 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 	const sortedGoals = [...subtasks].sort((a, b) =>
 		a.isCompleted === b.isCompleted ? 0 : a.isCompleted ? 1 : -1,
 	);
+
+	// 삭제 버튼 공통 스타일
+	const deleteButtonStyles =
+		"absolute right-0 top-1/2 transform -translate-y-1/2";
 
 	// 체크박스 컴포넌트들
 	const GradientCheckbox = () => (
@@ -335,10 +315,6 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 		</div>
 	);
 
-	// 삭제 버튼 공통 스타일
-	const deleteButtonStyles =
-		"absolute right-0 top-1/2 transform -translate-y-1/2";
-
 	if (isLoading) {
 		return (
 			<div
@@ -353,7 +329,6 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 			</div>
 		);
 	}
-
 	return (
 		<div
 			className="w-full p-4"
@@ -399,61 +374,71 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 								/>
 							</div>
 							{editingGoalId === goal.id ? (
-								<div className="relative flex-grow pr-8">
-									<textarea
-										value={editingText}
-										onChange={(e) =>
-											handleTextareaInput(
-												e,
-												MAX_DETAIL_GOAL_LENGTH,
-												setEditingText,
-											)
-										}
-										className={`text-b2 break-words w-full border-none bg-transparent p-0 outline-none resize-none overflow-hidden ${
-											goal.isCompleted
-												? "text-gray-neutral"
-												: "text-gray-normal"
-										}`}
-										style={{
-											wordBreak: "break-word",
-											display: "block",
-											caretColor: "#5D6470",
-											height: "auto",
-											minHeight: "1.5rem",
-										}}
-										enterKeyHint="done"
-										ref={editInputRef}
-										aria-label="세부 목표 수정"
-										onKeyDown={(e) => {
-											if (e.key === "Enter" && editingText.trim().length >= 1) {
-												e.preventDefault();
-												handleFinishEditing();
+								<div className="relative flex-grow">
+									<div className="relative w-full flex items-center">
+										<textarea
+											value={editingText}
+											onChange={(e) =>
+												handleTextareaInput(
+													e,
+													MAX_DETAIL_GOAL_LENGTH,
+													setEditingText,
+												)
 											}
-										}}
-										rows={1}
-									/>
-									{editingText && (
-										<button
-											onMouseDown={(e) => {
-												e.preventDefault();
-												e.stopPropagation();
-												setEditingText("");
-												if (editInputRef.current) {
-													editInputRef.current.focus();
-												}
+											className={`text-b2 flex-grow break-words border-none bg-transparent p-0 outline-none resize-none overflow-hidden mr-3 ${
+												goal.isCompleted
+													? "text-gray-neutral"
+													: "text-gray-normal"
+											}`}
+											style={{
+												wordBreak: "break-word",
+												display: "block",
+												caretColor: "#5D6470",
+												height: "auto",
+												minHeight: "1.5rem",
 											}}
-											className={deleteButtonStyles}
-											type="button"
-											aria-label="텍스트 지우기"
-										>
-											<Image
-												src="/icons/x-circle.svg"
-												alt="제거"
-												width={24}
-												height={24}
-											/>
-										</button>
-									)}
+											enterKeyHint="done"
+											ref={editInputRef}
+											aria-label="세부 목표 수정"
+											rows={1}
+										/>
+										{editingText && (
+											<>
+												<button
+													onClick={handleFinishEditing}
+													disabled={
+														editingText.trim().length === 0 ||
+														editingText.length > MAX_DETAIL_GOAL_LENGTH
+													}
+													className={`text-s2 mr-3 ${editingText.trim().length === 0 || editingText.length > MAX_DETAIL_GOAL_LENGTH ? "text-[#8484E6]" : "text-[#8484E6]"}`}
+													type="button"
+													aria-label="세부 목표 수정 완료"
+												>
+													완료
+												</button>
+												<button
+													onMouseDown={(e) => {
+														e.preventDefault();
+														e.stopPropagation();
+														setEditingText("");
+														if (editInputRef.current) {
+															editInputRef.current.focus();
+														}
+													}}
+													className=""
+													type="button"
+													aria-label="텍스트 지우기"
+												>
+													<Image
+														src="/icons/x-circle.svg"
+														alt="제거"
+														width={24}
+														height={24}
+													/>
+												</button>
+											</>
+										)}
+									</div>
 								</div>
 							) : (
 								<button
@@ -483,59 +468,64 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 						<div className="mr-3 mt-[1px]">
 							<GradientCheckbox />
 						</div>
-						<div className="relative flex-grow pr-8">
-							<textarea
-								value={newGoalTitle}
-								onChange={(e) =>
-									handleTextareaInput(
-										e,
-										MAX_DETAIL_GOAL_LENGTH + 1,
-										setNewGoalTitle,
-									)
-								}
-								onKeyDown={(e) => {
-									if (
-										e.key === "Enter" &&
-										!e.shiftKey &&
-										newGoalTitle.trim().length >= 1 &&
-										newGoalTitle.length <= MAX_DETAIL_GOAL_LENGTH
-									) {
-										e.preventDefault();
-										handleSaveGoal();
+						<div className="relative flex-grow">
+							<div className="relative w-full flex items-center">
+								<textarea
+									value={newGoalTitle}
+									onChange={(e) =>
+										handleTextareaInput(
+											e,
+											MAX_DETAIL_GOAL_LENGTH + 1,
+											setNewGoalTitle,
+										)
 									}
-								}}
-								placeholder=""
-								className="b2 w-full rounded border-none bg-transparent p-0 text-gray-normal outline-none resize-none overflow-hidden"
-								style={{
-									caretColor: "#5D6470",
-									height: "auto",
-									minHeight: "1.5rem",
-								}}
-								ref={inputRef}
-								enterKeyHint="done"
-								aria-label="세부 목표 입력"
-								rows={1}
-							/>
-							{newGoalTitle && (
-								<button
-									onClick={(e) => {
-										e.preventDefault(); // 이벤트 버블링 방지
-										e.stopPropagation(); // 이벤트 버블링 방지
-										setNewGoalTitle(""); // 직접 상태 업데이트
-										setTimeout(() => inputRef.current?.focus(), 0);
+									placeholder=""
+									className="b2 flex-grow rounded border-none bg-transparent p-0 text-gray-normal outline-none resize-none overflow-hidden mr-3"
+									style={{
+										caretColor: "#5D6470",
+										height: "auto",
+										minHeight: "1.5rem",
 									}}
-									className={deleteButtonStyles}
-									type="button"
-									aria-label="텍스트 지우기"
-								>
-									<Image
-										src="/icons/x-circle.svg"
-										alt="제거"
-										width={24}
-										height={24}
-									/>
-								</button>
-							)}
+									ref={inputRef}
+									enterKeyHint="done"
+									aria-label="세부 목표 입력"
+									rows={1}
+								/>
+								{newGoalTitle && (
+									<>
+										<button
+											onClick={handleSaveGoal}
+											disabled={
+												newGoalTitle.trim().length === 0 ||
+												newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH
+											}
+											className={`text-s2 mr-3 ${newGoalTitle.trim().length === 0 || newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH ? "text-[#8484E6]" : "text-[#8484E6]"}`}
+											type="button"
+											aria-label="세부 목표 생성"
+										>
+											완료
+										</button>
+										<button
+											onClick={(e) => {
+												e.preventDefault();
+												e.stopPropagation();
+												setNewGoalTitle("");
+												setTimeout(() => inputRef.current?.focus(), 0);
+											}}
+											className=""
+											type="button"
+											aria-label="텍스트 지우기"
+										>
+											<Image
+												src="/icons/immersion/delete.svg"
+												alt="제거"
+												width={24}
+												height={24}
+											/>
+										</button>
+									</>
+								)}
+							</div>
 						</div>
 					</div>
 				</div>
