@@ -15,9 +15,10 @@ import { Button } from "@/components/ui/button";
 import { useCompleteTask, useInProgressTasks } from "@/hooks/useTasks";
 import { getPersonaImage } from "@/utils/getPersonaImage";
 
-// 페르소나가 필수인 Task 타입 정의
-interface TaskWithPersona extends Omit<Task, "persona"> {
+// 페르소나와 dueDatetime이 모두 필수인 Task 타입 정의
+interface TaskWithPersona extends Omit<Task, "persona" | "dueDatetime"> {
 	persona: NonNullable<Task["persona"]>;
+	dueDatetime: string;
 }
 
 interface Props {
@@ -40,22 +41,18 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 	// 남은 시간을 계산하고 상태 업데이트하는 함수
 	useEffect(() => {
 		const updateRemainingTime = () => {
-			if (initialTask?.dueDatetime) {
-				const targetDate = new Date(initialTask.dueDatetime);
-				const now = new Date();
+			const targetDate = new Date(initialTask.dueDatetime);
+			const now = new Date();
 
-				// 마감시간이 지났는지 확인
-				if (now > targetDate && !showTimeExpiredSheet) {
-					setShowTimeExpiredSheet(true);
-				}
-
-				const timeStr = calculateRemainingTime(targetDate);
-
-				// 포맷 변경: n분 n초 남음, n시간 n분 남음, n일 n시간 n분 남음 형식 유지
-				setRemainingTime(timeStr);
-			} else {
-				setRemainingTime("시간 정보 없음");
+			// 마감시간이 지났는지 확인
+			if (now > targetDate && !showTimeExpiredSheet) {
+				setShowTimeExpiredSheet(true);
 			}
+
+			const timeStr = calculateRemainingTime(targetDate);
+
+			// 포맷 변경: n분 n초 남음, n시간 n분 남음, n일 n시간 n분 남음 형식 유지
+			setRemainingTime(timeStr);
 		};
 
 		// 초기 업데이트
@@ -66,7 +63,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 		// 컴포넌트 언마운트 시 인터벌 정리
 		return () => clearInterval(intervalId);
-	}, [initialTask?.dueDatetime, showTimeExpiredSheet]);
+	}, [initialTask.dueDatetime, showTimeExpiredSheet]);
 
 	const handleComplete = () => {
 		setShowBottomSheet(true);
@@ -83,8 +80,6 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 	// 마감 시간 지남 확인
 	const isExpired = (task: TaskWithPersona) => {
-		if (!task.dueDatetime) return false;
-
 		const now = new Date();
 		const dueDate = new Date(task.dueDatetime);
 
@@ -93,8 +88,6 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 	// 긴급 작업 판단 함수
 	const isUrgent = (task: TaskWithPersona) => {
-		if (!task.dueDatetime) return false;
-
 		const now = new Date();
 		const dueDate = new Date(task.dueDatetime);
 		const diffInHours = (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60);

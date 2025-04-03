@@ -1,5 +1,6 @@
 "use client";
 
+import Toast from "@/components/toast/Toast";
 import {
 	useCreateSubtask,
 	useDeleteSubtask,
@@ -334,23 +335,6 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 		</div>
 	);
 
-	// 토스트 메시지 컴포넌트
-	const ToastMessage = ({ message }: { message: string }) => (
-		<div className="fixed bottom-[118px] left-0 right-0 z-[9999] mx-auto px-3">
-			<div className="flex items-center bg-component-gray-tertiary p-4 rounded-xl gap-2 max-w-md mx-auto">
-				<div className="shrink-0">
-					<Image
-						src="/icons/immersion/warning.svg"
-						alt="경고"
-						width={20}
-						height={20}
-					/>
-				</div>
-				<p className="b3 text-gray-strong">{message}</p>
-			</div>
-		</div>
-	);
-
 	// 삭제 버튼 공통 스타일
 	const deleteButtonStyles =
 		"absolute right-0 top-1/2 transform -translate-y-1/2";
@@ -558,13 +542,13 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 			)}
 			{/* 토스트 경고 메시지 */}
 			{showLengthWarning && (
-				<ToastMessage message="최대 40자까지만 입력할 수 있어요." />
+				<Toast message="최대 40자까지만 입력할 수 있어요." />
 			)}
 			{editShowLengthWarning && (
-				<ToastMessage message="최대 40자까지만 입력할 수 있어요." />
+				<Toast message="최대 40자까지만 입력할 수 있어요." />
 			)}
 			{showMaxCountWarning && (
-				<ToastMessage message="세부 목표는 10개까지만 입력할 수 있어요." />
+				<Toast message="세부 목표는 10개까지만 입력할 수 있어요." />
 			)}
 		</div>
 	);
