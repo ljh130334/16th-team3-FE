@@ -2,6 +2,7 @@
 
 import type { Task } from "@/types/task";
 import { calculateRemainingTime } from "@/utils/dateFormat";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -112,8 +113,9 @@ export default function TasksDropdown({
 					aria-haspopup="menu"
 					type="button"
 					name="진행 중인 일 화살표"
+					style={{ display: "flex", alignItems: "center" }}
 				>
-					<span className="text-center">
+					<span className="flex items-center">
 						<span className="l4 text-gray-strong">진행 중인 일</span>{" "}
 						<span
 							className={`l5 ${hasUrgentTask() ? "c1 text-component-accent-red" : "text-gray-neutral"}`}
@@ -130,17 +132,11 @@ export default function TasksDropdown({
 							className="ml-1"
 						/>
 					)}
-					<Image
-						src={
-							isDropdownOpen
-								? "/icons/immersion/chevron-up.svg"
-								: "/icons/immersion/chevron-down.svg"
-						}
-						alt="화살표"
-						width={10}
-						height={6}
-						className="ml-2"
-					/>
+					{isDropdownOpen ? (
+						<ChevronUp className="ml-1 w-4 h-4 text-gray-disabled" />
+					) : (
+						<ChevronDown className="ml-1 w-4 h-4 text-gray-disabled" />
+					)}
 				</button>
 			</div>
 
