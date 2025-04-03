@@ -50,14 +50,12 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 	const personaId = task.persona.id;
 	const personaImageUrl = getPersonaImage(personaId);
 
-	// const { data: taskDetail, isLoading } = useTask(task.id);
-
 	// 남은 시간 계산 함수
 	const calculateRemainingTimeLocal = useCallback(() => {
 		if (!task.dueDate) return "";
 
 		// dueDatetime이 있으면 사용, 없으면 dueDate와 dueTime에서 계산
-		let dueDatetime;
+		let dueDatetime: Date | undefined;
 		if (task.dueDatetime) {
 			dueDatetime = new Date(task.dueDatetime);
 		} else if (task.dueDate && task.dueTime) {
@@ -114,7 +112,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 	const formatNickname = (name: string) => {
 		if (!name) return "";
 		if (name.length > 9) {
-			return name.substring(0, 9) + "...";
+			return `${name.substring(0, 9)}...`;
 		}
 		return name;
 	};
@@ -128,7 +126,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 		onClose();
 	};
 
-	const handleMoreClick = (e: React.MouseEvent) => {
+	const handleMoreClick = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
 		setShowMenu((prev) => !prev);
 	};
@@ -186,14 +184,40 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 		return `${month}월 ${day}일 ${dayOfWeek}, ${timeDisplay}`;
 	};
 
+	// 예상 소요시간 파싱 및 포맷팅 함수
+	const getFormattedEstimatedTime = (estimatedTime?: number): string => {
+		if (!estimatedTime) return "-";
+
+		const days = Math.floor(estimatedTime / (60 * 24));
+		const remainingMinutes = estimatedTime % (60 * 24);
+		const hours = Math.floor(remainingMinutes / 60);
+		const minutes = remainingMinutes % 60;
+
+		// BufferTime.tsx와 유사한 방식으로 포맷팅
+		const parts = [
+			days > 0 && `${days}일`,
+			hours > 0 && `${hours}시간`,
+			minutes > 0 && `${minutes}분`,
+		].filter(Boolean);
+
+		return parts.length > 0 ? parts.join(" ") : "-";
+	};
+
 	// 진행 중인 태스크인지 확인
 	const isInProgress = task.status === "inProgress";
 	const personaName = task.persona.name || "페르소나 없음";
 	const personaTriggerAction = task.triggerAction || "노트북 켜기";
 	const userNickname = userData?.nickname || "";
+	const formattedEstimatedTime = getFormattedEstimatedTime(task.estimatedTime);
 
 	// 미리 시작 상태일 때만 화살표 표시 (지금 시작 또는 이어서 몰입일 때는 표시 안함)
 	const showArrow = !isInProgress;
+
+	const handleItemClick = (path: string) => {
+		if (!isInProgress) {
+			router.push(path);
+		}
+	};
 
 	return (
 		<Drawer open={isOpen} onDrag={onClose} onAnimationEnd={() => onClose()}>
@@ -209,6 +233,8 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 						ref={buttonRef}
 						className="z-10 px-5"
 						onClick={handleMoreClick}
+						type="button"
+						aria-label="더 많은 옵션"
 					>
 						<Image
 							src="/icons/home/dots-vertical.svg"
@@ -224,9 +250,16 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 							className="absolute right-[20px] top-[70px] z-10 w-[190px] rounded-[16px] bg-component-gray-tertiary drop-shadow-lg"
 						>
 							<div className="c2 p-5 pb-0 text-text-alternative">편집</div>
-							<div
-								className="l3 flex items-center justify-between px-5 py-3 text-text-red"
+							<button
+								className="l3 flex w-full items-center justify-between px-5 py-3 text-text-red"
 								onClick={handleDelete}
+								onKeyDown={(e) => {
+									if (e.key === "Enter" || e.key === " ") {
+										handleDelete();
+									}
+								}}
+								type="button"
+								aria-label="삭제하기"
 							>
 								삭제하기
 								<Image
@@ -236,10 +269,17 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 									height={16}
 									className="ml-2"
 								/>
-							</div>
-							<div
-								className="l3 flex items-center justify-between px-5 pb-[22px] pt-3 text-text-normal"
+							</button>
+							<button
+								className="l3 flex w-full items-center justify-between px-5 pb-[22px] pt-3 text-text-normal"
 								onClick={handleEditTitle}
+								onKeyDown={(e) => {
+									if (e.key === "Enter" || e.key === " ") {
+										handleEditTitle();
+									}
+								}}
+								type="button"
+								aria-label="할일 이름 바꾸기"
 							>
 								할일 이름 바꾸기
 								<Image
@@ -249,15 +289,14 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 									height={16}
 									className="ml-2"
 								/>
-							</div>
+							</button>
 						</div>
 					)}
 				</div>
 
 				<div className="px-5">
 					<p className="b3 mb-5 text-center text-text-neutral">
-						{personaName}&nbsp;
-						{formatNickname(userNickname)}님!
+						{`${personaName} ${formatNickname(userNickname)}님!`}
 						<br />
 						미루지 말고 여유있게 시작해볼까요?
 					</p>
@@ -278,20 +317,23 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 							className="z-10 mb-6 h-[26px] w-auto rounded-[8px] px-[7px] py-[6px] text-text-inverse"
 						>
 							<span className="l6 text-text-inverse">
-								{personaName}&nbsp;{formatNickname(userNickname)}
+								{`${personaName} ${formatNickname(userNickname)}`}
 							</span>
 						</Button>
 					</div>
 
 					<div>
-						{/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-						<div
-							className="flex items-center justify-between py-2.5 pt-0"
-							onClick={() => {
-								if (!isInProgress) {
+						<button
+							className="flex w-full items-center justify-between py-2.5 pt-0"
+							onClick={() => handleItemClick(`/edit/deadline-date/${task.id}`)}
+							onKeyDown={(e) => {
+								if ((e.key === "Enter" || e.key === " ") && !isInProgress) {
 									router.push(`/edit/deadline-date/${task.id}`);
 								}
 							}}
+							disabled={isInProgress}
+							type="button"
+							aria-label="마감일 편집"
 						>
 							<div className="b2 text-text-alternative">마감일</div>
 							<div className="flex items-center">
@@ -307,17 +349,21 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 									/>
 								)}
 							</div>
-						</div>
+						</button>
 					</div>
 
 					<div>
-						<div
-							className="flex items-center justify-between py-2.5"
-							onClick={() => {
-								if (!isInProgress) {
+						<button
+							className="flex w-full items-center justify-between py-2.5"
+							onClick={() => handleItemClick(`/edit/small-action/${task.id}`)}
+							onKeyDown={(e) => {
+								if ((e.key === "Enter" || e.key === " ") && !isInProgress) {
 									router.push(`/edit/small-action/${task.id}`);
 								}
 							}}
+							disabled={isInProgress}
+							type="button"
+							aria-label="작은 행동 편집"
 						>
 							<div className="b2 text-text-alternative">작은 행동</div>
 							<div className="flex items-center">
@@ -333,22 +379,26 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 									/>
 								)}
 							</div>
-						</div>
+						</button>
 					</div>
 
 					<div>
-						<div
-							className="flex items-center justify-between py-2.5"
-							onClick={() => {
-								if (!isInProgress) {
+						<button
+							className="flex w-full items-center justify-between py-2.5"
+							onClick={() => handleItemClick(`/edit/estimated-time/${task.id}`)}
+							onKeyDown={(e) => {
+								if ((e.key === "Enter" || e.key === " ") && !isInProgress) {
 									router.push(`/edit/estimated-time/${task.id}`);
 								}
 							}}
+							disabled={isInProgress}
+							type="button"
+							aria-label="예상 소요시간 편집"
 						>
 							<div className="b2 text-text-alternative">예상 소요시간</div>
 							<div className="flex items-center">
 								<span className="b2 mr-1 text-text-neutral">
-									{task.timeRequired || "-"}
+									{formattedEstimatedTime}
 								</span>
 								{showArrow && (
 									<Image
@@ -359,13 +409,13 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 									/>
 								)}
 							</div>
-						</div>
+						</button>
 					</div>
 
 					<div className="flex items-center justify-between py-2.5">
 						<div className="b2 text-text-alternative">첫 알림</div>
 						<div className="flex items-center justify-end">
-							<span className={`s2 text-text-neutral mr-1`}>
+							<span className="s2 text-text-neutral mr-1">
 								{task.triggerActionAlarmTime
 									? `${new Date(task.triggerActionAlarmTime).getMonth() + 1}월 ${new Date(task.triggerActionAlarmTime).getDate()}일 (${["일", "월", "화", "수", "목", "금", "토"][new Date(task.triggerActionAlarmTime).getDay()]}), ${new Date(
 											task.triggerActionAlarmTime,
@@ -376,12 +426,12 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 										})}`
 									: "-"}
 							</span>
-							{showArrow && <span className="mr-5"></span>}
+							{showArrow && <span className="mr-5" />}
 						</div>
 					</div>
 
 					<DrawerFooter className="px-0">
-						<DrawerClose className="mt-1">
+						<DrawerClose asChild className="mt-1">
 							<Button
 								variant={isUrgent ? "hologram" : "primary"}
 								size="default"
@@ -395,10 +445,12 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 										: "미리 시작"}
 							</Button>
 						</DrawerClose>
-						<DrawerClose>
+						<DrawerClose asChild>
 							<button
 								className="b2 flex w-full justify-center bg-none pt-4 text-text-neutral"
 								onClick={onClose}
+								type="button"
+								aria-label="닫기"
 							>
 								닫기
 							</button>

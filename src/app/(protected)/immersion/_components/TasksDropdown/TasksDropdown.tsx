@@ -101,7 +101,7 @@ export default function TasksDropdown({
 			<div
 				className={`bg-component-gray-tertiary rounded-t-[8px] ${!isDropdownOpen ? "rounded-b-[8px]" : "rounded-t-[8px]"} overflow-hidden`}
 				style={{
-					width: isDropdownOpen ? "243px" : "175px",
+					width: isDropdownOpen ? "243px" : "178px",
 					transition: "width 0.3s ease-out",
 				}}
 			>
