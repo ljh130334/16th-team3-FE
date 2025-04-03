@@ -15,8 +15,13 @@ import { Button } from "@/components/ui/button";
 import { useCompleteTask, useInProgressTasks } from "@/hooks/useTasks";
 import { getPersonaImage } from "@/utils/getPersonaImage";
 
+// 페르소나가 필수인 Task 타입 정의
+interface TaskWithPersona extends Omit<Task, "persona"> {
+	persona: NonNullable<Task["persona"]>;
+}
+
 interface Props {
-	initialTask: Task;
+	initialTask: TaskWithPersona;
 }
 
 export default function ImmersionPageClient({ initialTask }: Props) {
@@ -24,7 +29,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 	const [remainingTime, setRemainingTime] = useState("");
 	const [showBottomSheet, setShowBottomSheet] = useState(false);
 	const [showTimeExpiredSheet, setShowTimeExpiredSheet] = useState(false);
-	const personaId = initialTask.persona?.id;
+	const personaId = initialTask.persona.id;
 	const personaImageSrc = getPersonaImage(personaId);
 
 	const nickname = useUserStore((state) => state.userData.nickname);
@@ -77,7 +82,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 	};
 
 	// 마감 시간 지남 확인
-	const isExpired = (task: Task) => {
+	const isExpired = (task: TaskWithPersona) => {
 		if (!task.dueDatetime) return false;
 
 		const now = new Date();
@@ -87,7 +92,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 	};
 
 	// 긴급 작업 판단 함수
-	const isUrgent = (task: Task) => {
+	const isUrgent = (task: TaskWithPersona) => {
 		if (!task.dueDatetime) return false;
 
 		const now = new Date();
@@ -200,7 +205,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 								/>
 							</div>
 							<Badge>
-								{initialTask.persona?.name} {nickname}
+								{initialTask.persona.name} {nickname}
 							</Badge>
 						</div>
 					</div>
