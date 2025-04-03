@@ -12,7 +12,7 @@ import {
 	useResetAlerts,
 	useStartTask,
 } from "@/hooks/useTasks";
-import type { Task } from "@/types/task";
+import type { Task, TaskWithPersona } from "@/types/task";
 import { parseDateAndTime } from "@/utils/dateFormat";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -20,6 +20,7 @@ import React, { useState, useEffect, useMemo, Suspense } from "react";
 
 import Loader from "@/components/loader/Loader";
 import { useAuthStore } from "@/store";
+import { getPersonaImage } from "@/utils/getPersonaImage";
 import Link from "next/link";
 import CharacterDialog from "../(create)/_components/characterDialog/CharacterDialog";
 
@@ -175,6 +176,7 @@ const HomePageContent = () => {
 	const [expiredTask, setExpiredTask] = useState<Task | null>(null);
 	const [isReentry, setIsReentry] = useState(false);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [personaId, setPersonaId] = useState<number | undefined>(undefined);
 	const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
 
 	const searchParams = useSearchParams();
@@ -187,7 +189,7 @@ const HomePageContent = () => {
 
 	// TODO: 회고 페이지로 이동
 	const handleGoToReflection = (taskId: number) => {
-		router.push(`/reflection/${taskId}`);
+		router.push(`/retrospection/${taskId}`);
 		setShowExpiredTaskSheet(false);
 	};
 
@@ -314,8 +316,12 @@ const HomePageContent = () => {
 		}
 
 		const personaParam = searchParams.get("personaName");
-		if (personaParam) {
-			setPersonaName(personaParam);
+
+		const personaIdParam = searchParams.get("personaId");
+		const personaId = personaIdParam ? parseInt(personaIdParam, 10) : undefined;
+
+		if (personaId) {
+			setPersonaId(personaId);
 		}
 
 		const taskTypeParam = searchParams.get("type");
@@ -1109,7 +1115,7 @@ const HomePageContent = () => {
 				<TaskDetailSheet
 					isOpen={isDetailSheetOpen}
 					onClose={handleCloseDetailSheet}
-					task={detailTask}
+					task={detailTask as TaskWithPersona}
 					onDelete={handleDeleteTask}
 					onStart={handleStartTask}
 				/>
@@ -1120,6 +1126,7 @@ const HomePageContent = () => {
 				task={taskName}
 				taskType={taskType}
 				personaName={personaName}
+				personaId={personaId}
 				onClick={handleCharacterDialogButtonClick}
 			/>
 

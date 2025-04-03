@@ -5,7 +5,7 @@ import WeeklyTaskItem from "@/app/(protected)/(root)/_components/WeeklyTaskItem"
 import Loader from "@/components/loader/Loader";
 import Header from "@/components/ui/header";
 import { useDeleteTask, useHomeData, useStartTask } from "@/hooks/useTasks";
-import type { Task } from "@/types/task";
+import type { Task, TaskWithPersona } from "@/types/task";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useState, useMemo } from "react";
@@ -148,7 +148,7 @@ const WeeklyTasksPage = () => {
 				<TaskDetailSheet
 					isOpen={isDetailSheetOpen}
 					onClose={handleCloseDetailSheet}
-					task={selectedTask}
+					task={selectedTask as TaskWithPersona}
 					onDelete={handleDeleteTask}
 					onStart={handleStartTask}
 				/>

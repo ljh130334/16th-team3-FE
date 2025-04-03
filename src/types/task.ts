@@ -15,6 +15,7 @@ export type TaskType = "today" | "weekly" | "future";
 export interface Task {
 	id: number;
 	title: string;
+	name?: string;
 	dueDate: string;
 	dueDay: string;
 	dueTime: string;
@@ -73,6 +74,11 @@ export interface TaskResponse {
 		};
 	};
 	createdAt: string;
+}
+
+export interface TaskWithPersona extends Omit<Task, "persona" | "dueDatetime"> {
+	persona: NonNullable<Task["persona"]>;
+	dueDatetime: string;
 }
 
 // API 응답을 Task 타입으로 변환하는 함수
