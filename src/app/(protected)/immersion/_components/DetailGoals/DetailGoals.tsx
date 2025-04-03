@@ -29,6 +29,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 	const [editingText, setEditingText] = useState<string>("");
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const editInputRef = useRef<HTMLTextAreaElement>(null);
+	const [submitting, setSubmitting] = useState(false);
 
 	// API 연동 훅 사용
 	const { data: subtasks = [], isLoading } = useSubtasks(taskId);
@@ -77,20 +78,35 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 
 	// 새 목표 저장 핸들러
 	const handleSaveGoal = () => {
+		if (submitting) return; // 중복 제출 방지
+
 		const trimmedTitle = newGoalTitle.trim();
 		if (
 			trimmedTitle.length >= 1 &&
 			trimmedTitle.length <= MAX_DETAIL_GOAL_LENGTH
 		) {
+			// 저장 전에 입력 상태 초기화 (UX 개선)
+			const titleToSave = trimmedTitle;
+			setNewGoalTitle("");
+			setIsAddingGoal(false);
+			setSubmitting(true);
+
+			// 저장 요청 전송
 			createSubtaskMutation(
 				{
 					taskId,
-					name: trimmedTitle,
+					name: titleToSave,
 				},
 				{
 					onSuccess: () => {
-						setNewGoalTitle("");
-						setIsAddingGoal(false);
+						setSubmitting(false);
+					},
+					onError: (error) => {
+						console.error("Failed to create subtask:", error);
+						// 오류 발생 시 다시 입력 상태로 복원
+						setNewGoalTitle(titleToSave);
+						setIsAddingGoal(true);
+						setSubmitting(false);
 					},
 				},
 			);
@@ -142,18 +158,40 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 	};
 
 	const handleFinishEditing = () => {
+		if (submitting) return; // 중복 제출 방지
+
 		if (
 			editingGoalId !== null &&
 			editingText.trim().length >= 1 &&
 			editingText.length <= MAX_DETAIL_GOAL_LENGTH
 		) {
-			updateSubtaskMutation({
-				id: editingGoalId,
-				taskId,
-				name: editingText,
-			});
+			const goalId = editingGoalId;
+			const newText = editingText.trim();
+
+			// 먼저 UI 상태 업데이트
+			setEditingGoalId(null);
+			setSubmitting(true);
+
+			// 그 다음 API 요청
+			updateSubtaskMutation(
+				{
+					id: goalId,
+					taskId,
+					name: newText,
+				},
+				{
+					onSuccess: () => {
+						setSubmitting(false);
+					},
+					onError: () => {
+						setSubmitting(false);
+					},
+				},
+			);
+		} else {
+			// 유효하지 않은 상태이면 편집 모드만 종료
+			setEditingGoalId(null);
 		}
-		setEditingGoalId(null);
 	};
 
 	// 목표 삭제 핸들러
@@ -391,7 +429,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 			) : (
 				<ul className="flex flex-col">
 					{sortedGoals.map((goal) => (
-						<li key={goal.id} className="flex items-start py-2">
+						<li key={goal.id} className="flex items-start py-2 relative">
 							<div className="mr-3">
 								<CheckboxWithGradientBorder
 									checked={goal.isCompleted}
@@ -425,12 +463,32 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 										ref={editInputRef}
 										aria-label="세부 목표 수정"
 										onKeyDown={(e) => {
-											if (e.key === "Enter" && editingText.trim().length >= 1) {
+											if (
+												e.key === "Enter" &&
+												editingText.trim().length >= 1 &&
+												editingText.length <= MAX_DETAIL_GOAL_LENGTH
+											) {
 												e.preventDefault();
 												handleFinishEditing();
+											} else if (e.key === "Escape") {
+												e.preventDefault();
+												setEditingGoalId(null);
+											}
+										}}
+										onBlur={() => {
+											if (
+												editingText.trim().length >= 1 &&
+												editingText.length <= MAX_DETAIL_GOAL_LENGTH
+											) {
+												handleFinishEditing();
+											} else {
+												setEditingGoalId(null);
 											}
 										}}
 										rows={1}
+										autoComplete="off"
+										autoCorrect="off"
+										spellCheck="false"
 									/>
 									{editingText && (
 										<button
@@ -456,22 +514,39 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 									)}
 								</div>
 							) : (
-								<button
-									type="button"
-									className={`text-b2 break-words cursor-text text-left w-full ${goal.isCompleted ? "text-gray-neutral" : "text-gray-normal"}`}
-									style={{
-										wordBreak: "break-word",
-										display: "block",
-										background: "transparent",
-										border: "none",
-										padding: 0,
-										margin: 0,
-									}}
-									onClick={() => handleStartEditing(goal.id, goal.name)}
-									aria-label={`${goal.name} 편집하기`}
-								>
-									{formatGoalText(goal.name)}
-								</button>
+								<div className="flex items-start w-full">
+									<div className="flex-grow overflow-hidden">
+										<button
+											type="button"
+											className={`text-b2 break-words cursor-text text-left w-full ${goal.isCompleted ? "text-gray-neutral" : "text-gray-normal"}`}
+											style={{
+												wordBreak: "break-word",
+												display: "block",
+												background: "transparent",
+												border: "none",
+												padding: 0,
+												margin: 0,
+											}}
+											onClick={() => handleStartEditing(goal.id, goal.name)}
+											aria-label={`${goal.name} 편집하기`}
+										>
+											{formatGoalText(goal.name)}
+										</button>
+									</div>
+									<button
+										onClick={() => handleDeleteGoal(goal.id)}
+										className="ml-2 flex-shrink-0 text-gray-400 hover:text-red-500"
+										type="button"
+										aria-label="목표 삭제"
+									>
+										<Image
+											src="/icons/x-circle.svg"
+											alt="삭제"
+											width={20}
+											height={20}
+										/>
+									</button>
+								</div>
 							)}
 						</li>
 					))}
@@ -484,38 +559,58 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 							<GradientCheckbox />
 						</div>
 						<div className="relative flex-grow pr-8">
-							<textarea
-								value={newGoalTitle}
-								onChange={(e) =>
-									handleTextareaInput(
-										e,
-										MAX_DETAIL_GOAL_LENGTH + 1,
-										setNewGoalTitle,
-									)
-								}
-								onKeyDown={(e) => {
+							<form
+								onSubmit={(e) => {
+									e.preventDefault();
 									if (
-										e.key === "Enter" &&
-										!e.shiftKey &&
 										newGoalTitle.trim().length >= 1 &&
 										newGoalTitle.length <= MAX_DETAIL_GOAL_LENGTH
 									) {
-										e.preventDefault();
 										handleSaveGoal();
 									}
 								}}
-								placeholder=""
-								className="b2 w-full rounded border-none bg-transparent p-0 text-gray-normal outline-none resize-none overflow-hidden"
-								style={{
-									caretColor: "#5D6470",
-									height: "auto",
-									minHeight: "1.5rem",
-								}}
-								ref={inputRef}
-								enterKeyHint="done"
-								aria-label="세부 목표 입력"
-								rows={1}
-							/>
+							>
+								<textarea
+									value={newGoalTitle}
+									onChange={(e) =>
+										handleTextareaInput(
+											e,
+											MAX_DETAIL_GOAL_LENGTH + 1,
+											setNewGoalTitle,
+										)
+									}
+									onKeyDown={(e) => {
+										if (
+											e.key === "Enter" &&
+											!e.shiftKey &&
+											newGoalTitle.trim().length >= 1 &&
+											newGoalTitle.length <= MAX_DETAIL_GOAL_LENGTH
+										) {
+											e.preventDefault();
+											handleSaveGoal();
+										} else if (e.key === "Escape") {
+											e.preventDefault();
+											setIsAddingGoal(false);
+											setNewGoalTitle("");
+										}
+									}}
+									placeholder="세부 목표를 입력하세요"
+									className="b2 w-full rounded border-none bg-transparent p-0 text-gray-normal outline-none resize-none overflow-hidden"
+									style={{
+										caretColor: "#5D6470",
+										height: "auto",
+										minHeight: "1.5rem",
+									}}
+									ref={inputRef}
+									enterKeyHint="done"
+									aria-label="세부 목표 입력"
+									rows={1}
+									autoComplete="off"
+									autoCorrect="off"
+									spellCheck="false"
+								/>
+								<input type="submit" hidden />
+							</form>
 							{newGoalTitle && (
 								<button
 									onClick={(e) => {

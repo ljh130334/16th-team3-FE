@@ -163,7 +163,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 						{/* 캐릭터 및 배지 영역 */}
 						<div className="relative mt-4 flex flex-col items-center justify-center gap-4">
-							<div className="z-20">
+							<div className="floating-container flex flex-col items-center gap-4 z-20">
 								<div
 									className="s3 flex items-center justify-center whitespace-nowrap rounded-[999px] px-[14px] py-[10px] text-[#BDBDF5]"
 									style={{
@@ -186,20 +186,21 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 											: "한 줄만 써봐요! 표지만 완성은 안 돼요!"}
 									</span>
 								</div>
-							</div>
 
-							<div className="relative z-10 flex items-center gap-2">
-								<Image
-									src={personaImageSrc}
-									alt="페르소나 이미지"
-									width={165}
-									height={165}
-									className="floating-character"
-								/>
+								<div className="relative z-10">
+									<Image
+										src={personaImageSrc}
+										alt="페르소나 이미지"
+										width={165}
+										height={165}
+									/>
+									<div className="mt-2 flex justify-center">
+										<Badge>
+											{initialTask.persona.name} {nickname}
+										</Badge>
+									</div>
+								</div>
 							</div>
-							<Badge>
-								{initialTask.persona.name} {nickname}
-							</Badge>
 						</div>
 					</div>
 
@@ -308,7 +309,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 					}
 				}
 
-				.floating-character {
+				.floating-container {
 					animation: floating 3s ease-in-out infinite;
 				}
 			`}</style>
