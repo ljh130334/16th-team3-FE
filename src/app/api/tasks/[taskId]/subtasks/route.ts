@@ -10,12 +10,9 @@ interface Subtask {
 }
 
 // GET: 서브태스크 목록 조회
-export async function GET(
-	request: NextRequest,
-	{ params }: { params: { taskId: string } },
-) {
+export async function GET(request: NextRequest, context: any) {
 	try {
-		const taskId = params.taskId;
+		const taskId = context.params.taskId;
 
 		if (!taskId) {
 			return NextResponse.json(
@@ -26,7 +23,6 @@ export async function GET(
 
 		console.log(`[API] 서브태스크 조회 요청: taskId=${taskId}`);
 
-		// 새로운 v1/tasks/{taskId}/subtasks 엔드포인트 직접 호출
 		const response = await serverApi.get(`v1/tasks/${taskId}/subtasks`);
 
 		if (!response.ok) {

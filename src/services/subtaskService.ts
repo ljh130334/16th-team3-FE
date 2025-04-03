@@ -18,7 +18,7 @@ const fetchWithError = async <T>(
 	return response.json();
 };
 
-// 서브태스크 목록 조회 (새로운 API 주소 적용)
+// 서브태스크 목록 조회
 export const fetchSubtasks = async (taskId: number): Promise<Subtask[]> => {
 	try {
 		return await fetchWithError<Subtask[]>(`/api/tasks/${taskId}/subtasks`);
@@ -58,13 +58,12 @@ export const createSubtask = async (
 	}
 };
 
-// 서브태스크 이름 수정 (POST 사용)
+// 서브태스크 이름 수정
 export const updateSubtaskName = async (
 	id: number,
 	taskId: number, // taskId 매개변수 추가
 	name: string,
 ): Promise<Subtask> => {
-	// 백엔드 API 명세에 따른 요청 본문 (id, taskId, name 모두 포함)
 	const requestBody = {
 		id,
 		taskId,
@@ -97,7 +96,6 @@ export const updateSubtaskName = async (
 	} catch (error) {
 		console.error("[API] 서브태스크 이름 수정 오류:", error);
 
-		// 오류 정보를 더 자세히 로깅
 		if (error instanceof Error) {
 			console.error(`[API] 오류 메시지: ${error.message}`);
 			console.error(`[API] 오류 스택: ${error.stack}`);

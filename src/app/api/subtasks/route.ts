@@ -21,7 +21,6 @@ export async function POST(request: NextRequest) {
 	try {
 		const body = (await request.json()) as SubtaskRequest;
 
-		// 요청 본문 전체 로그
 		console.log(
 			"[API] 서브태스크 생성/수정 요청 본문 전체:",
 			JSON.stringify(body),
@@ -39,7 +38,7 @@ export async function POST(request: NextRequest) {
 		const isCreating = body.taskId !== undefined && body.id === undefined;
 		const isUpdating = body.id !== undefined && body.taskId !== undefined;
 
-		// 요청 타입 로깅 (디버깅용)
+		// 요청 타입 로깅
 		console.log(
 			`[API] 요청 타입: ${isCreating ? "생성" : isUpdating ? "수정" : "알 수 없음"}`,
 		);
@@ -64,7 +63,6 @@ export async function POST(request: NextRequest) {
 				`[API] 서브태스크 생성 요청: taskId=${body.taskId}, name=${body.name}`,
 			);
 
-			// ID가 string 타입으로 전달된 경우 숫자로 변환
 			const taskId =
 				typeof body.taskId === "string"
 					? Number.parseInt(body.taskId, 10)
@@ -78,12 +76,11 @@ export async function POST(request: NextRequest) {
 				signal: controller.signal,
 			});
 		} else {
-			// 서브태스크 수정 (이름 변경)
+			// 서브태스크 수정
 			console.log(
 				`[API] 서브태스크 수정 요청: id=${body.id}, taskId=${body.taskId}, name=${body.name}`,
 			);
 
-			// ID와 taskId가 string 타입으로 전달된 경우 숫자로 변환
 			const id =
 				typeof body.id === "string" ? Number.parseInt(body.id, 10) : body.id;
 
@@ -117,7 +114,6 @@ export async function POST(request: NextRequest) {
 	} catch (error) {
 		console.error("[API] 서브태스크 생성/수정 오류:", error);
 
-		// 오류 내용을 더 자세히 기록
 		const errorDetail =
 			error instanceof Error
 				? { message: error.message, stack: error.stack }

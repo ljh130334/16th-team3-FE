@@ -1,16 +1,8 @@
 import { serverApi } from "@/lib/serverKy";
 import { type NextRequest, NextResponse } from "next/server";
 
-interface Params {
-	id: string;
-}
-
-// PATCH: 서브태스크 수정
-export async function PATCH(
-	request: NextRequest,
-	{ params }: { params: Params },
-) {
-	const { id } = params;
+export async function PATCH(request: NextRequest, context: any) {
+	const { id } = context.params;
 	try {
 		const body = await request.json();
 
