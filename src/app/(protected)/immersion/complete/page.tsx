@@ -1,3 +1,4 @@
+import Loader from "@/components/loader/Loader";
 import { Suspense } from "react";
 import CompleteContent from "./CompleteContent";
 
@@ -6,7 +7,7 @@ export default function ImmersionCompletePage() {
 		<Suspense
 			fallback={
 				<div className="flex h-full items-center justify-center">
-					로딩 중...
+					<Loader />
 				</div>
 			}
 		>

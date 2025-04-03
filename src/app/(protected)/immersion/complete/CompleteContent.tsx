@@ -2,20 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 export default function CompleteContent() {
-	const router = useRouter();
 	const searchParams = useSearchParams();
 	const taskId = searchParams.get("taskId");
 
-	const handleReflection = () => {
-		if (taskId) {
-			router.push(`/retrospection/${taskId}`);
-		} else {
-			router.push("/reflection");
-		}
-	};
+	const reflectionUrl = taskId ? `/retrospection/${taskId}` : "/reflection";
 
 	return (
 		<div className="flex h-full flex-col gap-4 bg-background-primary">
@@ -36,13 +30,11 @@ export default function CompleteContent() {
 				</p>
 			</div>
 			<div className="relative mt-auto flex flex-col items-center px-5 py-6">
-				<Button
-					variant="primary"
-					className="relative mb-4 w-full"
-					onClick={handleReflection}
-				>
-					회고하기
-				</Button>
+				<Link href={reflectionUrl} className="w-full">
+					<Button variant="primary" className="relative mb-4 w-full">
+						회고하기
+					</Button>
+				</Link>
 			</div>
 		</div>
 	);
