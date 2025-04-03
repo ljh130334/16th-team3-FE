@@ -19,9 +19,14 @@ import { useRouter } from "next/navigation";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+// 페르소나가 필수인 Task 타입 정의
+interface TaskWithPersona extends Omit<Task, "persona"> {
+	persona: NonNullable<Task["persona"]>;
+}
+
 type TaskDetailSheetProps = {
 	isOpen: boolean;
-	task: Task;
+	task: TaskWithPersona;
 	onClose: () => void;
 	onDelete?: (taskId: number) => void;
 	onStart?: (taskId: number) => void;
@@ -42,7 +47,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 	const [isUrgent, setIsUrgent] = useState(false);
 	const { userData } = useUserStore();
 
-	const personaId = task.persona?.id;
+	const personaId = task.persona.id;
 	const personaImageUrl = getPersonaImage(personaId);
 
 	// const { data: taskDetail, isLoading } = useTask(task.id);
@@ -183,7 +188,7 @@ const TaskDetailSheet: React.FC<TaskDetailSheetProps> = ({
 
 	// 진행 중인 태스크인지 확인
 	const isInProgress = task.status === "inProgress";
-	const personaName = task.persona?.name || "페르소나 없음";
+	const personaName = task.persona.name || "페르소나 없음";
 	const personaTriggerAction = task.triggerAction || "노트북 켜기";
 	const userNickname = userData?.nickname || "";
 

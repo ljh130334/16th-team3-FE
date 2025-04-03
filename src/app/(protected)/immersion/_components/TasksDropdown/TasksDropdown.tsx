@@ -115,8 +115,8 @@ export default function TasksDropdown({
 					name="진행 중인 일 화살표"
 					style={{ display: "flex", alignItems: "center" }}
 				>
-					<span className="flex items-center">
-						<span className="l4 text-gray-strong">진행 중인 일</span>{" "}
+					<span className="flex items-center gap-1">
+						<span className="l4 text-gray-strong">진행 중인 일</span>
 						<span
 							className={`l5 ${hasUrgentTask() ? "c1 text-component-accent-red" : "text-gray-neutral"}`}
 						>
@@ -125,7 +125,7 @@ export default function TasksDropdown({
 					</span>
 					{hasUrgentTask() && (
 						<Image
-							src="/icons/immersion/emergency.svg"
+							src="/icons/immersion/emergency.png"
 							alt="긴급"
 							width={16}
 							height={16}
