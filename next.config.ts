@@ -11,7 +11,9 @@ const nextConfig = {
 		dangerouslyAllowSVG: true,
 		contentSecurityPolicy: "default-src 'self'; img-src 'self' data: https:;",
 	},
-	// 기존 설정이 있다면 유지
+	env: {
+    NEXT_PUBLIC_GA_ID: process.env.NEXT_PUBLIC_GA_ID,
+  	},
 };
 
 module.exports = nextConfig;
