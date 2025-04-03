@@ -17,15 +17,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 interface InProgressTaskItemProps {
 	task: Task;
-	onContinue: (taskId: number) => void;
-	isReentry?: boolean;
+	isReentry: boolean;
 	onShowDetails?: (task: Task) => void;
 }
 
 const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 	task,
-	onContinue,
-	isReentry = false,
+	isReentry,
 	onShowDetails,
 }) => {
 	const router = useRouter();
@@ -86,9 +84,10 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 	}, [calculateRemainingTimeLocal]);
 
 	// 홈화면 재진입 시 자동으로 바텀시트 표시
+	// ! TODO(prgmr99) 이 로직 검토 필요
 	useEffect(() => {
 		// 홈화면 재진입인 경우에만 바텀시트 표시
-		if (isReentry) {
+		if (!isReentry) {
 			setShowBottomSheet(true);
 		}
 	}, [isReentry]);
@@ -175,10 +174,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 	// 바텀시트 렌더링 (일반 및 긴급 케이스 모두 공통으로 사용)
 	const renderBottomSheet = () => {
 		return (
-			<Drawer
-				open={showBottomSheet && isReentry}
-				onOpenChange={setShowBottomSheet}
-			>
+			<Drawer open={showBottomSheet} onOpenChange={setShowBottomSheet}>
 				<DrawerContent className="w-auto border-0 bg-component-gray-secondary px-5 pb-[33px] pt-2">
 					<DrawerHeader>
 						<DrawerTitle className="t3 text-center text-text-strong">
@@ -186,13 +182,13 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 						</DrawerTitle>
 						<DrawerDescription className="t3 text-center text-text-strong">
 							하던 중이었어요. 이어서 몰입할까요?
-							<span
-								className={`b3 ${isExpired ? "text-red-500" : "text-text-neutral"} mt-2 text-center block`}
-							>
-								{isExpired
-									? "마감 시간이 지났습니다"
-									: `마감까지 ${remainingTime}`}
-							</span>
+						</DrawerDescription>
+						<DrawerDescription
+							className={`b3 ${isExpired ? "text-red-500" : "text-text-neutral"} mt-2 text-center`}
+						>
+							{isExpired
+								? "마감 시간이 지났습니다"
+								: `마감까지 ${remainingTime}`}
 						</DrawerDescription>
 					</DrawerHeader>
 					<button

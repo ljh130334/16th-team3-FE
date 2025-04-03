@@ -1,3 +1,4 @@
+import { OneButtonDialog } from "@/components/dialog/OneButtonDialog";
 import { Button } from "@/components/ui/button";
 import {
 	Drawer,
@@ -8,10 +9,9 @@ import {
 } from "@/components/ui/drawer";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ActionCard from "./ActionCard";
 import TimerBadge from "./TimerBadge";
-
 interface ActionStartDrawerProps {
 	onTakePicture: () => void;
 	smallActionTitle?: string;
@@ -28,20 +28,52 @@ export default function ActionStartDrawer({
 	const router = useRouter();
 	const [countdown, setCountdown] = useState(60);
 	const [open, setOpen] = useState(false);
+	const [dialogOpen, setDialogOpen] = useState(false);
 
-	useEffect(() => {
-		const timer = setInterval(() => {
+	// 타이머 ID를 저장할 ref
+	const intervalRef = useRef<number | null>(null);
+
+	// 카운트다운을 시작하는 함수
+	const startCountdown = () => {
+		// 혹시 기존에 동작 중이던 타이머가 있다면 먼저 해제
+		if (intervalRef.current) {
+			clearInterval(intervalRef.current);
+		}
+
+		// 새로운 타이머 생성
+		intervalRef.current = window.setInterval(() => {
 			setCountdown((prev) => {
 				if (prev <= 1) {
-					clearInterval(timer);
+					clearInterval(intervalRef.current!);
+					intervalRef.current = null;
+					setDialogOpen(true); // 다이얼로그 열기
 					return 0;
 				}
 				return prev - 1;
 			});
 		}, 1000);
+	};
 
-		return () => clearInterval(timer);
+	// 컴포넌트가 마운트되면 자동으로 카운트다운 시작
+	useEffect(() => {
+		startCountdown();
+		return () => {
+			// 언마운트 시 타이머 해제
+			if (intervalRef.current) {
+				clearInterval(intervalRef.current);
+			}
+		};
 	}, []);
+
+	// "다시 도전하기" 버튼을 누르면
+	// 1) 다이얼로그를 닫고
+	// 2) countdown을 다시 60으로 설정하고
+	// 3) 카운트다운을 재시작
+	const handleStartAgainButtonClick = () => {
+		setDialogOpen(false);
+		setCountdown(60);
+		startCountdown();
+	};
 
 	return (
 		<div className="relative mt-auto flex flex-col items-center px-5 py-6">
@@ -61,9 +93,17 @@ export default function ActionStartDrawer({
 					<DrawerContent>
 						<DrawerHeader>
 							<DrawerTitle className="flex flex-col gap-2">
-								<p className="text-t3">작은 행동을 사진으로 찍어주세요</p>
+								<p className="mt-[30px] text-t3">
+									작은 행동을 사진으로 찍어주세요
+								</p>
 								<p className="text-sm text-gray-neutral">
-									<span className="font-semibold text-component-accent-primary">
+									<span
+										className={`mr-1 font-semibold ${
+											countdown < 10
+												? "text-component-accent-red"
+												: "text-component-accent-primary"
+										}`}
+									>
 										{countdown}초
 									</span>
 									내에 사진 촬영을 하지 않으면
@@ -98,6 +138,14 @@ export default function ActionStartDrawer({
 			>
 				나중에 할래요
 			</Link>
+			<OneButtonDialog
+				value={dialogOpen}
+				title="1분을 초과했어요!"
+				content1="여기서 더 미루실 건가요?"
+				content2="지금해야 빨리 할일을 시작할 수 있어요!"
+				buttonName="다시 도전하기"
+				onButtonClick={handleStartAgainButtonClick}
+			/>
 		</div>
 	);
 }
