@@ -71,8 +71,6 @@ const TimeSelectedComponent = ({
 	const handleConfirmButtonClick = () => {
 		if (temporaryTime === undefined) return;
 
-		if (toastMessage !== "") return;
-
 		handleTimeChange(temporaryTime);
 		setIsOpen(false);
 	};
