@@ -2,53 +2,47 @@ import {
 	createSubtask,
 	deleteSubtask,
 	fetchSubtasks,
-	updateSubtask,
+	updateSubtaskCompletion,
+	updateSubtaskName,
 } from "@/services/subtaskService";
 import type { Subtask } from "@/types/subtask";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRef } from "react";
 
 // 서브태스크 목록 조회 훅
 export const useSubtasks = (taskId: number) => {
-	return useQuery({
-		queryKey: ["subtasks", taskId] as const,
+	return useQuery<Subtask[]>({
+		queryKey: ["subtasks", taskId],
 		queryFn: () => fetchSubtasks(taskId),
-		enabled: !!taskId,
-		staleTime: 0,
+		// 오류 발생 시 빈 배열로 기본값 처리
+		select: (data) => data ?? [],
 	});
 };
 
 // 서브태스크 생성 훅
 export const useCreateSubtask = () => {
 	const queryClient = useQueryClient();
-	const pendingRequestRef = useRef<Set<string>>(new Set());
 
 	return useMutation({
-		mutationFn: ({ taskId, name }: { taskId: number; name: string }) => {
-			const requestKey = `${taskId}-${name}`;
-			if (pendingRequestRef.current.has(requestKey)) {
-				return Promise.resolve({ id: 0, taskId, name, isCompleted: false });
-			}
+		mutationFn: ({ taskId, name }: { taskId: number; name: string }) =>
+			createSubtask(taskId, name),
+		onSuccess: (newSubtask, variables) => {
+			// 새로 생성된 항목을 추가하는 방식으로 캐시 업데이트
+			queryClient.setQueryData<Subtask[]>(
+				["subtasks", variables.taskId],
+				(old = []) => {
+					// 중복 방지를 위해 ID 검사
+					const exists = old.some((item) => item.id === newSubtask.id);
+					if (exists) {
+						console.log(
+							`[Cache] ID ${newSubtask.id}가 이미 존재합니다. 중복 방지됨.`,
+						);
+						return old;
+					}
 
-			pendingRequestRef.current.add(requestKey);
-
-			return createSubtask(taskId, name).finally(() => {
-				pendingRequestRef.current.delete(requestKey);
-			});
-		},
-
-		// 요청 성공 시 캐시 업데이트
-		onSuccess: (data, variables) => {
-			if (data.id === 0) return;
-
-			// 캐시 무효화 방식으로 변경
-			queryClient.invalidateQueries({
-				queryKey: ["subtasks", variables.taskId] as const,
-			});
-		},
-
-		onError: (error) => {
-			console.error("서브태스크 생성 오류:", error);
+					console.log(`[Cache] 새 항목 추가: ${newSubtask.id}`);
+					return [...old, newSubtask];
+				},
+			);
 		},
 	});
 };
@@ -57,20 +51,125 @@ export const useCreateSubtask = () => {
 export const useUpdateSubtask = () => {
 	const queryClient = useQueryClient();
 
-	return useMutation<
-		Subtask,
-		Error,
-		{ id: number; taskId: number; name?: string; isCompleted?: boolean }
-	>({
-		mutationFn: ({ id, name, isCompleted }) =>
-			updateSubtask(id, { name, isCompleted }),
-		onSuccess: (_, variables) => {
-			queryClient.invalidateQueries({
-				queryKey: ["subtasks", variables.taskId] as const,
+	return useMutation({
+		mutationFn: ({
+			id,
+			taskId,
+			name,
+			isCompleted,
+		}: {
+			id: number;
+			taskId: number;
+			name?: string;
+			isCompleted?: boolean;
+		}) => {
+			// 값 타입 검사 추가 (디버깅용)
+			console.log("[Client] 서브태스크 수정 요청 매개변수 타입:", {
+				id: typeof id,
+				name: typeof name,
+				isCompleted: typeof isCompleted,
+				taskId: typeof taskId,
 			});
+
+			console.log("[Client] 서브태스크 수정 요청:", {
+				id,
+				name,
+				isCompleted,
+				taskId,
+			});
+
+			if (name !== undefined) {
+				// 이름 수정 - POST 메서드 사용
+				return updateSubtaskName(id, taskId, name);
+			}
+
+			if (isCompleted !== undefined) {
+				// 완료 상태 수정 - PATCH 메서드 사용
+				return updateSubtaskCompletion(id, isCompleted);
+			}
+
+			throw new Error("name 또는 isCompleted 중 하나는 제공되어야 합니다");
 		},
-		onError: (error) => {
-			// 오류 핸들링
+
+		// 낙관적 업데이트: UI를 먼저 업데이트하고 나중에 서버 응답이 오면 조정
+		onMutate: async (variables) => {
+			// 진행 중인 쿼리 취소
+			await queryClient.cancelQueries({
+				queryKey: ["subtasks", variables.taskId],
+			});
+
+			// 기존 데이터 백업
+			const previousData =
+				queryClient.getQueryData<Subtask[]>(["subtasks", variables.taskId]) ||
+				[];
+
+			console.log("[Cache] 업데이트 전 캐시:", previousData);
+
+			// 캐시 데이터 직접 업데이트
+			queryClient.setQueryData<Subtask[]>(
+				["subtasks", variables.taskId],
+				(old = []) => {
+					// 기존 항목만 업데이트
+					return old.map((subtask) => {
+						if (subtask.id === variables.id) {
+							const updated = {
+								...subtask,
+								...(variables.name !== undefined
+									? { name: variables.name }
+									: {}),
+								...(variables.isCompleted !== undefined
+									? { isCompleted: variables.isCompleted }
+									: {}),
+							};
+							console.log(`[Cache] 항목 업데이트: ${subtask.id} => `, updated);
+							return updated;
+						}
+						return subtask;
+					});
+				},
+			);
+
+			return { previousData };
+		},
+
+		// 오류 발생 시 이전 데이터로 복원
+		onError: (error, variables, context) => {
+			console.error("[Client] 서브태스크 수정 오류:", error);
+
+			if (context?.previousData) {
+				console.log("[Cache] 오류로 인한 롤백:", context.previousData);
+
+				queryClient.setQueryData(
+					["subtasks", variables.taskId],
+					context.previousData,
+				);
+			}
+		},
+
+		// 서버에서 응답이 오면 캐시 업데이트 (중복 방지)
+		onSuccess: (updatedSubtask, variables) => {
+			console.log("[Client] 서브태스크 수정 성공:", updatedSubtask);
+
+			queryClient.setQueryData<Subtask[]>(
+				["subtasks", variables.taskId],
+				(old = []) => {
+					// 중복 방지를 위해 ID 기반으로 업데이트
+					const updatedList = old.map((subtask) =>
+						subtask.id === updatedSubtask.id ? updatedSubtask : subtask,
+					);
+
+					// 캐시에 항목이 없는 경우를 확인
+					if (!old.some((item) => item.id === updatedSubtask.id)) {
+						console.warn(
+							`[Cache] 항목 ${updatedSubtask.id}가 캐시에 없었습니다.`,
+						);
+						// 항목이 없으면 추가하지 않고 기존 목록 유지
+						return updatedList;
+					}
+
+					return updatedList;
+				},
+			);
 		},
 	});
 };
@@ -79,15 +178,15 @@ export const useUpdateSubtask = () => {
 export const useDeleteSubtask = () => {
 	const queryClient = useQueryClient();
 
-	return useMutation<void, Error, { id: number; taskId: number }>({
-		mutationFn: ({ id }) => deleteSubtask(id),
+	return useMutation({
+		mutationFn: ({ id, taskId }: { id: number; taskId: number }) =>
+			deleteSubtask(id),
 		onSuccess: (_, variables) => {
-			queryClient.invalidateQueries({
-				queryKey: ["subtasks", variables.taskId] as const,
-			});
-		},
-		onError: (error) => {
-			// 오류 핸들링
+			// 캐시에서 삭제된 항목 제거
+			queryClient.setQueryData<Subtask[]>(
+				["subtasks", variables.taskId],
+				(old = []) => old.filter((item) => item.id !== variables.id),
+			);
 		},
 	});
 };

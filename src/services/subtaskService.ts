@@ -33,38 +33,120 @@ export const createSubtask = async (
 	taskId: number,
 	name: string,
 ): Promise<Subtask> => {
+	const requestBody = {
+		taskId,
+		name,
+	};
+
+	console.log("[API] 서브태스크 생성 요청 본문:", JSON.stringify(requestBody));
+
 	const options = {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify({
-			taskId,
-			name,
-		}),
+		body: JSON.stringify(requestBody),
 	};
 
-	return fetchWithError<Subtask>(`/api/subtasks`, options);
+	try {
+		const result = await fetchWithError<Subtask>("/api/subtasks", options);
+		console.log("[API] 서브태스크 생성 응답:", result);
+		return result;
+	} catch (error) {
+		console.error("[API] 서브태스크 생성 오류:", error);
+		throw error;
+	}
 };
 
-// 서브태스크 수정
-export const updateSubtask = async (
+// 서브태스크 이름 수정 (POST 사용)
+export const updateSubtaskName = async (
 	id: number,
-	data: { name?: string; isCompleted?: boolean },
+	taskId: number, // taskId 매개변수 추가
+	name: string,
 ): Promise<Subtask> => {
+	// 백엔드 API 명세에 따른 요청 본문 (id, taskId, name 모두 포함)
+	const requestBody = {
+		id,
+		taskId,
+		name,
+	};
+
+	console.log(
+		"[API] 서브태스크 이름 수정 요청 본문:",
+		JSON.stringify(requestBody),
+	);
+
+	const options = {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(requestBody),
+	};
+
+	try {
+		// 요청 전송 전 최종 확인 로그
+		console.log("[API] 서브태스크 이름 수정 요청 URL: /api/subtasks");
+		console.log(`[API] 서브태스크 이름 수정 요청 메서드: ${options.method}`);
+		console.log("[API] 서브태스크 이름 수정 요청 헤더:", options.headers);
+		console.log("[API] 서브태스크 이름 수정 요청 본문:", options.body);
+
+		const result = await fetchWithError<Subtask>("/api/subtasks", options);
+		console.log("[API] 서브태스크 이름 수정 응답:", result);
+		return result;
+	} catch (error) {
+		console.error("[API] 서브태스크 이름 수정 오류:", error);
+
+		// 오류 정보를 더 자세히 로깅
+		if (error instanceof Error) {
+			console.error(`[API] 오류 메시지: ${error.message}`);
+			console.error(`[API] 오류 스택: ${error.stack}`);
+		}
+
+		throw error;
+	}
+};
+
+// 서브태스크 완료상태 업데이트 (PATCH 사용)
+export const updateSubtaskCompletion = async (
+	id: number,
+	isCompleted: boolean,
+): Promise<Subtask> => {
+	const requestBody = {
+		isCompleted,
+	};
+
+	console.log(
+		"[API] 서브태스크 완료상태 업데이트 요청 본문:",
+		JSON.stringify(requestBody),
+	);
+	console.log(`[API] 서브태스크 완료상태 업데이트 URL: /api/subtasks/${id}`);
+
 	const options = {
 		method: "PATCH",
 		headers: {
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify(data),
+		body: JSON.stringify(requestBody),
 	};
 
-	return fetchWithError<Subtask>(`/api/subtasks/${id}`, options);
+	try {
+		const result = await fetchWithError<Subtask>(
+			`/api/subtasks/${id}`,
+			options,
+		);
+		console.log("[API] 서브태스크 완료상태 업데이트 응답:", result);
+		return result;
+	} catch (error) {
+		console.error("[API] 서브태스크 완료상태 업데이트 오류:", error);
+		throw error;
+	}
 };
 
 // 서브태스크 삭제
 export const deleteSubtask = async (id: number): Promise<void> => {
+	console.log(`[API] 서브태스크 삭제 요청: id=${id}`);
+
 	const options = {
 		method: "DELETE",
 		headers: {
@@ -72,5 +154,11 @@ export const deleteSubtask = async (id: number): Promise<void> => {
 		},
 	};
 
-	await fetchWithError(`/api/subtasks/${id}`, options);
+	try {
+		await fetchWithError(`/api/subtasks/${id}`, options);
+		console.log(`[API] 서브태스크 삭제 성공: id=${id}`);
+	} catch (error) {
+		console.error("[API] 서브태스크 삭제 오류:", error);
+		throw error;
+	}
 };
