@@ -1,3 +1,5 @@
+"use client";
+
 import Loader from "@/components/loader/Loader";
 import { Suspense } from "react";
 import CompleteContent from "./CompleteContent";

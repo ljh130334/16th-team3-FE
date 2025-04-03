@@ -76,6 +76,11 @@ export interface TaskResponse {
 	createdAt: string;
 }
 
+export interface TaskWithPersona extends Omit<Task, "persona" | "dueDatetime"> {
+	persona: NonNullable<Task["persona"]>;
+	dueDatetime: string;
+}
+
 // API 응답을 Task 타입으로 변환하는 함수
 export function convertApiResponseToTask(response: TaskResponse): Task {
 	try {

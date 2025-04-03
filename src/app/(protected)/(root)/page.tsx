@@ -12,7 +12,7 @@ import {
 	useResetAlerts,
 	useStartTask,
 } from "@/hooks/useTasks";
-import type { Task } from "@/types/task";
+import type { Task, TaskWithPersona } from "@/types/task";
 import { parseDateAndTime } from "@/utils/dateFormat";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -1115,7 +1115,7 @@ const HomePageContent = () => {
 				<TaskDetailSheet
 					isOpen={isDetailSheetOpen}
 					onClose={handleCloseDetailSheet}
-					task={detailTask}
+					task={detailTask as TaskWithPersona}
 					onDelete={handleDeleteTask}
 					onStart={handleStartTask}
 				/>
