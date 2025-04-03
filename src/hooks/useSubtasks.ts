@@ -30,16 +30,6 @@ export const useCreateSubtask = () => {
 			queryClient.setQueryData<Subtask[]>(
 				["subtasks", variables.taskId],
 				(old = []) => {
-					// 중복 방지를 위해 ID 검사
-					const exists = old.some((item) => item.id === newSubtask.id);
-					if (exists) {
-						console.log(
-							`[Cache] ID ${newSubtask.id}가 이미 존재합니다. 중복 방지됨.`,
-						);
-						return old;
-					}
-
-					console.log(`[Cache] 새 항목 추가: ${newSubtask.id}`);
 					return [...old, newSubtask];
 				},
 			);
@@ -63,21 +53,6 @@ export const useUpdateSubtask = () => {
 			name?: string;
 			isCompleted?: boolean;
 		}) => {
-			// 값 타입 검사 추가 (디버깅용)
-			console.log("[Client] 서브태스크 수정 요청 매개변수 타입:", {
-				id: typeof id,
-				name: typeof name,
-				isCompleted: typeof isCompleted,
-				taskId: typeof taskId,
-			});
-
-			console.log("[Client] 서브태스크 수정 요청:", {
-				id,
-				name,
-				isCompleted,
-				taskId,
-			});
-
 			if (name !== undefined) {
 				// 이름 수정 - POST 메서드 사용
 				return updateSubtaskName(id, taskId, name);
@@ -103,8 +78,6 @@ export const useUpdateSubtask = () => {
 				queryClient.getQueryData<Subtask[]>(["subtasks", variables.taskId]) ||
 				[];
 
-			console.log("[Cache] 업데이트 전 캐시:", previousData);
-
 			// 캐시 데이터 직접 업데이트
 			queryClient.setQueryData<Subtask[]>(
 				["subtasks", variables.taskId],
@@ -121,7 +94,6 @@ export const useUpdateSubtask = () => {
 									? { isCompleted: variables.isCompleted }
 									: {}),
 							};
-							console.log(`[Cache] 항목 업데이트: ${subtask.id} => `, updated);
 							return updated;
 						}
 						return subtask;
@@ -137,8 +109,6 @@ export const useUpdateSubtask = () => {
 			console.error("[Client] 서브태스크 수정 오류:", error);
 
 			if (context?.previousData) {
-				console.log("[Cache] 오류로 인한 롤백:", context.previousData);
-
 				queryClient.setQueryData(
 					["subtasks", variables.taskId],
 					context.previousData,
@@ -148,8 +118,6 @@ export const useUpdateSubtask = () => {
 
 		// 서버에서 응답이 오면 캐시 업데이트 (중복 방지)
 		onSuccess: (updatedSubtask, variables) => {
-			console.log("[Client] 서브태스크 수정 성공:", updatedSubtask);
-
 			queryClient.setQueryData<Subtask[]>(
 				["subtasks", variables.taskId],
 				(old = []) => {

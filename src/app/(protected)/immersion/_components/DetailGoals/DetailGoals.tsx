@@ -395,7 +395,6 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 					/>
 				</button>
 			</div>
-
 			{subtasks.length === 0 && !isAddingGoal ? (
 				<button
 					type="button"
@@ -447,22 +446,25 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 												handleFinishEditing();
 											}
 										}}
-										onBlur={handleFinishEditing}
 										rows={1}
 									/>
 									{editingText && (
 										<button
-											onClick={() => {
+											onMouseDown={(e) => {
+												e.preventDefault();
+												e.stopPropagation();
 												setEditingText("");
-												setTimeout(() => editInputRef.current?.focus(), 0);
+												if (editInputRef.current) {
+													editInputRef.current.focus();
+												}
 											}}
 											className={deleteButtonStyles}
 											type="button"
 											aria-label="텍스트 지우기"
 										>
 											<Image
-												src="/icons/immersion/delete.svg"
-												alt="지우기"
+												src="/icons/x-circle.svg"
+												alt="제거"
 												width={24}
 												height={24}
 											/>
@@ -491,7 +493,6 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 					))}
 				</ul>
 			)}
-
 			{isAddingGoal && (
 				<div>
 					<div className="flex items-start py-2">
@@ -533,14 +534,19 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 							/>
 							{newGoalTitle && (
 								<button
-									onClick={handleClearText}
+									onClick={(e) => {
+										e.preventDefault(); // 이벤트 버블링 방지
+										e.stopPropagation(); // 이벤트 버블링 방지
+										setNewGoalTitle(""); // 직접 상태 업데이트
+										setTimeout(() => inputRef.current?.focus(), 0);
+									}}
 									className={deleteButtonStyles}
 									type="button"
 									aria-label="텍스트 지우기"
 								>
 									<Image
-										src="/icons/immersion/delete.svg"
-										alt="지우기"
+										src="/icons/x-circle.svg"
+										alt="제거"
 										width={24}
 										height={24}
 									/>
@@ -550,7 +556,6 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 					</div>
 				</div>
 			)}
-
 			{/* 토스트 경고 메시지 */}
 			{showLengthWarning && (
 				<ToastMessage message="최대 40자까지만 입력할 수 있어요." />

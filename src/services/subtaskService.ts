@@ -38,8 +38,6 @@ export const createSubtask = async (
 		name,
 	};
 
-	console.log("[API] 서브태스크 생성 요청 본문:", JSON.stringify(requestBody));
-
 	const options = {
 		method: "POST",
 		headers: {
@@ -50,7 +48,6 @@ export const createSubtask = async (
 
 	try {
 		const result = await fetchWithError<Subtask>("/api/subtasks", options);
-		console.log("[API] 서브태스크 생성 응답:", result);
 		return result;
 	} catch (error) {
 		console.error("[API] 서브태스크 생성 오류:", error);
@@ -70,11 +67,6 @@ export const updateSubtaskName = async (
 		name,
 	};
 
-	console.log(
-		"[API] 서브태스크 이름 수정 요청 본문:",
-		JSON.stringify(requestBody),
-	);
-
 	const options = {
 		method: "POST",
 		headers: {
@@ -84,14 +76,7 @@ export const updateSubtaskName = async (
 	};
 
 	try {
-		// 요청 전송 전 최종 확인 로그
-		console.log("[API] 서브태스크 이름 수정 요청 URL: /api/subtasks");
-		console.log(`[API] 서브태스크 이름 수정 요청 메서드: ${options.method}`);
-		console.log("[API] 서브태스크 이름 수정 요청 헤더:", options.headers);
-		console.log("[API] 서브태스크 이름 수정 요청 본문:", options.body);
-
 		const result = await fetchWithError<Subtask>("/api/subtasks", options);
-		console.log("[API] 서브태스크 이름 수정 응답:", result);
 		return result;
 	} catch (error) {
 		console.error("[API] 서브태스크 이름 수정 오류:", error);
@@ -114,12 +99,6 @@ export const updateSubtaskCompletion = async (
 		isCompleted,
 	};
 
-	console.log(
-		"[API] 서브태스크 완료상태 업데이트 요청 본문:",
-		JSON.stringify(requestBody),
-	);
-	console.log(`[API] 서브태스크 완료상태 업데이트 URL: /api/subtasks/${id}`);
-
 	const options = {
 		method: "PATCH",
 		headers: {
@@ -133,7 +112,6 @@ export const updateSubtaskCompletion = async (
 			`/api/subtasks/${id}`,
 			options,
 		);
-		console.log("[API] 서브태스크 완료상태 업데이트 응답:", result);
 		return result;
 	} catch (error) {
 		console.error("[API] 서브태스크 완료상태 업데이트 오류:", error);
@@ -143,8 +121,6 @@ export const updateSubtaskCompletion = async (
 
 // 서브태스크 삭제
 export const deleteSubtask = async (id: number): Promise<void> => {
-	console.log(`[API] 서브태스크 삭제 요청: id=${id}`);
-
 	const options = {
 		method: "DELETE",
 		headers: {
@@ -154,7 +130,6 @@ export const deleteSubtask = async (id: number): Promise<void> => {
 
 	try {
 		await fetchWithError(`/api/subtasks/${id}`, options);
-		console.log(`[API] 서브태스크 삭제 성공: id=${id}`);
 	} catch (error) {
 		console.error("[API] 서브태스크 삭제 오류:", error);
 		throw error;

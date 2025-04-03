@@ -21,8 +21,6 @@ export async function GET(request: NextRequest, context: any) {
 			);
 		}
 
-		console.log(`[API] 서브태스크 조회 요청: taskId=${taskId}`);
-
 		const response = await serverApi.get(`v1/tasks/${taskId}/subtasks`);
 
 		if (!response.ok) {
