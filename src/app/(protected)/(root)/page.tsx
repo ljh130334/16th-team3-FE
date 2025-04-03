@@ -23,9 +23,6 @@ import { useAuthStore } from '@/store';
 import Link from 'next/link';
 import CharacterDialog from '../(create)/_components/characterDialog/CharacterDialog';
 
-import * as gtag from '@/lib/gtag';
-import Script from 'next/script';
-
 const HomePageContent = () => {
   const pathname = usePathname();
   const router = useRouter();
@@ -318,6 +315,9 @@ const HomePageContent = () => {
     }
 
     const personaParam = searchParams.get('personaName');
+    if (personaParam) {
+      setPersonaName(personaParam);
+    }
 
     const personaIdParam = searchParams.get('personaId');
     const personaId = personaIdParam ? parseInt(personaIdParam, 10) : undefined;
@@ -473,695 +473,669 @@ const HomePageContent = () => {
     inProgressTasks.length === 0 && todayTasks.length > 0;
 
   return (
-    <>
-      <Script
-        strategy="afterInteractive"
-        src={`https://www.googletagmanager.com/gtag/js?id=${gtag.GA_TRACKING_ID}`}
-      />
-      <Script
-        id="gtag-init"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${gtag.GA_TRACKING_ID}', {
-              page_path: window.location.pathname,
-            });
-          `,
-        }}
-      />
-      <div className="flex flex-col overflow-hidden bg-background-primary">
-        <header className="fixed top-0 z-20 w-[100vw] bg-background-primary pt-[44px]">
-          <div className="flex h-[60px] items-center justify-between px-[20px] py-[15px]">
-            <Image
-              src="/icons/home/spurt.svg"
-              alt="SPURT"
-              width={54}
-              height={20}
-              priority
-              className="w-[54px]"
-            />
-            <Link href="/my-page">
-              <button type="button">
-                <Image
-                  src="/icons/home/mypage.svg"
-                  alt="마이페이지"
-                  width={20}
-                  height={20}
-                />
-              </button>
-            </Link>
-          </div>
-          <div className="px-[20px] py-[11px]">
-            <div className="flex space-x-4">
-              {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-              <div
-                onClick={() => {
-                  handleTabChange('today');
-                  router.replace('/?tab=today', { scroll: true });
-                }}
+    <div className="flex flex-col overflow-hidden bg-background-primary">
+      <header className="fixed top-0 z-20 w-[100vw] bg-background-primary pt-[44px]">
+        <div className="flex h-[60px] items-center justify-between px-[20px] py-[15px]">
+          <Image
+            src="/icons/home/spurt.svg"
+            alt="SPURT"
+            width={54}
+            height={20}
+            priority
+            className="w-[54px]"
+          />
+          <Link href="/my-page">
+            <button type="button">
+              <Image
+                src="/icons/home/mypage.svg"
+                alt="마이페이지"
+                width={20}
+                height={20}
+              />
+            </button>
+          </Link>
+        </div>
+        <div className="px-[20px] py-[11px]">
+          <div className="flex space-x-4">
+            {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+            <div
+              onClick={() => {
+                handleTabChange('today');
+                router.replace('/?tab=today', { scroll: true });
+              }}
+            >
+              <span
+                className={`t3 ${activeTab === 'today' ? 'text-text-normal' : 'text-text-disabled'}`}
               >
-                <span
-                  className={`t3 ${activeTab === 'today' ? 'text-text-normal' : 'text-text-disabled'}`}
-                >
-                  오늘 할일
-                </span>
-                <span
-                  className={`s1 ml-1 ${activeTab === 'today' ? 'text-text-primary' : 'text-text-disabled'}`}
-                >
-                  {todayTasks.length + inProgressTasks.length}
-                </span>
-              </div>
-              {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-              <div
-                onClick={() => {
-                  handleTabChange('all');
-                  router.replace('/?tab=all', { scroll: true });
-                }}
+                오늘 할일
+              </span>
+              <span
+                className={`s1 ml-1 ${activeTab === 'today' ? 'text-text-primary' : 'text-text-disabled'}`}
               >
-                <span
-                  className={`t3 ${activeTab === 'all' ? 'text-text-normal' : 'text-text-disabled'}`}
-                >
-                  전체 할일
-                </span>
-                <span
-                  className={`s1 ml-1 ${activeTab === 'all' ? 'text-text-primary' : 'text-text-disabled'}`}
-                >
-                  {allTasks.length}
-                </span>
-              </div>
+                {todayTasks.length + inProgressTasks.length}
+              </span>
+            </div>
+            {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+            <div
+              onClick={() => {
+                handleTabChange('all');
+                router.replace('/?tab=all', { scroll: true });
+              }}
+            >
+              <span
+                className={`t3 ${activeTab === 'all' ? 'text-text-normal' : 'text-text-disabled'}`}
+              >
+                전체 할일
+              </span>
+              <span
+                className={`s1 ml-1 ${activeTab === 'all' ? 'text-text-primary' : 'text-text-disabled'}`}
+              >
+                {allTasks.length}
+              </span>
             </div>
           </div>
-        </header>
+        </div>
+      </header>
 
-        {/* 메인 영역 - flex-1과 overflow-y-auto로 설정 */}
-        <main className="flex-1 overflow-y-auto px-5 pb-40 pt-28">
-          {/* 오늘 할일 탭 */}
-          {activeTab === 'today' && (
-            <>
-              {isTotallyEmpty && (
-                <div className="mt-[130px]">
-                  <div className="flex flex-col items-center px-4 text-center">
-                    <div className="mb-[50px]">
-                      <Image
-                        src="/icons/home/rocket.svg"
-                        alt="Rocket"
-                        width={64}
-                        height={64}
-                        className="mx-auto h-auto w-auto"
-                      />
-                    </div>
-                    <h2 className="t3 mb-[8px] text-text-strong">
-                      마감 할 일을 추가하고
-                      <br />
-                      바로 시작해볼까요?
-                    </h2>
-                    <p className="b3 text-text-alternative">
-                      미루지 않도록 알림을 보내 챙겨드릴게요.
-                    </p>
+      {/* 메인 영역 - flex-1과 overflow-y-auto로 설정 */}
+      <main className="flex-1 overflow-y-auto px-5 pb-40 pt-28">
+        {/* 오늘 할일 탭 */}
+        {activeTab === 'today' && (
+          <>
+            {isTotallyEmpty && (
+              <div className="mt-[130px]">
+                <div className="flex flex-col items-center px-4 text-center">
+                  <div className="mb-[50px]">
+                    <Image
+                      src="/icons/home/rocket.svg"
+                      alt="Rocket"
+                      width={64}
+                      height={64}
+                      className="mx-auto h-auto w-auto"
+                    />
                   </div>
+                  <h2 className="t3 mb-[8px] text-text-strong">
+                    마감 할 일을 추가하고
+                    <br />
+                    바로 시작해볼까요?
+                  </h2>
+                  <p className="b3 text-text-alternative">
+                    미루지 않도록 알림을 보내 챙겨드릴게요.
+                  </p>
                 </div>
-              )}
-
-              {/* 진행 중인 일이 있고 오늘 할 일도 있는 경우 */}
-              {hasTodayAndInProgressTasks && (
-                <>
-                  {/* 진행 중 섹션 */}
-                  <div className="mb-7">
-                    <h3 className="s2 mb-2 mt-2 text-text-neutral">진행 중</h3>
-                    {inProgressTasks.map((task) => (
-                      <InProgressTaskItem
-                        key={task.id}
-                        task={task}
-                        isReentry={isReentry}
-                        onShowDetails={() => handleDetailTask(task)}
-                      />
-                    ))}
-                  </div>
-
-                  {/* 진행 예정 섹션 */}
-                  <div className="mb-8">
-                    <h3 className="s2 mb-2 mt-2 text-text-neutral">
-                      진행 예정
-                    </h3>
-                    <div className="rounded-[20px] bg-component-gray-secondary p-4">
-                      {todayTasks.map((task, index) => (
-                        <React.Fragment key={task.id}>
-                          <div
-                            className="flex items-center justify-between"
-                            onClick={() => handleTaskClick(task)}
-                          >
-                            <div>
-                              <div className="c3 flex items-center text-text-primary">
-                                <span className="flex items-center">
-                                  <span>
-                                    {task.dueTime && task.dueDate
-                                      ? `${task.dueDate === new Date().toISOString().split('T')[0] ? '오늘' : new Date(task.dueDate).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })} ${task.dueTime}`
-                                      : task.dueDatetime
-                                        ? `${new Date(task.dueDatetime).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })} ${new Date(task.dueDatetime).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: 'numeric' })}까지`
-                                        : '시간 미정'}
-                                  </span>
-                                  <span className="c3 mx-1 text-text-neutral">
-                                    •
-                                  </span>
-                                  <Image
-                                    src="/icons/home/clock.svg"
-                                    alt="시간"
-                                    width={14}
-                                    height={14}
-                                    className="mr-[4px]"
-                                  />
-                                  <span className="c3 text-text-neutral">
-                                    {task.timeRequired || '1시간 소요'}
-                                  </span>
-                                </span>
-                              </div>
-                              <div className="s2 mt-[3px] text-text-strong">
-                                {task.title}
-                              </div>
-                            </div>
-                            <button
-                              className={`l4 rounded-[10px] px-[12px] py-[9.5px] ${
-                                (task.ignoredAlerts &&
-                                  task.ignoredAlerts >= 3) ||
-                                task.status === 'procrastinating'
-                                  ? 'bg-hologram text-text-inverse'
-                                  : task.status === 'inProgress'
-                                    ? 'bg-component-accent-tertiary text-text-strong'
-                                    : 'bg-component-accent-primary text-text-strong'
-                              }`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (
-                                  (task.ignoredAlerts &&
-                                    task.ignoredAlerts >= 3) ||
-                                  task.status === 'procrastinating'
-                                ) {
-                                  handleDetailTask(task); // 상세 시트를 보여주거나 시작 로직 추가
-                                } else {
-                                  startTaskMutation(task.id);
-                                }
-                              }}
-                            >
-                              {task.status === 'inProgress'
-                                ? '이어서 몰입'
-                                : (task.ignoredAlerts &&
-                                      task.ignoredAlerts >= 3) ||
-                                    task.status === 'procrastinating'
-                                  ? '지금 시작'
-                                  : '미리 시작'}
-                            </button>
-                          </div>
-                          {index < todayTasks.length - 1 && (
-                            <div className="h-[20px] w-full bg-component-gray-secondary"></div>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <button
-                      className="flex w-full items-center justify-between rounded-[20px] bg-component-gray-secondary px-4 py-4"
-                      onClick={() => router.push('/weekly-tasks')}
-                    >
-                      <span className="s2 text-text-neutral">이번주 할일</span>
-                      <Image
-                        src="/icons/home/arrow-right.svg"
-                        alt="Arrow Right"
-                        width={7}
-                        height={12}
-                      />
-                    </button>
-                  </div>
-                </>
-              )}
-
-              {/* 진행 중인 일만 있고 오늘 할 일은 없는 경우 */}
-              {hasInProgressTasksOnly && (
-                <>
-                  {/* 진행 중 섹션 */}
-                  <div className="mb-7">
-                    <h3 className="s3 mb-2 text-text-neutral">진행 중</h3>
-                    {inProgressTasks.map((task) => (
-                      <InProgressTaskItem
-                        key={task.id}
-                        task={task}
-                        isReentry={isReentry}
-                        onShowDetails={() => handleDetailTask(task)}
-                      />
-                    ))}
-                  </div>
-
-                  <div>
-                    <button
-                      className="flex w-full items-center justify-between rounded-[20px] bg-component-gray-secondary px-4 py-4"
-                      onClick={() => router.push('/weekly-tasks')}
-                    >
-                      <span className="s2 text-text-neutral">이번주 할일</span>
-                      <Image
-                        src="/icons/home/arrow-right.svg"
-                        alt="Arrow Right"
-                        width={7}
-                        height={12}
-                      />
-                    </button>
-                  </div>
-                </>
-              )}
-
-              {/* 진행 중인 일은 없고 오늘 진행 예정인 일만 있는 경우 */}
-              {hasTodayTasksOnly && (
-                <>
-                  {/* 진행 예정 섹션 */}
-                  <div className="mb-8">
-                    <h3 className="s2 mb-2 mt-2 text-text-neutral">
-                      진행 예정
-                    </h3>
-                    <div className="rounded-[20px] bg-component-gray-secondary p-4">
-                      {todayTasks.map((task, index) => (
-                        <React.Fragment key={task.id}>
-                          <div
-                            className="flex items-center justify-between"
-                            onClick={() => handleTaskClick(task)}
-                          >
-                            <div>
-                              <div className="c3 flex items-center text-text-primary">
-                                <span className="flex items-center">
-                                  <span>
-                                    {task.dueTime && task.dueDate
-                                      ? `${task.dueDate === new Date().toISOString().split('T')[0] ? '오늘' : new Date(task.dueDate).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })} ${task.dueTime}`
-                                      : task.dueDatetime
-                                        ? `${new Date(task.dueDatetime).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })} ${new Date(task.dueDatetime).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: 'numeric' })}까지`
-                                        : '시간 미정'}
-                                  </span>
-                                  <span className="c3 mx-1 text-text-neutral">
-                                    •
-                                  </span>
-                                  <Image
-                                    src="/icons/home/clock.svg"
-                                    alt="시간"
-                                    width={14}
-                                    height={14}
-                                    className="mr-[4px]"
-                                  />
-                                  <span className="c3 text-text-neutral">
-                                    {task.timeRequired || '1시간 소요'}
-                                  </span>
-                                </span>
-                              </div>
-                              <div className="s2 mt-[3px] text-text-strong">
-                                {task.title}
-                              </div>
-                            </div>
-                            <button
-                              className={`l4 rounded-[10px] px-[12px] py-[9.5px] ${
-                                (task.ignoredAlerts &&
-                                  task.ignoredAlerts >= 3) ||
-                                task.status === 'procrastinating'
-                                  ? 'bg-hologram text-text-inverse'
-                                  : task.status === 'inProgress'
-                                    ? 'bg-component-accent-tertiary text-text-strong'
-                                    : 'bg-component-accent-primary text-text-strong'
-                              }`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (
-                                  (task.ignoredAlerts &&
-                                    task.ignoredAlerts >= 3) ||
-                                  task.status === 'procrastinating'
-                                ) {
-                                  handleDetailTask(task); // 상세 시트를 보여주거나 시작 로직 추가
-                                } else {
-                                  startTaskMutation(task.id);
-                                }
-                              }}
-                            >
-                              {task.status === 'inProgress'
-                                ? '이어서 몰입'
-                                : (task.ignoredAlerts &&
-                                      task.ignoredAlerts >= 3) ||
-                                    task.status === 'procrastinating'
-                                  ? '지금 시작'
-                                  : '미리 시작'}
-                            </button>
-                          </div>
-                          {index < todayTasks.length - 1 && (
-                            <div className="bg-divider-weak h-[20px] w-full"></div>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <button
-                      className="flex w-full items-center justify-between rounded-[20px] bg-component-gray-secondary px-4 py-4"
-                      onClick={() => router.push('/weekly-tasks')}
-                    >
-                      <span className="s2 text-text-neutral">이번주 할일</span>
-                      <Image
-                        src="/icons/home/arrow-right.svg"
-                        alt="Arrow Right"
-                        width={7}
-                        height={12}
-                      />
-                    </button>
-                  </div>
-                </>
-              )}
-
-              {hasWeeklyTasksOnly && (
-                <div className="mt-4">
-                  <div className="mb-[40px]">
-                    <div className="flex flex-col items-center justify-center">
-                      <Image
-                        src="/icons/home/xman.svg"
-                        alt="Character"
-                        width={80}
-                        height={80}
-                        className="mb-[40px] mt-[60px]"
-                      />
-                      <h2 className="t3 text-center text-text-strong">
-                        오늘 마감할 일이 없어요.
-                      </h2>
-                      <h2 className="t3 mb-2 text-center text-text-strong">
-                        이번주 할일 먼저 해볼까요?
-                      </h2>
-                      <p className="b3 text-center text-text-alternative">
-                        이번주 안에 끝내야 하는 할 일이에요
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mb-4">
-                    {topWeeklyTasks.map((task) => (
-                      <TaskItem
-                        key={task.id}
-                        title={task.title}
-                        dueDate={task.dueDate}
-                        dueTime={task.dueTime}
-                        taskId={task.id}
-                        onClick={() => handleTaskClick(task)}
-                        onDelete={() => handleDeleteTask(task.id)}
-                        timeRequired={task.timeRequired}
-                        onPreviewStart={(taskId) =>
-                          taskId && startTaskMutation(taskId)
-                        }
-                        ignoredAlerts={task.ignoredAlerts}
-                        resetAlerts={resetAlerts}
-                        dueDatetime={task.dueDatetime}
-                        status={task.status}
-                      />
-                    ))}
-                  </div>
-
-                  <div>
-                    <button
-                      className="flex w-full items-center justify-between px-4 py-4"
-                      onClick={() => router.push('/weekly-tasks')}
-                    >
-                      <span className="s2 text-text-neutral">
-                        이번주 할일 더보기
-                      </span>
-                      <Image
-                        src="/icons/home/arrow-right.svg"
-                        alt="Arrow Right"
-                        width={7}
-                        height={12}
-                      />
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {hasAllTasksOnly && (
-                <div className="mt-4">
-                  <div className="mb-[40px]">
-                    <div className="flex flex-col items-center justify-center">
-                      <Image
-                        src="/icons/home/xman.svg"
-                        alt="Character"
-                        width={80}
-                        height={80}
-                        className="mb-[40px] mt-[60px]"
-                      />
-                      <h2 className="t3 text-center text-text-strong">
-                        이번주 마감할 일이 없어요.
-                      </h2>
-                      <h2 className="t3 mb-2 text-center text-text-strong">
-                        급한 할일부터 시작해볼까요?
-                      </h2>
-                      <p className="b3 text-center text-text-alternative">
-                        미루지 말고 여유있게 시작해보세요
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mb-4">
-                    {topAllTasks.map((task) => (
-                      <TaskItem
-                        key={task.id}
-                        title={task.title}
-                        dueDate={task.dueDate}
-                        dueTime={task.dueTime}
-                        taskId={task.id}
-                        onClick={() => handleTaskClick(task)}
-                        onDelete={() => handleDeleteTask(task.id)}
-                        timeRequired={task.timeRequired}
-                        onPreviewStart={(taskId) =>
-                          taskId && startTaskMutation(taskId)
-                        }
-                        ignoredAlerts={task.ignoredAlerts}
-                        resetAlerts={resetAlerts}
-                        dueDatetime={task.dueDatetime}
-                        status={task.status}
-                      />
-                    ))}
-                  </div>
-
-                  <div>
-                    <button
-                      className="flex w-full items-center justify-between px-4 py-4"
-                      onClick={() => setActiveTab('all')}
-                    >
-                      <span className="s2 text-text-neutral">
-                        전체 할일 더보기
-                      </span>
-                      <Image
-                        src="/icons/home/arrow-right.svg"
-                        alt="Arrow Right"
-                        width={7}
-                        height={12}
-                      />
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {showExpiredTaskSheet && expiredTask && (
-                <div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
-                  <div className="flex w-full flex-col items-center rounded-t-[28px] bg-component-gray-secondary p-4 pt-10">
-                    <h2 className="t3 text-center text-text-strong">
-                      {expiredTask.title}
-                    </h2>
-                    <p className="t3 mb-2 text-center text-text-strong">
-                      작업이 끝났어요. 짧게 돌아볼까요?
-                    </p>
-                    <div className="flex w-full justify-between">
-                      <p className="b3 mb-7 text-text-neutral">마감일 </p>
-                      <p className="b3 mb-7 text-text-neutral">
-                        {new Date(expiredTask.dueDate).toLocaleDateString(
-                          'ko-KR',
-                          { month: 'long', day: 'numeric' },
-                        )}
-                        ({expiredTask.dueDay}), {expiredTask.dueTime}
-                      </p>
-                    </div>
-                    <button
-                      className="l2 mb-3 w-full rounded-[16px] bg-component-accent-primary py-4 text-white"
-                      onClick={() => handleGoToReflection(expiredTask.id)}
-                    >
-                      회고하기
-                    </button>
-
-                    <button
-                      className="l2 w-full py-4 text-text-neutral"
-                      onClick={handleCloseExpiredSheet}
-                    >
-                      닫기
-                    </button>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-
-          {/* 전체 할일 탭 */}
-          {activeTab === 'all' && (
-            <>
-              {isAllEmpty ? (
-                <div className="mt-[130px]">
-                  <div className="flex h-full flex-col items-center justify-center px-4 text-center">
-                    <div className="mb-[50px]">
-                      <Image
-                        src="/icons/home/rocket.svg"
-                        alt="Rocket"
-                        width={64}
-                        height={64}
-                        className="mx-auto h-auto w-auto"
-                      />
-                    </div>
-                    <h2 className="t3 mb-[8px] text-text-strong">
-                      이번주 할일이 없어요.
-                      <br />
-                      마감할 일을 추가해볼까요?
-                    </h2>
-                    <p className="b3 text-text-alternative">
-                      미루지 않도록 알림을 보내 챙겨드릴게요.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div className="flex justify-end">
-                    <button className="c1 rounded-[8px] bg-component-gray-primary px-3 py-2 text-text-normal">
-                      마감일 가까운 순
-                    </button>
-                  </div>
-
-                  {inProgressTasks.length > 0 && (
-                    <div className="mb-6">
-                      <h3 className="s3 mb-2 text-text-neutral">진행 중</h3>
-                      {inProgressTasks.map((task) => (
-                        <AllTaskItem
-                          key={task.id}
-                          task={task}
-                          onClick={handleTaskClick}
-                          onDelete={handleDeleteTask}
-                        />
-                      ))}
-                    </div>
-                  )}
-
-                  {todayTasks.length > 0 && (
-                    <div className="mb-6">
-                      <h3 className="s3 mb-2 text-text-neutral">오늘</h3>
-                      {todayTasks.map((task) => (
-                        <AllTaskItem
-                          key={task.id}
-                          task={task}
-                          onClick={handleTaskClick}
-                          onDelete={handleDeleteTask}
-                        />
-                      ))}
-                    </div>
-                  )}
-
-                  {weeklyTasks.length > 0 && (
-                    <div className="mb-6">
-                      <h3 className="s3 mb-2 text-text-neutral">이번주</h3>
-                      {weeklyTasks.map((task) => (
-                        <AllTaskItem
-                          key={task.id}
-                          task={task}
-                          onClick={handleTaskClick}
-                          onDelete={handleDeleteTask}
-                        />
-                      ))}
-                    </div>
-                  )}
-
-                  {futureTasks.length > 0 && (
-                    <div className="mb-6">
-                      <h3 className="s3 mb-2 text-text-neutral">이후 할일</h3>
-                      {futureTasks.map((task) => (
-                        <AllTaskItem
-                          key={task.id}
-                          task={task}
-                          onClick={handleTaskClick}
-                          onDelete={handleDeleteTask}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </>
-              )}
-            </>
-          )}
-        </main>
-
-        <footer className="fixed bottom-0 left-0 right-0 z-10">
-          {/* 투명에서 검정색으로 페이드되는 그라디언트 오버레이 */}
-          <div
-            className="pointer-events-none absolute bottom-0 left-0 right-0 h-40"
-            style={{
-              background:
-                'linear-gradient(to bottom, rgba(15, 17, 20, 0) 0%, rgba(15, 17, 20, 1) 100%)',
-            }}
-          />
-
-          {/* 버튼 컨테이너 */}
-          <div className="relative flex justify-end p-5 pb-[47px]">
-            {showTooltip && (
-              <div className="b3 absolute bottom-[130px] right-4 rounded-[12px] bg-component-accent-primary px-4 py-3 text-text-strong shadow-lg">
-                지금 바로 할 일을 추가해보세요!
-                <div
-                  className="absolute h-0 w-0"
-                  style={{
-                    bottom: '-11px',
-                    right: '3rem',
-                    transform: 'translateX(50%)',
-                    borderStyle: 'solid',
-                    borderWidth: '12px 7px 0 7px',
-                    borderColor: '#6B6BE1 transparent transparent transparent',
-                  }}
-                ></div>
               </div>
             )}
-            <Button
-              variant="point"
-              size="md"
-              className="l2 flex h-[52px] w-[130px] items-center gap-2 rounded-full py-[16.5px] text-text-inverse"
-              onClick={handleAddTask}
-            >
-              <Image
-                src="/icons/home/plus.svg"
-                alt="할일 추가"
-                width={16}
-                height={16}
-              />
-              할일 추가
-            </Button>
-          </div>
-        </footer>
 
-        {detailTask && (
-          <TaskDetailSheet
-            isOpen={isDetailSheetOpen}
-            onClose={handleCloseDetailSheet}
-            task={detailTask as TaskWithPersona}
-            onDelete={handleDeleteTask}
-            onStart={handleStartTask}
-          />
+            {/* 진행 중인 일이 있고 오늘 할 일도 있는 경우 */}
+            {hasTodayAndInProgressTasks && (
+              <>
+                {/* 진행 중 섹션 */}
+                <div className="mb-7">
+                  <h3 className="s2 mb-2 mt-2 text-text-neutral">진행 중</h3>
+                  {inProgressTasks.map((task) => (
+                    <InProgressTaskItem
+                      key={task.id}
+                      task={task}
+                      isReentry={isReentry}
+                      onShowDetails={() => handleDetailTask(task)}
+                    />
+                  ))}
+                </div>
+
+                {/* 진행 예정 섹션 */}
+                <div className="mb-8">
+                  <h3 className="s2 mb-2 mt-2 text-text-neutral">진행 예정</h3>
+                  <div className="rounded-[20px] bg-component-gray-secondary p-4">
+                    {todayTasks.map((task, index) => (
+                      <React.Fragment key={task.id}>
+                        <div
+                          className="flex items-center justify-between"
+                          onClick={() => handleTaskClick(task)}
+                        >
+                          <div>
+                            <div className="c3 flex items-center text-text-primary">
+                              <span className="flex items-center">
+                                <span>
+                                  {task.dueTime && task.dueDate
+                                    ? `${task.dueDate === new Date().toISOString().split('T')[0] ? '오늘' : new Date(task.dueDate).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })} ${task.dueTime}`
+                                    : task.dueDatetime
+                                      ? `${new Date(task.dueDatetime).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })} ${new Date(task.dueDatetime).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: 'numeric' })}까지`
+                                      : '시간 미정'}
+                                </span>
+                                <span className="c3 mx-1 text-text-neutral">
+                                  •
+                                </span>
+                                <Image
+                                  src="/icons/home/clock.svg"
+                                  alt="시간"
+                                  width={14}
+                                  height={14}
+                                  className="mr-[4px]"
+                                />
+                                <span className="c3 text-text-neutral">
+                                  {task.timeRequired || '1시간 소요'}
+                                </span>
+                              </span>
+                            </div>
+                            <div className="s2 mt-[3px] text-text-strong">
+                              {task.title}
+                            </div>
+                          </div>
+                          <button
+                            className={`l4 rounded-[10px] px-[12px] py-[9.5px] ${
+                              (task.ignoredAlerts && task.ignoredAlerts >= 3) ||
+                              task.status === 'procrastinating'
+                                ? 'bg-hologram text-text-inverse'
+                                : task.status === 'inProgress'
+                                  ? 'bg-component-accent-tertiary text-text-strong'
+                                  : 'bg-component-accent-primary text-text-strong'
+                            }`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (
+                                (task.ignoredAlerts &&
+                                  task.ignoredAlerts >= 3) ||
+                                task.status === 'procrastinating'
+                              ) {
+                                handleDetailTask(task); // 상세 시트를 보여주거나 시작 로직 추가
+                              } else {
+                                startTaskMutation(task.id);
+                              }
+                            }}
+                          >
+                            {task.status === 'inProgress'
+                              ? '이어서 몰입'
+                              : (task.ignoredAlerts &&
+                                    task.ignoredAlerts >= 3) ||
+                                  task.status === 'procrastinating'
+                                ? '지금 시작'
+                                : '미리 시작'}
+                          </button>
+                        </div>
+                        {index < todayTasks.length - 1 && (
+                          <div className="h-[20px] w-full bg-component-gray-secondary"></div>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <button
+                    className="flex w-full items-center justify-between rounded-[20px] bg-component-gray-secondary px-4 py-4"
+                    onClick={() => router.push('/weekly-tasks')}
+                  >
+                    <span className="s2 text-text-neutral">이번주 할일</span>
+                    <Image
+                      src="/icons/home/arrow-right.svg"
+                      alt="Arrow Right"
+                      width={7}
+                      height={12}
+                    />
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* 진행 중인 일만 있고 오늘 할 일은 없는 경우 */}
+            {hasInProgressTasksOnly && (
+              <>
+                {/* 진행 중 섹션 */}
+                <div className="mb-7">
+                  <h3 className="s3 mb-2 text-text-neutral">진행 중</h3>
+                  {inProgressTasks.map((task) => (
+                    <InProgressTaskItem
+                      key={task.id}
+                      task={task}
+                      isReentry={isReentry}
+                      onShowDetails={() => handleDetailTask(task)}
+                    />
+                  ))}
+                </div>
+
+                <div>
+                  <button
+                    className="flex w-full items-center justify-between rounded-[20px] bg-component-gray-secondary px-4 py-4"
+                    onClick={() => router.push('/weekly-tasks')}
+                  >
+                    <span className="s2 text-text-neutral">이번주 할일</span>
+                    <Image
+                      src="/icons/home/arrow-right.svg"
+                      alt="Arrow Right"
+                      width={7}
+                      height={12}
+                    />
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* 진행 중인 일은 없고 오늘 진행 예정인 일만 있는 경우 */}
+            {hasTodayTasksOnly && (
+              <>
+                {/* 진행 예정 섹션 */}
+                <div className="mb-8">
+                  <h3 className="s2 mb-2 mt-2 text-text-neutral">진행 예정</h3>
+                  <div className="rounded-[20px] bg-component-gray-secondary p-4">
+                    {todayTasks.map((task, index) => (
+                      <React.Fragment key={task.id}>
+                        <div
+                          className="flex items-center justify-between"
+                          onClick={() => handleTaskClick(task)}
+                        >
+                          <div>
+                            <div className="c3 flex items-center text-text-primary">
+                              <span className="flex items-center">
+                                <span>
+                                  {task.dueTime && task.dueDate
+                                    ? `${task.dueDate === new Date().toISOString().split('T')[0] ? '오늘' : new Date(task.dueDate).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })} ${task.dueTime}`
+                                    : task.dueDatetime
+                                      ? `${new Date(task.dueDatetime).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })} ${new Date(task.dueDatetime).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: 'numeric' })}까지`
+                                      : '시간 미정'}
+                                </span>
+                                <span className="c3 mx-1 text-text-neutral">
+                                  •
+                                </span>
+                                <Image
+                                  src="/icons/home/clock.svg"
+                                  alt="시간"
+                                  width={14}
+                                  height={14}
+                                  className="mr-[4px]"
+                                />
+                                <span className="c3 text-text-neutral">
+                                  {task.timeRequired || '1시간 소요'}
+                                </span>
+                              </span>
+                            </div>
+                            <div className="s2 mt-[3px] text-text-strong">
+                              {task.title}
+                            </div>
+                          </div>
+                          <button
+                            className={`l4 rounded-[10px] px-[12px] py-[9.5px] ${
+                              (task.ignoredAlerts && task.ignoredAlerts >= 3) ||
+                              task.status === 'procrastinating'
+                                ? 'bg-hologram text-text-inverse'
+                                : task.status === 'inProgress'
+                                  ? 'bg-component-accent-tertiary text-text-strong'
+                                  : 'bg-component-accent-primary text-text-strong'
+                            }`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (
+                                (task.ignoredAlerts &&
+                                  task.ignoredAlerts >= 3) ||
+                                task.status === 'procrastinating'
+                              ) {
+                                handleDetailTask(task); // 상세 시트를 보여주거나 시작 로직 추가
+                              } else {
+                                startTaskMutation(task.id);
+                              }
+                            }}
+                          >
+                            {task.status === 'inProgress'
+                              ? '이어서 몰입'
+                              : (task.ignoredAlerts &&
+                                    task.ignoredAlerts >= 3) ||
+                                  task.status === 'procrastinating'
+                                ? '지금 시작'
+                                : '미리 시작'}
+                          </button>
+                        </div>
+                        {index < todayTasks.length - 1 && (
+                          <div className="bg-divider-weak h-[20px] w-full"></div>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <button
+                    className="flex w-full items-center justify-between rounded-[20px] bg-component-gray-secondary px-4 py-4"
+                    onClick={() => router.push('/weekly-tasks')}
+                  >
+                    <span className="s2 text-text-neutral">이번주 할일</span>
+                    <Image
+                      src="/icons/home/arrow-right.svg"
+                      alt="Arrow Right"
+                      width={7}
+                      height={12}
+                    />
+                  </button>
+                </div>
+              </>
+            )}
+
+            {hasWeeklyTasksOnly && (
+              <div className="mt-4">
+                <div className="mb-[40px]">
+                  <div className="flex flex-col items-center justify-center">
+                    <Image
+                      src="/icons/home/xman.svg"
+                      alt="Character"
+                      width={80}
+                      height={80}
+                      className="mb-[40px] mt-[60px]"
+                    />
+                    <h2 className="t3 text-center text-text-strong">
+                      오늘 마감할 일이 없어요.
+                    </h2>
+                    <h2 className="t3 mb-2 text-center text-text-strong">
+                      이번주 할일 먼저 해볼까요?
+                    </h2>
+                    <p className="b3 text-center text-text-alternative">
+                      이번주 안에 끝내야 하는 할 일이에요
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  {topWeeklyTasks.map((task) => (
+                    <TaskItem
+                      key={task.id}
+                      title={task.title}
+                      dueDate={task.dueDate}
+                      dueTime={task.dueTime}
+                      taskId={task.id}
+                      onClick={() => handleTaskClick(task)}
+                      onDelete={() => handleDeleteTask(task.id)}
+                      timeRequired={task.timeRequired}
+                      onPreviewStart={(taskId) =>
+                        taskId && startTaskMutation(taskId)
+                      }
+                      ignoredAlerts={task.ignoredAlerts}
+                      resetAlerts={resetAlerts}
+                      dueDatetime={task.dueDatetime}
+                      status={task.status}
+                    />
+                  ))}
+                </div>
+
+                <div>
+                  <button
+                    className="flex w-full items-center justify-between px-4 py-4"
+                    onClick={() => router.push('/weekly-tasks')}
+                  >
+                    <span className="s2 text-text-neutral">
+                      이번주 할일 더보기
+                    </span>
+                    <Image
+                      src="/icons/home/arrow-right.svg"
+                      alt="Arrow Right"
+                      width={7}
+                      height={12}
+                    />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {hasAllTasksOnly && (
+              <div className="mt-4">
+                <div className="mb-[40px]">
+                  <div className="flex flex-col items-center justify-center">
+                    <Image
+                      src="/icons/home/xman.svg"
+                      alt="Character"
+                      width={80}
+                      height={80}
+                      className="mb-[40px] mt-[60px]"
+                    />
+                    <h2 className="t3 text-center text-text-strong">
+                      이번주 마감할 일이 없어요.
+                    </h2>
+                    <h2 className="t3 mb-2 text-center text-text-strong">
+                      급한 할일부터 시작해볼까요?
+                    </h2>
+                    <p className="b3 text-center text-text-alternative">
+                      미루지 말고 여유있게 시작해보세요
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  {topAllTasks.map((task) => (
+                    <TaskItem
+                      key={task.id}
+                      title={task.title}
+                      dueDate={task.dueDate}
+                      dueTime={task.dueTime}
+                      taskId={task.id}
+                      onClick={() => handleTaskClick(task)}
+                      onDelete={() => handleDeleteTask(task.id)}
+                      timeRequired={task.timeRequired}
+                      onPreviewStart={(taskId) =>
+                        taskId && startTaskMutation(taskId)
+                      }
+                      ignoredAlerts={task.ignoredAlerts}
+                      resetAlerts={resetAlerts}
+                      dueDatetime={task.dueDatetime}
+                      status={task.status}
+                    />
+                  ))}
+                </div>
+
+                <div>
+                  <button
+                    className="flex w-full items-center justify-between px-4 py-4"
+                    onClick={() => setActiveTab('all')}
+                  >
+                    <span className="s2 text-text-neutral">
+                      전체 할일 더보기
+                    </span>
+                    <Image
+                      src="/icons/home/arrow-right.svg"
+                      alt="Arrow Right"
+                      width={7}
+                      height={12}
+                    />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {showExpiredTaskSheet && expiredTask && (
+              <div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
+                <div className="flex w-full flex-col items-center rounded-t-[28px] bg-component-gray-secondary p-4 pt-10">
+                  <h2 className="t3 text-center text-text-strong">
+                    {expiredTask.title}
+                  </h2>
+                  <p className="t3 mb-2 text-center text-text-strong">
+                    작업이 끝났어요. 짧게 돌아볼까요?
+                  </p>
+                  <div className="flex w-full justify-between">
+                    <p className="b3 mb-7 text-text-neutral">마감일 </p>
+                    <p className="b3 mb-7 text-text-neutral">
+                      {new Date(expiredTask.dueDate).toLocaleDateString(
+                        'ko-KR',
+                        { month: 'long', day: 'numeric' },
+                      )}
+                      ({expiredTask.dueDay}), {expiredTask.dueTime}
+                    </p>
+                  </div>
+                  <button
+                    className="l2 mb-3 w-full rounded-[16px] bg-component-accent-primary py-4 text-white"
+                    onClick={() => handleGoToReflection(expiredTask.id)}
+                  >
+                    회고하기
+                  </button>
+
+                  <button
+                    className="l2 w-full py-4 text-text-neutral"
+                    onClick={handleCloseExpiredSheet}
+                  >
+                    닫기
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
 
-        <CharacterDialog
-          isOpen={isDialogOpen}
-          task={taskName}
-          taskType={taskType}
-          personaName={personaName}
-          personaId={personaId}
-          onClick={handleCharacterDialogButtonClick}
+        {/* 전체 할일 탭 */}
+        {activeTab === 'all' && (
+          <>
+            {isAllEmpty ? (
+              <div className="mt-[130px]">
+                <div className="flex h-full flex-col items-center justify-center px-4 text-center">
+                  <div className="mb-[50px]">
+                    <Image
+                      src="/icons/home/rocket.svg"
+                      alt="Rocket"
+                      width={64}
+                      height={64}
+                      className="mx-auto h-auto w-auto"
+                    />
+                  </div>
+                  <h2 className="t3 mb-[8px] text-text-strong">
+                    이번주 할일이 없어요.
+                    <br />
+                    마감할 일을 추가해볼까요?
+                  </h2>
+                  <p className="b3 text-text-alternative">
+                    미루지 않도록 알림을 보내 챙겨드릴게요.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="flex justify-end">
+                  <button className="c1 rounded-[8px] bg-component-gray-primary px-3 py-2 text-text-normal">
+                    마감일 가까운 순
+                  </button>
+                </div>
+
+                {inProgressTasks.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="s3 mb-2 text-text-neutral">진행 중</h3>
+                    {inProgressTasks.map((task) => (
+                      <AllTaskItem
+                        key={task.id}
+                        task={task}
+                        onClick={handleTaskClick}
+                        onDelete={handleDeleteTask}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {todayTasks.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="s3 mb-2 text-text-neutral">오늘</h3>
+                    {todayTasks.map((task) => (
+                      <AllTaskItem
+                        key={task.id}
+                        task={task}
+                        onClick={handleTaskClick}
+                        onDelete={handleDeleteTask}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {weeklyTasks.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="s3 mb-2 text-text-neutral">이번주</h3>
+                    {weeklyTasks.map((task) => (
+                      <AllTaskItem
+                        key={task.id}
+                        task={task}
+                        onClick={handleTaskClick}
+                        onDelete={handleDeleteTask}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {futureTasks.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="s3 mb-2 text-text-neutral">이후 할일</h3>
+                    {futureTasks.map((task) => (
+                      <AllTaskItem
+                        key={task.id}
+                        task={task}
+                        onClick={handleTaskClick}
+                        onDelete={handleDeleteTask}
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </>
+        )}
+      </main>
+
+      <footer className="fixed bottom-0 left-0 right-0 z-10">
+        {/* 투명에서 검정색으로 페이드되는 그라디언트 오버레이 */}
+        <div
+          className="pointer-events-none absolute bottom-0 left-0 right-0 h-40"
+          style={{
+            background:
+              'linear-gradient(to bottom, rgba(15, 17, 20, 0) 0%, rgba(15, 17, 20, 1) 100%)',
+          }}
         />
 
-        <CreateTaskSheet
-          isOpen={isCreateSheetOpen}
-          onClose={handleCloseCreateSheet}
+        {/* 버튼 컨테이너 */}
+        <div className="relative flex justify-end p-5 pb-[47px]">
+          {showTooltip && (
+            <div className="b3 absolute bottom-[130px] right-4 rounded-[12px] bg-component-accent-primary px-4 py-3 text-text-strong shadow-lg">
+              지금 바로 할 일을 추가해보세요!
+              <div
+                className="absolute h-0 w-0"
+                style={{
+                  bottom: '-11px',
+                  right: '3rem',
+                  transform: 'translateX(50%)',
+                  borderStyle: 'solid',
+                  borderWidth: '12px 7px 0 7px',
+                  borderColor: '#6B6BE1 transparent transparent transparent',
+                }}
+              ></div>
+            </div>
+          )}
+          <Button
+            variant="point"
+            size="md"
+            className="l2 flex h-[52px] w-[130px] items-center gap-2 rounded-full py-[16.5px] text-text-inverse"
+            onClick={handleAddTask}
+          >
+            <Image
+              src="/icons/home/plus.svg"
+              alt="할일 추가"
+              width={16}
+              height={16}
+            />
+            할일 추가
+          </Button>
+        </div>
+      </footer>
+
+      {detailTask && (
+        <TaskDetailSheet
+          isOpen={isDetailSheetOpen}
+          onClose={handleCloseDetailSheet}
+          task={detailTask as TaskWithPersona}
+          onDelete={handleDeleteTask}
+          onStart={handleStartTask}
         />
-      </div>
-    </>
+      )}
+
+      <CharacterDialog
+        isOpen={isDialogOpen}
+        task={taskName}
+        taskType={taskType}
+        personaName={personaName}
+        personaId={personaId}
+        onClick={handleCharacterDialogButtonClick}
+      />
+
+      <CreateTaskSheet
+        isOpen={isCreateSheetOpen}
+        onClose={handleCloseCreateSheet}
+      />
+    </div>
   );
 };
 

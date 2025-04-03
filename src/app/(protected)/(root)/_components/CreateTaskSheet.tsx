@@ -114,7 +114,7 @@ const CreateTaskSheet = ({ isOpen, onClose }: CreateTaskSheetProps) => {
 						href="/instant-create"
 						onClick={(e) => {
 							e.preventDefault();
-							router.push("/scheduled-create", {
+							router.push("/instant-create", {
 								onTransitionReady: pageAnimation,
 							});
 						}}
