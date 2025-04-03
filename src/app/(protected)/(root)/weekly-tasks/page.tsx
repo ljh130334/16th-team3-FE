@@ -123,13 +123,13 @@ const WeeklyTasksPage = () => {
 					</>
 				) : (
 					<div className="mt-[120px] flex h-full flex-col items-center justify-center px-4 text-center">
-						<div className="mb-[50px] mt-[50px]">
+						<div className="mb-[40px] mt-[60px]">
 							<Image
 								src="/icons/home/rocket.svg"
 								alt="Rocket"
-								width={64}
-								height={64}
-								className="mx-auto h-auto w-auto"
+								width={142}
+								height={80}
+								className="mx-auto"
 							/>
 						</div>
 						<h2 className="t3 mb-[8px] mt-[8px] text-text-strong">
