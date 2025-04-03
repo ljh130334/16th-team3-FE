@@ -21,9 +21,9 @@ const SmallActionChip = ({ smallAction, onClick }: SmallActionChipProps) => {
 			<Image
 				src={`/icons/${smallAction}.svg`}
 				alt={smallAction}
-				width={20}
-				height={20}
-				className="mt-[2px]"
+				width={24}
+				height={24}
+				className=""
 			/>
 			<span className="l4">{SMALL_ACTION_LABELS[smallAction]}</span>
 		</div>

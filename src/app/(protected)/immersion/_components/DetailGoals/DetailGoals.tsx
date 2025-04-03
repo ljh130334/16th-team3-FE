@@ -29,7 +29,6 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 	const [editingText, setEditingText] = useState<string>("");
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const editInputRef = useRef<HTMLTextAreaElement>(null);
-	const [submitting, setSubmitting] = useState(false);
 
 	// API 연동 훅 사용
 	const { data: subtasks = [], isLoading } = useSubtasks(taskId);
@@ -52,8 +51,11 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 
 	// 글자수 경고 메시지 표시 관리
 	useEffect(() => {
-		setShowLengthWarning(newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH);
-	}, [newGoalTitle]);
+		setShowLengthWarning(
+			newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH ||
+				editingText.length > MAX_DETAIL_GOAL_LENGTH,
+		);
+	}, [newGoalTitle, editingText]);
 
 	// 최대 개수 토스트 자동 닫기
 	useEffect(() => {
@@ -78,45 +80,24 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 
 	// 새 목표 저장 핸들러
 	const handleSaveGoal = () => {
-		if (submitting) return; // 중복 제출 방지
-
 		const trimmedTitle = newGoalTitle.trim();
 		if (
 			trimmedTitle.length >= 1 &&
 			trimmedTitle.length <= MAX_DETAIL_GOAL_LENGTH
 		) {
-			// 저장 전에 입력 상태 초기화 (UX 개선)
-			const titleToSave = trimmedTitle;
-			setNewGoalTitle("");
-			setIsAddingGoal(false);
-			setSubmitting(true);
-
-			// 저장 요청 전송
 			createSubtaskMutation(
 				{
 					taskId,
-					name: titleToSave,
+					name: trimmedTitle,
 				},
 				{
 					onSuccess: () => {
-						setSubmitting(false);
-					},
-					onError: (error) => {
-						console.error("Failed to create subtask:", error);
-						// 오류 발생 시 다시 입력 상태로 복원
-						setNewGoalTitle(titleToSave);
-						setIsAddingGoal(true);
-						setSubmitting(false);
+						setNewGoalTitle("");
+						setIsAddingGoal(false);
 					},
 				},
 			);
 		}
-	};
-
-	// 텍스트 지우기 핸들러
-	const handleClearText = () => {
-		setNewGoalTitle("");
-		setTimeout(() => inputRef.current?.focus(), 0);
 	};
 
 	// 완료 상태 토글 핸들러
@@ -131,65 +112,22 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 		}
 	};
 
-	const handleUpdateGoalTitle = (goalId: number, newTitle: string) => {
-		if (newTitle.length <= MAX_DETAIL_GOAL_LENGTH) {
-			setEditingText(newTitle);
-			setEditShowLengthWarning(false);
-		} else {
-			setEditShowLengthWarning(true);
-		}
-	};
-
 	const handleStartEditing = (goalId: number, originalText: string) => {
 		setEditingGoalId(goalId);
 		setEditingText(originalText);
 	};
 
-	const handleEditTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		const value = e.target.value;
-		setEditingText(value);
-
-		// 글자 수 제한 경고 표시
-		setEditShowLengthWarning(value.length > MAX_DETAIL_GOAL_LENGTH);
-
-		// 자동 높이 조절
-		e.target.style.height = "auto";
-		e.target.style.height = `${e.target.scrollHeight}px`;
-	};
-
 	const handleFinishEditing = () => {
-		if (submitting) return; // 중복 제출 방지
-
 		if (
 			editingGoalId !== null &&
 			editingText.trim().length >= 1 &&
 			editingText.length <= MAX_DETAIL_GOAL_LENGTH
 		) {
-			const goalId = editingGoalId;
-			const newText = editingText.trim();
-
-			// 먼저 UI 상태 업데이트
-			setEditingGoalId(null);
-			setSubmitting(true);
-
-			// 그 다음 API 요청
-			updateSubtaskMutation(
-				{
-					id: goalId,
-					taskId,
-					name: newText,
-				},
-				{
-					onSuccess: () => {
-						setSubmitting(false);
-					},
-					onError: () => {
-						setSubmitting(false);
-					},
-				},
-			);
-		} else {
-			// 유효하지 않은 상태이면 편집 모드만 종료
+			updateSubtaskMutation({
+				id: editingGoalId,
+				taskId,
+				name: editingText,
+			});
 			setEditingGoalId(null);
 		}
 	};
@@ -235,6 +173,10 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 	const sortedGoals = [...subtasks].sort((a, b) =>
 		a.isCompleted === b.isCompleted ? 0 : a.isCompleted ? 1 : -1,
 	);
+
+	// 삭제 버튼 공통 스타일
+	const deleteButtonStyles =
+		"absolute right-0 top-1/2 transform -translate-y-1/2";
 
 	// 체크박스 컴포넌트들
 	const GradientCheckbox = () => (
@@ -373,10 +315,6 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 		</div>
 	);
 
-	// 삭제 버튼 공통 스타일
-	const deleteButtonStyles =
-		"absolute right-0 top-1/2 transform -translate-y-1/2";
-
 	if (isLoading) {
 		return (
 			<div
@@ -391,7 +329,6 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 			</div>
 		);
 	}
-
 	return (
 		<div
 			className="w-full p-4"
@@ -429,7 +366,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 			) : (
 				<ul className="flex flex-col">
 					{sortedGoals.map((goal) => (
-						<li key={goal.id} className="flex items-start py-2 relative">
+						<li key={goal.id} className="flex items-start py-2">
 							<div className="mr-3">
 								<CheckboxWithGradientBorder
 									checked={goal.isCompleted}
@@ -437,116 +374,89 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 								/>
 							</div>
 							{editingGoalId === goal.id ? (
-								<div className="relative flex-grow pr-8">
-									<textarea
-										value={editingText}
-										onChange={(e) =>
-											handleTextareaInput(
-												e,
-												MAX_DETAIL_GOAL_LENGTH,
-												setEditingText,
-											)
-										}
-										className={`text-b2 break-words w-full border-none bg-transparent p-0 outline-none resize-none overflow-hidden ${
-											goal.isCompleted
-												? "text-gray-neutral"
-												: "text-gray-normal"
-										}`}
-										style={{
-											wordBreak: "break-word",
-											display: "block",
-											caretColor: "#5D6470",
-											height: "auto",
-											minHeight: "1.5rem",
-										}}
-										enterKeyHint="done"
-										ref={editInputRef}
-										aria-label="세부 목표 수정"
-										onKeyDown={(e) => {
-											if (
-												e.key === "Enter" &&
-												editingText.trim().length >= 1 &&
-												editingText.length <= MAX_DETAIL_GOAL_LENGTH
-											) {
-												e.preventDefault();
-												handleFinishEditing();
-											} else if (e.key === "Escape") {
-												e.preventDefault();
-												setEditingGoalId(null);
+								<div className="relative flex-grow">
+									<div className="relative w-full flex items-center">
+										<textarea
+											value={editingText}
+											onChange={(e) =>
+												handleTextareaInput(
+													e,
+													MAX_DETAIL_GOAL_LENGTH,
+													setEditingText,
+												)
 											}
-										}}
-										onBlur={() => {
-											if (
-												editingText.trim().length >= 1 &&
-												editingText.length <= MAX_DETAIL_GOAL_LENGTH
-											) {
-												handleFinishEditing();
-											} else {
-												setEditingGoalId(null);
-											}
-										}}
-										rows={1}
-										autoComplete="off"
-										autoCorrect="off"
-										spellCheck="false"
-									/>
-									{editingText && (
-										<button
-											onMouseDown={(e) => {
-												e.preventDefault();
-												e.stopPropagation();
-												setEditingText("");
-												if (editInputRef.current) {
-													editInputRef.current.focus();
-												}
-											}}
-											className={deleteButtonStyles}
-											type="button"
-											aria-label="텍스트 지우기"
-										>
-											<Image
-												src="/icons/x-circle.svg"
-												alt="제거"
-												width={24}
-												height={24}
-											/>
-										</button>
-									)}
-								</div>
-							) : (
-								<div className="flex items-start w-full">
-									<div className="flex-grow overflow-hidden">
-										<button
-											type="button"
-											className={`text-b2 break-words cursor-text text-left w-full ${goal.isCompleted ? "text-gray-neutral" : "text-gray-normal"}`}
+											className={`text-b2 flex-grow break-words border-none bg-transparent p-0 outline-none resize-none overflow-hidden mr-3 ${
+												goal.isCompleted
+													? "text-gray-neutral"
+													: "text-gray-normal"
+											}`}
 											style={{
 												wordBreak: "break-word",
 												display: "block",
-												background: "transparent",
-												border: "none",
-												padding: 0,
-												margin: 0,
+												caretColor: "#5D6470",
+												height: "auto",
+												minHeight: "1.5rem",
 											}}
-											onClick={() => handleStartEditing(goal.id, goal.name)}
-											aria-label={`${goal.name} 편집하기`}
-										>
-											{formatGoalText(goal.name)}
-										</button>
-									</div>
-									<button
-										onClick={() => handleDeleteGoal(goal.id)}
-										className="ml-2 flex-shrink-0 text-gray-400 hover:text-red-500"
-										type="button"
-										aria-label="목표 삭제"
-									>
-										<Image
-											src="/icons/x-circle.svg"
-											alt="삭제"
-											width={20}
-											height={20}
+											enterKeyHint="done"
+											ref={editInputRef}
+											aria-label="세부 목표 수정"
+											rows={1}
 										/>
-									</button>
+										{editingText && (
+											<>
+												<button
+													onClick={handleFinishEditing}
+													disabled={
+														editingText.trim().length === 0 ||
+														editingText.length > MAX_DETAIL_GOAL_LENGTH
+													}
+													className={`text-s2 mr-3 ${editingText.trim().length === 0 || editingText.length > MAX_DETAIL_GOAL_LENGTH ? "text-[#8484E6]" : "text-[#8484E6]"}`}
+													type="button"
+													aria-label="세부 목표 수정 완료"
+												>
+													완료
+												</button>
+												<button
+													onMouseDown={(e) => {
+														e.preventDefault();
+														e.stopPropagation();
+														setEditingText("");
+														if (editInputRef.current) {
+															editInputRef.current.focus();
+														}
+													}}
+													className=""
+													type="button"
+													aria-label="텍스트 지우기"
+												>
+													<Image
+														src="/icons/x-circle.svg"
+														alt="제거"
+														width={24}
+														height={24}
+													/>
+												</button>
+											</>
+										)}
+									</div>
 								</div>
+							) : (
+								<button
+									type="button"
+									className={`text-b2 break-words cursor-text text-left w-full ${goal.isCompleted ? "text-gray-neutral" : "text-gray-normal"}`}
+									style={{
+										wordBreak: "break-word",
+										display: "block",
+										background: "transparent",
+										border: "none",
+										padding: 0,
+										margin: 0,
+									}}
+									onClick={() => handleStartEditing(goal.id, goal.name)}
+									aria-label={`${goal.name} 편집하기`}
+								>
+									{formatGoalText(goal.name)}
+								</button>
 							)}
 						</li>
 					))}
@@ -558,18 +468,8 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 						<div className="mr-3 mt-[1px]">
 							<GradientCheckbox />
 						</div>
-						<div className="relative flex-grow pr-8">
-							<form
-								onSubmit={(e) => {
-									e.preventDefault();
-									if (
-										newGoalTitle.trim().length >= 1 &&
-										newGoalTitle.length <= MAX_DETAIL_GOAL_LENGTH
-									) {
-										handleSaveGoal();
-									}
-								}}
-							>
+						<div className="relative flex-grow">
+							<div className="relative w-full flex items-center">
 								<textarea
 									value={newGoalTitle}
 									onChange={(e) =>
@@ -579,23 +479,8 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 											setNewGoalTitle,
 										)
 									}
-									onKeyDown={(e) => {
-										if (
-											e.key === "Enter" &&
-											!e.shiftKey &&
-											newGoalTitle.trim().length >= 1 &&
-											newGoalTitle.length <= MAX_DETAIL_GOAL_LENGTH
-										) {
-											e.preventDefault();
-											handleSaveGoal();
-										} else if (e.key === "Escape") {
-											e.preventDefault();
-											setIsAddingGoal(false);
-											setNewGoalTitle("");
-										}
-									}}
-									placeholder="세부 목표를 입력하세요"
-									className="b2 w-full rounded border-none bg-transparent p-0 text-gray-normal outline-none resize-none overflow-hidden"
+									placeholder=""
+									className="b2 flex-grow rounded border-none bg-transparent p-0 text-gray-normal outline-none resize-none overflow-hidden mr-3"
 									style={{
 										caretColor: "#5D6470",
 										height: "auto",
@@ -605,32 +490,42 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 									enterKeyHint="done"
 									aria-label="세부 목표 입력"
 									rows={1}
-									autoComplete="off"
-									autoCorrect="off"
-									spellCheck="false"
 								/>
-								<input type="submit" hidden />
-							</form>
-							{newGoalTitle && (
-								<button
-									onClick={(e) => {
-										e.preventDefault(); // 이벤트 버블링 방지
-										e.stopPropagation(); // 이벤트 버블링 방지
-										setNewGoalTitle(""); // 직접 상태 업데이트
-										setTimeout(() => inputRef.current?.focus(), 0);
-									}}
-									className={deleteButtonStyles}
-									type="button"
-									aria-label="텍스트 지우기"
-								>
-									<Image
-										src="/icons/x-circle.svg"
-										alt="제거"
-										width={24}
-										height={24}
-									/>
-								</button>
-							)}
+								{newGoalTitle && (
+									<>
+										<button
+											onClick={handleSaveGoal}
+											disabled={
+												newGoalTitle.trim().length === 0 ||
+												newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH
+											}
+											className={`text-s2 mr-3 ${newGoalTitle.trim().length === 0 || newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH ? "text-[#8484E6]" : "text-[#8484E6]"}`}
+											type="button"
+											aria-label="세부 목표 생성"
+										>
+											완료
+										</button>
+										<button
+											onClick={(e) => {
+												e.preventDefault();
+												e.stopPropagation();
+												setNewGoalTitle("");
+												setTimeout(() => inputRef.current?.focus(), 0);
+											}}
+											className=""
+											type="button"
+											aria-label="텍스트 지우기"
+										>
+											<Image
+												src="/icons/immersion/delete.svg"
+												alt="제거"
+												width={24}
+												height={24}
+											/>
+										</button>
+									</>
+								)}
+							</div>
 						</div>
 					</div>
 				</div>

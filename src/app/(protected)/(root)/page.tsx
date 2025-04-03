@@ -548,13 +548,13 @@ const HomePageContent = () => {
 						{isTotallyEmpty && (
 							<div className="mt-[130px]">
 								<div className="flex flex-col items-center px-4 text-center">
-									<div className="mb-[50px]">
+									<div className="mb-[40px]">
 										<Image
 											src="/icons/home/rocket.svg"
 											alt="Rocket"
-											width={64}
-											height={64}
-											className="mx-auto h-auto w-auto"
+											width={142}
+											height={80}
+											className="mx-auto"
 										/>
 									</div>
 									<h2 className="t3 mb-[8px] text-text-strong">
@@ -819,7 +819,7 @@ const HomePageContent = () => {
 											alt="Character"
 											width={80}
 											height={80}
-											className="mb-[40px] mt-[60px]"
+											className="mb-[48px] mt-[60px]"
 										/>
 										<h2 className="t3 text-center text-text-strong">
 											오늘 마감할 일이 없어요.
@@ -982,13 +982,13 @@ const HomePageContent = () => {
 						{isAllEmpty ? (
 							<div className="mt-[130px]">
 								<div className="flex h-full flex-col items-center justify-center px-4 text-center">
-									<div className="mb-[50px]">
+									<div className="mb-[40px]">
 										<Image
 											src="/icons/home/rocket.svg"
 											alt="Rocket"
-											width={64}
-											height={64}
-											className="mx-auto h-auto w-auto"
+											width={142}
+											height={80}
+											className="mx-auto"
 										/>
 									</div>
 									<h2 className="t3 mb-[8px] text-text-strong">
