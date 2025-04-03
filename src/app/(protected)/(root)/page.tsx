@@ -315,6 +315,9 @@ const HomePageContent = () => {
 		}
 
 		const personaParam = searchParams.get("personaName");
+		if (personaParam) {
+			setPersonaName(personaParam);
+		}
 
 		const personaIdParam = searchParams.get("personaId");
 		const personaId = personaIdParam ? parseInt(personaIdParam, 10) : undefined;
