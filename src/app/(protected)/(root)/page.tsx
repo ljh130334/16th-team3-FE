@@ -1,6 +1,7 @@
 "use client";
 
 import AllTaskItem from "@/app/(protected)/(root)/_components/AllTaskItem";
+import AllTasksTab from "@/app/(protected)/(root)/_components/AllTasksTab";
 import CreateTaskSheet from "@/app/(protected)/(root)/_components/CreateTaskSheet";
 import InProgressTaskItem from "@/app/(protected)/(root)/_components/InProgressTaskItem";
 import TaskDetailSheet from "@/app/(protected)/(root)/_components/TaskDetailSheet";
@@ -1002,69 +1003,14 @@ const HomePageContent = () => {
 								</div>
 							</div>
 						) : (
-							<>
-								<div className="flex justify-end">
-									<button className="c1 rounded-[8px] bg-component-gray-primary px-3 py-2 text-text-normal">
-										마감일 가까운 순
-									</button>
-								</div>
-
-								{inProgressTasks.length > 0 && (
-									<div className="mb-6">
-										<h3 className="s3 mb-2 text-text-neutral">진행 중</h3>
-										{inProgressTasks.map((task) => (
-											<AllTaskItem
-												key={task.id}
-												task={task}
-												onClick={handleTaskClick}
-												onDelete={handleDeleteTask}
-											/>
-										))}
-									</div>
-								)}
-
-								{todayTasks.length > 0 && (
-									<div className="mb-6">
-										<h3 className="s3 mb-2 text-text-neutral">오늘</h3>
-										{todayTasks.map((task) => (
-											<AllTaskItem
-												key={task.id}
-												task={task}
-												onClick={handleTaskClick}
-												onDelete={handleDeleteTask}
-											/>
-										))}
-									</div>
-								)}
-
-								{weeklyTasks.length > 0 && (
-									<div className="mb-6">
-										<h3 className="s3 mb-2 text-text-neutral">이번주</h3>
-										{weeklyTasks.map((task) => (
-											<AllTaskItem
-												key={task.id}
-												task={task}
-												onClick={handleTaskClick}
-												onDelete={handleDeleteTask}
-											/>
-										))}
-									</div>
-								)}
-
-								{futureTasks.length > 0 && (
-									<div className="mb-6">
-										<h3 className="s3 mb-2 text-text-neutral">이후 할일</h3>
-										{futureTasks.map((task) => (
-											<AllTaskItem
-												key={task.id}
-												task={task}
-												onClick={handleTaskClick}
-												onDelete={handleDeleteTask}
-											/>
-										))}
-									</div>
-								)}
-							</>
+							<AllTasksTab
+								inProgressTasks={inProgressTasks}
+								todayTasks={todayTasks}
+								weeklyTasks={weeklyTasks}
+								futureTasks={futureTasks}
+								onTaskClick={handleTaskClick}
+								onDeleteTask={handleDeleteTask}
+							/>
 						)}
 					</>
 				)}

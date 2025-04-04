@@ -10,13 +10,12 @@ import { useDeleteTask, useHomeData, useStartTask } from "@/hooks/useTasks";
 import type { Task, TaskWithPersona } from "@/types/task";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 
 // 유형별 우선순위 정의
 const CATEGORY_PRIORITY: Record<string, number> = {
 	과제: 1,
 	"그림∙디자인": 2,
-	디자인: 2, // '디자인'만 있는 경우도 추가
 	글쓰기: 3,
 	공부: 4,
 	프로그래밍: 5,
@@ -25,13 +24,21 @@ const CATEGORY_PRIORITY: Record<string, number> = {
 
 // 소요시간 처리 함수 (시간을 분 단위로 변환)
 const getDurationInMinutes = (task: Task): number => {
-	// 추정시간 계산 (context.ts의 estimatedHour, estimatedMinute와 연계)
 	const estimatedHour = task.estimatedHour
 		? Number.parseInt(task.estimatedHour, 10)
 		: 0;
 	const estimatedMinute = task.estimatedMinute
 		? Number.parseInt(task.estimatedMinute, 10)
 		: 0;
+
+	// timeRequired에서 시간 추출
+	if (estimatedHour === 0 && estimatedMinute === 0 && task.timeRequired) {
+		const match = task.timeRequired?.match(/(\d+)시간/);
+		if (match?.[1]) {
+			return Number.parseInt(match[1], 10) * 60;
+		}
+	}
+
 	return estimatedHour * 60 + estimatedMinute;
 };
 
@@ -44,6 +51,19 @@ const WeeklyTasksPage = () => {
 		() => homeData?.allTasks || [],
 		[homeData?.allTasks],
 	);
+
+	// 문서의 body 스크롤을 비활성화
+	useEffect(() => {
+		// 원래 body의 overflow 값을 저장
+		const originalStyle = window.getComputedStyle(document.body).overflow;
+		// body의 스크롤을 비활성화
+		document.body.style.overflow = "hidden";
+
+		// 컴포넌트가 언마운트될 때 원래 값으로 복원
+		return () => {
+			document.body.style.overflow = originalStyle;
+		};
+	}, []);
 
 	const filterOptions = [
 		{ id: "due-asc", label: "마감일 가까운 순" },
@@ -241,9 +261,9 @@ const WeeklyTasksPage = () => {
 
 	if (isLoading) {
 		return (
-			<div className="flex min-h-screen flex-col bg-background-primary">
+			<div className="flex h-screen flex-col bg-background-primary">
 				<Header title="이번주 할일" />
-				<div className="mt-16 flex flex-1 items-center justify-center px-5 pb-24">
+				<div className="flex flex-1 items-center justify-center px-5 pb-24">
 					<Loader />
 				</div>
 			</div>
@@ -251,65 +271,79 @@ const WeeklyTasksPage = () => {
 	}
 
 	return (
-		<div className="flex min-h-screen flex-col bg-background-primary">
-			<Header title="이번주 할일" />
+		<div className="flex h-screen flex-col bg-background-primary">
+			{/* 헤더 */}
+			<div className="flex-shrink-0 z-30">
+				<Header title="이번주 할일" />
+			</div>
 
-			<main className="mt-[70px] flex-1 px-5 pb-24">
-				{weeklyTasks.length > 0 ? (
-					<>
-						<div className="mb-4 flex justify-end">
-							<TaskFilterDropdown
-								options={filterOptions}
-								defaultOptionId="due-asc"
-								onChange={handleFilterChange}
-							/>
-						</div>
-
-						{selectedFilter.id === "category"
-							? sortedCategories.map((category) => (
-									<div key={category} className="mb-6">
-										<h3 className="s3 mb-2 text-gray-neutral">{category}</h3>
-										{groupedTasks[category].map((task) => (
-											<WeeklyTaskItem
-												key={task.id}
-												task={task}
-												onClick={handleTaskClick}
-												onDelete={handleDeleteTask}
-											/>
-										))}
-									</div>
-								))
-							: weeklyTasks.map((task) => (
-									<WeeklyTaskItem
-										key={task.id}
-										task={task}
-										onClick={handleTaskClick}
-										onDelete={handleDeleteTask}
+			{/* 스크롤 영역 */}
+			<div
+				className="flex-1 overflow-y-auto"
+				style={{
+					height: "calc(100vh - 100px)",
+					paddingBottom: "24px",
+				}}
+			>
+				<div className="px-5 pt-[100px]">
+					{weeklyTasks.length > 0 ? (
+						<>
+							<div className="sticky top-0 pt-4 pb-4 bg-background-primary z-10">
+								<div className="flex justify-end">
+									<TaskFilterDropdown
+										options={filterOptions}
+										defaultOptionId="due-asc"
+										onChange={handleFilterChange}
 									/>
-								))}
-					</>
-				) : (
-					<div className="mt-[120px] flex h-full flex-col items-center justify-center px-4 text-center">
-						<div className="mb-[40px] mt-[60px]">
-							<Image
-								src="/icons/home/rocket.svg"
-								alt="Rocket"
-								width={142}
-								height={80}
-								className="mx-auto"
-							/>
+								</div>
+							</div>
+
+							{selectedFilter.id === "category"
+								? sortedCategories.map((category) => (
+										<div key={category} className="mb-6">
+											<h3 className="s3 mb-2 text-text-neutral">{category}</h3>
+											{groupedTasks[category].map((task) => (
+												<WeeklyTaskItem
+													key={task.id}
+													task={task}
+													onClick={handleTaskClick}
+													onDelete={handleDeleteTask}
+												/>
+											))}
+										</div>
+									))
+								: weeklyTasks.map((task) => (
+										<WeeklyTaskItem
+											key={task.id}
+											task={task}
+											onClick={handleTaskClick}
+											onDelete={handleDeleteTask}
+										/>
+									))}
+						</>
+					) : (
+						<div className="mt-[120px] flex h-full flex-col items-center justify-center px-4 text-center">
+							<div className="mb-[40px] mt-[60px]">
+								<Image
+									src="/icons/home/rocket.svg"
+									alt="Rocket"
+									width={142}
+									height={80}
+									className="mx-auto"
+								/>
+							</div>
+							<h2 className="t3 mb-[8px] mt-[8px] text-text-strong">
+								이번주 할일이 없어요.
+								<br />
+								마감할 일을 추가해볼까요?
+							</h2>
+							<p className="b3 text-text-alternative">
+								미루지 않도록 알림을 보내 챙겨드릴게요.
+							</p>
 						</div>
-						<h2 className="t3 mb-[8px] mt-[8px] text-text-strong">
-							이번주 할일이 없어요.
-							<br />
-							마감할 일을 추가해볼까요?
-						</h2>
-						<p className="b3 text-text-alternative">
-							미루지 않도록 알림을 보내 챙겨드릴게요.
-						</p>
-					</div>
-				)}
-			</main>
+					)}
+				</div>
+			</div>
 
 			{selectedTask && (
 				<TaskDetailSheet
