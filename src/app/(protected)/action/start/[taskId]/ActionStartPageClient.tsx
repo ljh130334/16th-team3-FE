@@ -36,7 +36,9 @@ export default function ActionStartPageClient({ initialTask }: Props) {
       </div>
 
       <ActionStartDrawer
-        onTakePicture={handleTakePicture}
+        onTakePicture={() =>
+          handleTakePicture(initialTask?.triggerAction ?? '')
+        }
         smallActionTitle={initialTask?.triggerAction}
         dueDate={initialTask?.dueDatetime}
         taskId={initialTask?.id?.toString()}

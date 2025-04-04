@@ -87,7 +87,7 @@ export default function ActionPushPageClient({
         <ActionDrawer
           screenState={screenState}
           task={task ?? task}
-          onTakePicture={handleTakePicture}
+          onTakePicture={() => handleTakePicture(task?.triggerAction ?? '')}
         />
       </div>
       <div className="absolute bottom-0 left-1/2 aspect-[424/647] h-[250px] w-full max-w-md -translate-x-1/2 bg-red-500/15 mix-blend-color-dodge blur-[62px]"></div>

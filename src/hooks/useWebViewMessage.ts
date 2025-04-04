@@ -6,9 +6,9 @@ import { useEffect } from "react";
 export const useWebViewMessage = (router?: ReturnType<typeof useRouter>) => {
 	const setDeviceInfo = useUserStore((state) => state.setDeviceInfo);
 
-	const handleTakePicture = () => {
+	const handleTakePicture = (action: string) => {
 		try {
-			const message = JSON.stringify({ type: "CAMERA_OPEN" });
+			const message = JSON.stringify({ type: "CAMERA_OPEN", action });
 			window.ReactNativeWebView?.postMessage(message);
 		} catch (error) {
 			console.error("메시지 전송 에러:", error);
