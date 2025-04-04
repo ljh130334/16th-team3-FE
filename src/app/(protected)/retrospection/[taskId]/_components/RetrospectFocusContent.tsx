@@ -2,7 +2,7 @@ import { useRef } from "react";
 
 const BAR = {
     HEIGHT: 18,
-    SLIDER_RADIUS: 12,
+    SLIDER_RADIUS: 9,
 }
 
 const RetrospectFocusContent = ({
@@ -109,8 +109,10 @@ const RetrospectFocusContent = ({
 
                 {/* 슬라이더 핸들 */}
                 <div
-                className={`absolute m-3 z-20 w-${BAR.SLIDER_RADIUS*2/4} h-${BAR.SLIDER_RADIUS*2/4} rounded-full border-2 border-white bg-white shadow`}
+                className={`absolute m-3 z-30 rounded-full border-2 border-white bg-white shadow`}
                 style={{
+                    width: `${BAR.SLIDER_RADIUS*2}px`,
+                    height: `${BAR.SLIDER_RADIUS*2}px`,
                     left: `calc(${(retrospectContent.focus / 5) * 100}% - ${BAR.SLIDER_RADIUS*2}px)`,
                     transition: "left 0.2s ease",
                 }}
