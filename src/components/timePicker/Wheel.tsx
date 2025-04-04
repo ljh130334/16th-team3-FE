@@ -11,17 +11,18 @@ const Wheel = (props: {
 	label?: string;
 	length: number;
 	loop?: boolean;
+	wheelSize?: number;
 	perspective?: "left" | "right" | "center";
 	width: number;
 	setValue?: (relative: number, absolute: number) => string;
 	onChange?: (currentValue: string | number) => void;
 }) => {
 	const perspective = "center";
-	const wheelSize = 20;
+	const wheelSize = props.wheelSize || 20;
 	const slides = props.length;
 	const slideDegree = 360 / wheelSize;
-	const slidesPerView = props.loop ? 3 : 1;
-	const spacing = 50;
+	const slidesPerView = props.loop ? 2 : 1;
+	const spacing = 25;
 
 	const [sliderState, setSliderState] = useState<TrackDetails | null>(null);
 	const size = useRef(0);
@@ -65,7 +66,7 @@ const Wheel = (props: {
 			}
 		},
 		rubberband: !props.loop,
-		mode: "free-snap",
+		mode: "snap",
 	});
 
 	const [sliderRef, slider] = useKeenSlider<HTMLDivElement>(options.current);

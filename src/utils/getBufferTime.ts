@@ -10,11 +10,14 @@ const getBufferTime = (
 	const minutes = Number(estimatedMinute) || 0;
 	const estimatedTotalMinutes = days * 1440 + hours * 60 + minutes;
 
-	const desiredBufferMinutes = ((estimatedTotalMinutes * scale) / 5) * 5;
+	const desiredBufferMinutes =
+		Math.round((estimatedTotalMinutes * scale) / 5) * 5;
 
 	const now = new Date();
 	const remainingMinutes = deadlineDateTime
-		? (deadlineDateTime.getTime() - now.getTime()) / (1000 * 60)
+		? Math.floor(
+				(deadlineDateTime.getTime() - now.getTime()) / (1000 * 60) / 5,
+			) * 5
 		: 0;
 
 	let bufferMinutes: number;
