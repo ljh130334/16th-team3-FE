@@ -36,15 +36,21 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 
 	// 입력 필드 포커스 처리
 	useEffect(() => {
-		const timer = setTimeout(() => {
-			if (isAddingGoal && inputRef.current) {
-				inputRef.current.focus();
-			} else if (editingGoalId !== null && editInputRef.current) {
-				editInputRef.current.focus();
-			}
-		}, 0);
+		if (isAddingGoal && inputRef.current) {
+			const timer = setTimeout(() => {
+				inputRef.current?.focus();
+			}, 50);
 
-		return () => clearTimeout(timer);
+			return () => clearTimeout(timer);
+		}
+
+		if (editingGoalId !== null && editInputRef.current) {
+			const timer = setTimeout(() => {
+				editInputRef.current?.focus();
+			}, 50);
+
+			return () => clearTimeout(timer);
+		}
 	}, [isAddingGoal, editingGoalId]);
 
 	// 글자수 경고 메시지 표시 관리
@@ -74,6 +80,12 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 		}
 
 		setIsAddingGoal(true);
+
+		setTimeout(() => {
+			if (inputRef.current) {
+				inputRef.current.focus();
+			}
+		}, 50);
 	};
 
 	// 새 목표 저장 핸들러
@@ -111,6 +123,12 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 	const handleStartEditing = (goalId: number, originalText: string) => {
 		setEditingGoalId(goalId);
 		setEditingText(originalText);
+		setTimeout(() => {
+			if (editInputRef.current) {
+				editInputRef.current.focus();
+				editInputRef.current.click();
+			}
+		}, 100);
 	};
 
 	// 편집 완료 핸들러
@@ -448,7 +466,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 							<textarea
 								value={newGoalTitle}
 								onChange={(e) => handleTextareaInput(e, setNewGoalTitle)}
-								placeholder=""
+								placeholder="세부 목표를 적어주세요"
 								className="b2 flex-grow min-w-0 rounded border-none bg-transparent p-0 text-gray-normal outline-none resize-none overflow-hidden mr-3"
 								style={{
 									caretColor: "#5D6470",
@@ -459,6 +477,9 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 								enterKeyHint="done"
 								aria-label="세부 목표 입력"
 								rows={1}
+								autoComplete="off"
+								autoCorrect="off"
+								spellCheck="false"
 							/>
 							{newGoalTitle && (
 								<>

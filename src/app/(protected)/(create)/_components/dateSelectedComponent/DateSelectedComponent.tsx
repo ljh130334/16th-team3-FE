@@ -18,13 +18,11 @@ import {
 
 interface DateSelectedComponentProps {
 	deadlineDate: Date | undefined;
-	isLastStepBufferTime?: boolean;
 	handleDateChange: (date: Date) => void;
 }
 
 const DateSelectedComponent = ({
 	deadlineDate,
-	isLastStepBufferTime,
 	handleDateChange,
 }: DateSelectedComponentProps) => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -73,14 +71,8 @@ const DateSelectedComponent = ({
 		}
 	}, [toastMessage]);
 
-	useEffect(() => {
-		if (isLastStepBufferTime) {
-			setIsOpen(true);
-		}
-	}, [isLastStepBufferTime]);
-
 	return (
-		<Drawer open={isOpen} onDrag={() => setIsOpen(false)}>
+		<Drawer open={isOpen} closeThreshold={0.5} onOpenChange={setIsOpen}>
 			<DrawerTrigger>
 				<div className="relative mt-2 w-full">
 					{/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
