@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import Link from "next/link";
 
 type Props = {
 	setOpenLeaveModal: (open: boolean) => void;
@@ -23,9 +24,11 @@ const RetrospectLeaveModalContent = ({ setOpenLeaveModal, router }: Props) => {
 				<Button variant="default" onClick={() => setOpenLeaveModal(false)}>
 					취소
 				</Button>
-				<Button variant="primary" onClick={() => router.back()}>
-					나가기
-				</Button>
+				<Link href="/" className="inline-block w-full">
+					<Button variant="primary">
+						나가기
+					</Button>
+				</Link>
 			</div>
 		</div>
 	);
