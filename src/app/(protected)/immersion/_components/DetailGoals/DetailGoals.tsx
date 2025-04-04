@@ -39,10 +39,12 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 		const timer = setTimeout(() => {
 			if (isAddingGoal && inputRef.current) {
 				inputRef.current.focus();
+				inputRef.current.click();
 			} else if (editingGoalId !== null && editInputRef.current) {
 				editInputRef.current.focus();
+				editInputRef.current.click();
 			}
-		}, 0);
+		}, 100);
 
 		return () => clearTimeout(timer);
 	}, [isAddingGoal, editingGoalId]);
@@ -74,6 +76,14 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 		}
 
 		setIsAddingGoal(true);
+
+		// setTimeout을 사용하여 상태 업데이트 후 실행되도록 함
+		setTimeout(() => {
+			if (inputRef.current) {
+				inputRef.current.focus();
+				inputRef.current.click();
+			}
+		}, 100);
 	};
 
 	// 새 목표 저장 핸들러
@@ -111,6 +121,12 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 	const handleStartEditing = (goalId: number, originalText: string) => {
 		setEditingGoalId(goalId);
 		setEditingText(originalText);
+		setTimeout(() => {
+			if (editInputRef.current) {
+				editInputRef.current.focus();
+				editInputRef.current.click();
+			}
+		}, 100);
 	};
 
 	// 편집 완료 핸들러

@@ -51,8 +51,10 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 			const timeStr = calculateRemainingTime(targetDate);
 
-			// 포맷 변경: n분 n초 남음, n시간 n분 남음, n일 n시간 n분 남음 형식 유지
-			setRemainingTime(timeStr);
+			// '남음' 문자열 제거
+			const timeStrWithoutSuffix = timeStr.replace(/ 남음$/, "");
+
+			setRemainingTime(timeStrWithoutSuffix);
 		};
 
 		// 초기 업데이트
@@ -125,7 +127,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			<div className="flex-1 overflow-y-auto">
 				<div className="relative z-10">
 					<div className="relative">
-						<div className="absolute inset-0 top-5 h-[400px]">
+						<div className="absolute inset-0 -top-5 h-[500px]">
 							<Image
 								src={
 									isUrgent(initialTask)
@@ -141,8 +143,8 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 						</div>
 
 						{/* 시간 정보 */}
-						<div className="relative z-10 mt-5 flex flex-col items-center justify-center">
-							<div className="text-s2">{initialTask.name} 마감까지</div>
+						<div className="relative z-10 mt-[6px] flex flex-col items-center justify-center">
+							<div className="text-s2">{initialTask.title} 마감까지</div>
 							<div
 								className={`whitespace-pre-line text-center ${isUrgent(initialTask) ? "text-h2" : "text-h3"} ${!isUrgent(initialTask) ? "bg-hologram bg-clip-text text-transparent" : ""}`}
 								style={
