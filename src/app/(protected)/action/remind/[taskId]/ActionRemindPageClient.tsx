@@ -103,6 +103,18 @@ export default function ActionRemindPageClient({
 
   const reminderTimes = calculateReminderTimes(count, selectedInterval);
 
+  const calculateRemainTime = () => {
+    const now = new Date();
+    const targetTime = new Date(initialTask.dueDatetime);
+    const diff = targetTime.getTime() - now.getTime();
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    if (hours <= 0) {
+      return `${minutes}분`;
+    }
+    return `${hours}시간 ${minutes}분`;
+  }
+
   return (
     <div className="flex h-full flex-col bg-background-primary pb-[30px]">
       {/* TODO : 헤더 컴포넌트로 변경 예정 */}
@@ -120,7 +132,7 @@ export default function ActionRemindPageClient({
         <div> {/* Content */}
           <TaskDetails
             taskName={initialTask?.name ?? ''}
-            remainingTime="4시간"
+            remainingTime={calculateRemainTime()}
             selectedInterval={selectedInterval}
             onIntervalChange={setSelectedInterval}
           />
