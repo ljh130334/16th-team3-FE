@@ -285,7 +285,7 @@ const WeeklyTasksPage = () => {
 					paddingBottom: "24px",
 				}}
 			>
-				<div className="px-5 pt-[100px]">
+				<div className="px-5 pt-[70px]">
 					{weeklyTasks.length > 0 ? (
 						<>
 							<div className="sticky top-0 pt-4 pb-4 bg-background-primary z-10">
