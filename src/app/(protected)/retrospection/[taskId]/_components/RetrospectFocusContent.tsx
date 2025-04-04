@@ -62,6 +62,30 @@ const RetrospectFocusContent = ({
         window.removeEventListener("mouseup", handleMouseUp);
     };
 
+    const handleTouch = (e: React.TouchEvent) => {
+        const touch = e.touches[0];
+        const idx = getClosestIndex(touch.clientX);
+        setFocusContent(idx);
+        isDragging.current = true;
+    
+        const handleMove = (e: TouchEvent) => {
+            if (!isDragging.current) return;
+            const touch = e.touches[0];
+            const idx = getClosestIndex(touch.clientX);
+            setFocusContent(idx);
+        };
+    
+        const handleEnd = () => {
+            isDragging.current = false;
+            window.removeEventListener("touchmove", handleMove);
+            window.removeEventListener("touchend", handleEnd);
+        };
+    
+        window.addEventListener("touchmove", handleMove);
+        window.addEventListener("touchend", handleEnd);
+    }
+
+
     return (
         <div className="w-full mx-2 mt-1">
             <div 
@@ -71,6 +95,7 @@ const RetrospectFocusContent = ({
                     height: `${BAR.HEIGHT}px`,
                 }}
                 onMouseDown={handleMouseDown}
+                onTouchStart={handleTouch}
             >
                 {/* 전체 바 배경 */}
                 <div 
