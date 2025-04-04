@@ -466,7 +466,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 							<textarea
 								value={newGoalTitle}
 								onChange={(e) => handleTextareaInput(e, setNewGoalTitle)}
-								placeholder=""
+								placeholder="세부 목표를 적어주세요"
 								className="b2 flex-grow min-w-0 rounded border-none bg-transparent p-0 text-gray-normal outline-none resize-none overflow-hidden mr-3"
 								style={{
 									caretColor: "#5D6470",

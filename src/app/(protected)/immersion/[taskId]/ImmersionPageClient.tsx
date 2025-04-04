@@ -184,8 +184,8 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 									/>
 									<span>
 										{isUrgent(initialTask)
-											? "마지막 1시간! 스퍼트 올려서 눈물 닦고 끝까지!"
-											: "한 줄만 써봐요! 표지만 완성은 안 돼요!"}
+											? "마지막 한 시간! 스퍼트 올릴 타이밍이에요!"
+											: "시작 준비 끝! 가볍게 들어가볼까요?"}
 									</span>
 								</div>
 
