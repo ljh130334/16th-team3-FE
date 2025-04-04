@@ -46,6 +46,11 @@ export interface Task {
 	triggerActionAlarmTime?: string;
 	estimatedTime?: number;
 	createdAt?: string;
+	estimatedHour?: string;
+	estimatedMinute?: string;
+	estimatedDay?: string;
+	taskType?: string;
+	moodType?: string;
 }
 
 export interface TaskResponse {
