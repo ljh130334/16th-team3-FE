@@ -20,7 +20,7 @@ const REMINDER_LIMITS = {
 
 const DEFAULT_VALUES = {
   INTERVAL: 15,
-  COUNT: 1,
+  COUNT: 0,
 } as const;
 
 interface ReminderTime {
@@ -115,19 +115,25 @@ export default function ActionRemindPageClient({
           onClick={() => router.back()}
         />
       </div>
-      <Header maxNotificationCount={REMINDER_LIMITS.MAX} />
-      <TaskDetails
-        taskName={initialTask?.name ?? ''}
-        remainingTime="4시간"
-        selectedInterval={selectedInterval}
-        onIntervalChange={setSelectedInterval}
-      />
-      <CountSelector
-        count={count}
-        onIncrease={() => handleCountChange('increase')}
-        onDecrease={() => handleCountChange('decrease')}
-      />
-      <TimesList times={reminderTimes} />
+      <div className='flex flex-col gap-12'> {/* Header + Content */}
+        <Header maxNotificationCount={REMINDER_LIMITS.MAX} />
+        <div> {/* Content */}
+          <TaskDetails
+            taskName={initialTask?.name ?? ''}
+            remainingTime="4시간"
+            selectedInterval={selectedInterval}
+            onIntervalChange={setSelectedInterval}
+          />
+          <CountSelector
+            count={count}
+            onIncrease={() => handleCountChange('increase')}
+            onDecrease={() => handleCountChange('decrease')}
+          />
+          <TimesList times={reminderTimes} />
+        </div>
+      </div>
+      
+      
       <CompleteButton onClick={handlePatch} />
       {toastMessage && <Toast message={toastMessage} />}
     </div>

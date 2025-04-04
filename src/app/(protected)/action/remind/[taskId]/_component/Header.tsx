@@ -6,14 +6,14 @@ export default function RemindDescription({
   maxNotificationCount = 3,
 }: RemindDescriptionProps) {
   return (
-    <div className="mb-[27px] mt-10 px-5">
-      <p className="mb-[11px] text-t2 text-white">
+    <div className="flex flex-col gap-[22px] mt-10 px-5">
+      <p className="text-t2 text-white">
         작업을 시작할 때 까지
         <br />
         계속 리마인드 해드릴게요
       </p>
       <p className="text-b2 text-gray-neutral">
-        선택하신 주기로 최대
+        선택하신 주기로 최대{'\u00A0'}
         <span className="font-semibold text-component-accent-primary">
           {maxNotificationCount}번
         </span>

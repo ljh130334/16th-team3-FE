@@ -15,7 +15,7 @@ export default function TaskDetails({
   onIntervalChange,
 }: TaskDetailsProps) {
   return (
-    <div className="flex flex-col gap-3 p-5">
+    <div className="flex flex-col gap-3 px-5">
       <div className="flex items-center justify-between">
         <p>{taskName}</p>
         <Badge>마감까지 {remainingTime}</Badge>
