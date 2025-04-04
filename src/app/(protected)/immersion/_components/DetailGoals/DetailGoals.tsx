@@ -369,7 +369,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 			) : (
 				<ul className="flex flex-col">
 					{sortedGoals.map((goal) => (
-						<li key={goal.id} className="flex items-start py-2">
+						<li key={goal.id} className="flex items-center py-2">
 							<div className="mr-3">
 								<CheckboxWithGradientBorder
 									checked={goal.isCompleted}
@@ -378,7 +378,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 							</div>
 							{editingGoalId === goal.id ? (
 								<div className="relative flex-grow">
-									<div className="relative w-full flex items-center">
+									<div className="relative w-full flex items-center min-w-0">
 										<textarea
 											value={editingText}
 											onChange={(e) =>
@@ -388,7 +388,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 													setEditingText,
 												)
 											}
-											className={`text-b2 flex-grow break-words border-none bg-transparent p-0 outline-none resize-none overflow-hidden mr-3 ${
+											className={`text-b2 flex-grow min-w-0 break-words border-none bg-transparent p-0 outline-none resize-none overflow-hidden mr-3 ${
 												goal.isCompleted
 													? "text-gray-neutral"
 													: "text-gray-normal"
@@ -413,7 +413,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 														editingText.trim().length === 0 ||
 														editingText.length > MAX_DETAIL_GOAL_LENGTH
 													}
-													className={`text-s2 mr-3 ${editingText.trim().length === 0 || editingText.length > MAX_DETAIL_GOAL_LENGTH ? "text-[#8484E6]" : "text-[#8484E6]"}`}
+													className="flex-shrink-0 pr-3 text-s2 text-[#8484E6]"
 													type="button"
 													aria-label="세부 목표 수정 완료"
 												>
@@ -428,7 +428,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 															editInputRef.current.focus();
 														}
 													}}
-													className=""
+													className="flex-shrink-0"
 													type="button"
 													aria-label="텍스트 지우기"
 												>
@@ -468,11 +468,11 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 			{isAddingGoal && (
 				<div>
 					<div className="flex items-start py-2">
-						<div className="mr-3 mt-[1px]">
+						<div className="mr-3 mt-[1px] items-center">
 							<GradientCheckbox />
 						</div>
 						<div className="relative flex-grow">
-							<div className="relative w-full flex items-center">
+							<div className="relative w-full flex items-center min-w-0">
 								<textarea
 									value={newGoalTitle}
 									onChange={(e) =>
@@ -483,7 +483,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 										)
 									}
 									placeholder=""
-									className="b2 flex-grow rounded border-none bg-transparent p-0 text-gray-normal outline-none resize-none overflow-hidden mr-3"
+									className="b2 flex-grow min-w-0 rounded border-none bg-transparent p-0 text-gray-normal outline-none resize-none overflow-hidden mr-3"
 									style={{
 										caretColor: "#5D6470",
 										height: "auto",
@@ -502,7 +502,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 												newGoalTitle.trim().length === 0 ||
 												newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH
 											}
-											className={`text-s2 mr-3 ${newGoalTitle.trim().length === 0 || newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH ? "text-[#8484E6]" : "text-[#8484E6]"}`}
+											className="flex-shrink-0 pr-3 text-s2 text-[#8484E6]"
 											type="button"
 											aria-label="세부 목표 생성"
 										>
@@ -515,7 +515,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 												setNewGoalTitle("");
 												setTimeout(() => inputRef.current?.focus(), 0);
 											}}
-											className=""
+											className="flex-shrink-0"
 											type="button"
 											aria-label="텍스트 지우기"
 										>
