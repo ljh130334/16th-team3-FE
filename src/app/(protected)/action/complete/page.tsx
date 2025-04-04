@@ -54,7 +54,12 @@ export default function Complete() {
       />
 
       {/* 인증 사진 사각박스 */}
-      {currentTask && <CharacterMotivation currentTask={currentTask} />}
+      {currentTask && (
+        <CharacterMotivation
+          currentTask={currentTask}
+          nickname={userData.nickname}
+        />
+      )}
       <div className="relative">
         <div className="absolute inset-0 h-[245px] bg-[rgba(65,65,137,0.40)] blur-[75px]" />
 
