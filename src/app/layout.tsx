@@ -8,6 +8,8 @@ import * as gtag from '@/lib/gtag';
 export const metadata: Metadata = {
   title: 'Spurt',
   description: 'Spurt is a task management app.',
+  viewport:
+    'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
 };
 
 const pretendard = localFont({
