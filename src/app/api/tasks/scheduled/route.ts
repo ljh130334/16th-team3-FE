@@ -30,6 +30,8 @@ export async function POST(req: NextRequest) {
 
 		return nextResponse;
 	} catch (error) {
+		console.error("Error creating scheduled task:", error);
+
 		return NextResponse.json(
 			{ error: "Error creating scheduled task" },
 			{ status: 500 },

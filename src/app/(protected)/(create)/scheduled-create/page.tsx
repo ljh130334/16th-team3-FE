@@ -13,22 +13,34 @@ import type {
 	TaskTypeInputType,
 } from "../context";
 
+import BackHeader from "@/components/backHeader/BackHeader";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import TaskInput from "../_components/taskInput/TaskInput";
 
-const BackHeader = dynamic(() => import("@/components/backHeader/BackHeader"));
 const BufferTime = dynamic(
-	() => import("../_components/bufferTime/BufferTime"),
+	() =>
+		import(/* webpackPrefetch: true */ "../_components/bufferTime/BufferTime"),
 );
 const EstimatedTimeInput = dynamic(
-	() => import("../_components/estimatedTimeInput/EstimatedTimeInput"),
+	() =>
+		import(
+			/* webpackPrefetch: true */ "../_components/estimatedTimeInput/EstimatedTimeInput"
+		),
 );
 const SmallActionInput = dynamic(
-	() => import("../_components/smallActionInput/SmallActionInput"),
+	() =>
+		import(
+			/* webpackPrefetch: true */ "../_components/smallActionInput/SmallActionInput"
+		),
 );
-const TaskInput = dynamic(() => import("../_components/taskInput/TaskInput"));
 const TaskTypeInput = dynamic(
-	() => import("../_components/taskTypeInput/TaskTypeInput"),
+	() =>
+		import(
+			/* webpackPrefetch: true */
+			"../_components/taskTypeInput/TaskTypeInput"
+		),
 );
 
 type FormState = {
@@ -89,6 +101,7 @@ const ScheduledTaskCreate = () => {
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const { isMounted } = useMount();
+	const [isBackButtonClicked, setIsBackButtonClicked] = useState(false);
 
 	const { mutate: scheduledTaskMutation, isIdle } = useMutation({
 		mutationFn: async (data: ScheduledTaskType) => {
@@ -112,14 +125,19 @@ const ScheduledTaskCreate = () => {
 					`/?dialog=success&task=${funnel.context.task}&personaName=${personaName}&type=scheduled`,
 				);
 			}
+
+			if (response.error) {
+				router.push("/?dialog=error");
+			}
 		},
 		onError: (error) => {
 			console.error("Mutation failed:", error);
+			router.push("/");
 		},
 	});
 
 	const handleHistoryBack = () => {
-		if (lastStep === "bufferTime") {
+		if (isBackButtonClicked) {
 			funnel.history.push("bufferTime", {
 				task: funnel.context.task,
 				deadlineDate: funnel.context.deadlineDate,
@@ -172,6 +190,12 @@ const ScheduledTaskCreate = () => {
 			}
 		}
 	};
+
+	useEffect(() => {
+		if (funnel.step === "bufferTime") {
+			setIsBackButtonClicked(false);
+		}
+	}, [funnel.step]);
 
 	if (!isMounted) return null;
 
@@ -243,27 +267,40 @@ const ScheduledTaskCreate = () => {
 								estimatedDay: estimatedDay,
 							} as BufferTimeType)
 						}
+						onJumpToTaskTypeInput={() =>
+							history.push("taskTypeInput", {
+								task: context.task,
+								deadlineDate: context.deadlineDate,
+								deadlineTime: context.deadlineTime,
+								smallAction: context.smallAction,
+								estimatedHour: "00",
+								estimatedMinute: "03",
+								estimatedDay: "00",
+							} as TaskTypeInputType)
+						}
 					/>
 				)}
 				bufferTime={({ context, history }) => (
 					<BufferTime
 						context={context}
-						handleDeadlineModify={() =>
+						handleDeadlineModify={() => {
 							history.push("taskForm", {
 								task: context.task,
 								deadlineDate: context.deadlineDate,
 								deadlineTime: context.deadlineTime,
-							})
-						}
-						handleSmallActionModify={() =>
+							});
+							setIsBackButtonClicked(true);
+						}}
+						handleSmallActionModify={() => {
 							history.push("smallActionInput", {
 								task: context.task,
 								deadlineDate: context.deadlineDate,
 								deadlineTime: context.deadlineTime,
 								smallAction: context.smallAction,
-							})
-						}
-						handleEstimatedTimeModify={() =>
+							});
+							setIsBackButtonClicked(true);
+						}}
+						handleEstimatedTimeModify={() => {
 							history.push("estimatedTimeInput", {
 								task: context.task,
 								deadlineDate: context.deadlineDate,
@@ -272,8 +309,9 @@ const ScheduledTaskCreate = () => {
 								estimatedHour: context.estimatedHour,
 								estimatedMinute: context.estimatedMinute,
 								estimatedDay: context.estimatedDay,
-							})
-						}
+							});
+							setIsBackButtonClicked(true);
+						}}
 						onNext={() =>
 							history.push("taskTypeInput", {
 								task: context.task,
