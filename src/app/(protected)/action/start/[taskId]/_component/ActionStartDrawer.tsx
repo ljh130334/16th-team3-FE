@@ -140,6 +140,7 @@ export default function ActionStartDrawer({
 			</Link>
 			<OneButtonDialog
 				value={dialogOpen}
+				icon="/icons/action/error.svg"
 				title="1분을 초과했어요!"
 				content1="여기서 더 미루실 건가요?"
 				content2="지금해야 빨리 할일을 시작할 수 있어요!"
