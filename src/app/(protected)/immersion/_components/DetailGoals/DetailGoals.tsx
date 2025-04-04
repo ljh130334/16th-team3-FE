@@ -36,17 +36,21 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 
 	// 입력 필드 포커스 처리
 	useEffect(() => {
-		const timer = setTimeout(() => {
-			if (isAddingGoal && inputRef.current) {
-				inputRef.current.focus();
-				inputRef.current.click();
-			} else if (editingGoalId !== null && editInputRef.current) {
-				editInputRef.current.focus();
-				editInputRef.current.click();
-			}
-		}, 100);
+		if (isAddingGoal && inputRef.current) {
+			const timer = setTimeout(() => {
+				inputRef.current?.focus();
+			}, 50);
 
-		return () => clearTimeout(timer);
+			return () => clearTimeout(timer);
+		}
+
+		if (editingGoalId !== null && editInputRef.current) {
+			const timer = setTimeout(() => {
+				editInputRef.current?.focus();
+			}, 50);
+
+			return () => clearTimeout(timer);
+		}
 	}, [isAddingGoal, editingGoalId]);
 
 	// 글자수 경고 메시지 표시 관리
@@ -77,13 +81,11 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 
 		setIsAddingGoal(true);
 
-		// setTimeout을 사용하여 상태 업데이트 후 실행되도록 함
 		setTimeout(() => {
 			if (inputRef.current) {
 				inputRef.current.focus();
-				inputRef.current.click();
 			}
-		}, 100);
+		}, 50);
 	};
 
 	// 새 목표 저장 핸들러
@@ -475,6 +477,9 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 								enterKeyHint="done"
 								aria-label="세부 목표 입력"
 								rows={1}
+								autoComplete="off"
+								autoCorrect="off"
+								spellCheck="false"
 							/>
 							{newGoalTitle && (
 								<>
