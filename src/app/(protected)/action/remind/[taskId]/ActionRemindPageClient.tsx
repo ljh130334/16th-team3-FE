@@ -12,6 +12,8 @@ import Header from './_component/Header';
 import TaskDetails from './_component/TaskDetails';
 import TimesList from './_component/TimesList';
 import Toast from '@/components/toast/Toast';
+import Modal from '@/components/modal/Modal';
+import RemindLeaveModalContent from './_component/RemindLeaveModalContent';
 
 const REMINDER_LIMITS = {
   MIN: 1,
@@ -94,6 +96,7 @@ export default function ActionRemindPageClient({
   );
   const { mutate } = usePatchTaskHoldOff();
   const router = useRouter();
+  const [openLeaveModal, setOpenLeaveModal] = useState(false);
   const handlePatch = () => {
     console.log(selectedInterval, count);
     console.log(initialTask.triggerActionAlarmTime);
@@ -131,9 +134,17 @@ export default function ActionRemindPageClient({
           alt="왼쪽 화살표"
           width={24}
           height={24}
-          onClick={() => router.back()}
+          onClick={() => setOpenLeaveModal(true)}
         />
       </div>
+      {openLeaveModal && (
+				<Modal isOpen={openLeaveModal} onClose={() => setOpenLeaveModal(false)}>
+					<RemindLeaveModalContent
+						setOpenLeaveModal={setOpenLeaveModal}
+						taskId={initialTask.id}
+					/>
+				</Modal>
+			)}
       <div className='flex flex-col gap-12'> {/* Header + Content */}
         <Header maxNotificationCount={REMINDER_LIMITS.MAX} />
         <div> {/* Content */}
