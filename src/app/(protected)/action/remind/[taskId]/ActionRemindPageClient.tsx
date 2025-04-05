@@ -79,7 +79,7 @@ const useReminderCount = (initialCount: number = DEFAULT_VALUES.COUNT) => {
     }
   };
 
-  return { count, handleCountChange, toastMessage, setToastMessage, toggleForRepeatableToast, setToggleForRepeatableToast };
+  return { count, setCount, handleCountChange, toastMessage, setToastMessage, toggleForRepeatableToast, setToggleForRepeatableToast };
 };
 
 function formatTimestamp(timestamp: string): string {
@@ -91,7 +91,7 @@ function formatTimestamp(timestamp: string): string {
 export default function ActionRemindPageClient({
   initialTask,
 }: ActionRemindPageClientProps) {
-  const { count, handleCountChange, toastMessage, setToastMessage, toggleForRepeatableToast, setToggleForRepeatableToast } =
+  const { count, setCount, handleCountChange, toastMessage, setToastMessage, toggleForRepeatableToast, setToggleForRepeatableToast } =
     useReminderCount();
   const [selectedInterval, setSelectedInterval] = useState<number>(
     DEFAULT_VALUES.INTERVAL,
@@ -150,6 +150,13 @@ export default function ActionRemindPageClient({
     return true;
   }
 
+  const handleIntervalChange = (newInterval: number) => {
+    setSelectedInterval(newInterval);
+    setToggleForRepeatableToast(!toggleForRepeatableToast);
+    setToastMessage('');
+    setCount(0);
+  }
+
   return (
     <div className="flex h-full flex-col bg-background-primary pb-[30px]">
       {/* TODO : 헤더 컴포넌트로 변경 예정 */}
@@ -180,7 +187,7 @@ export default function ActionRemindPageClient({
             taskName={initialTask?.name ?? ''}
             remainingTime={calculateRemainTime()}
             selectedInterval={selectedInterval}
-            onIntervalChange={setSelectedInterval}
+            onIntervalChange={handleIntervalChange}
           />
           <CountSelector
             count={count}
