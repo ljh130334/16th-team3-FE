@@ -29,6 +29,7 @@ export default function ActionStartDrawer({
 	const [countdown, setCountdown] = useState(60);
 	const [open, setOpen] = useState(false);
 	const [dialogOpen, setDialogOpen] = useState(false);
+	const [isRetried, setIsRetried] = useState(false);
 
 	// 타이머 ID를 저장할 ref
 	const intervalRef = useRef<number | null>(null);
@@ -73,6 +74,7 @@ export default function ActionStartDrawer({
 		setDialogOpen(false);
 		setCountdown(60);
 		startCountdown();
+		setIsRetried(true);
 	};
 
 	return (
@@ -97,6 +99,11 @@ export default function ActionStartDrawer({
 									작은 행동을 사진으로 찍어주세요
 								</p>
 								<p className="text-sm text-gray-neutral">
+									{isRetried && (
+										<span className="text-component-accent-red">
+											이번 기회는 놓치지 마세요! <br />
+										</span>
+									)}
 									<span
 										className={`mr-1 font-semibold ${
 											countdown < 10
@@ -140,6 +147,7 @@ export default function ActionStartDrawer({
 			</Link>
 			<OneButtonDialog
 				value={dialogOpen}
+				icon="/icons/action/error.svg"
 				title="1분을 초과했어요!"
 				content1="여기서 더 미루실 건가요?"
 				content2="지금해야 빨리 할일을 시작할 수 있어요!"

@@ -1,9 +1,9 @@
 import { useRef } from "react";
 
 const BAR = {
-	HEIGHT: 18,
-	SLIDER_RADIUS: 12,
-};
+    HEIGHT: 18,
+    SLIDER_RADIUS: 9,
+}
 
 const RetrospectFocusContent = ({
 	retrospectContent,
@@ -37,50 +37,75 @@ const RetrospectFocusContent = ({
 		return Math.min(Math.max(rawIndex, 0), MAX_INDEX);
 	};
 
-	const handleMouseMove = (e: MouseEvent) => {
-		// console.log(`handleMouseMove: ${e.clientX}`);
-		if (!isDragging.current) return;
-		const idx = getClosestIndex(e.clientX);
-		setFocusContent(idx);
-	};
+    const handleMouseMove = (e: MouseEvent) => {
+        // console.log(`handleMouseMove: ${e.clientX}`);
+        if (!isDragging.current) return;
+        const idx = getClosestIndex(e.clientX);
+        setFocusContent(idx);
+    };
+      
+    const handleMouseDown = (e: React.MouseEvent) => {
+        // console.log(`handleMouseDown: ${e.clientX}`);
+        const idx = getClosestIndex(e.clientX);
+        // console.log(`handleMouseDown Result: ${idx}`);
+        setFocusContent(idx);
+        isDragging.current = true;
+        
+        window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("mouseup", handleMouseUp);
+    };
+      
+    const handleMouseUp = () => {
+        // console.log("handleMouseUp");
+        isDragging.current = false;
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("mouseup", handleMouseUp);
+    };
 
-	const handleMouseDown = (e: React.MouseEvent) => {
-		// console.log(`handleMouseDown: ${e.clientX}`);
-		const idx = getClosestIndex(e.clientX);
-		// console.log(`handleMouseDown Result: ${idx}`);
-		setFocusContent(idx);
-		isDragging.current = true;
+    const handleTouch = (e: React.TouchEvent) => {
+        const touch = e.touches[0];
+        const idx = getClosestIndex(touch.clientX);
+        setFocusContent(idx);
+        isDragging.current = true;
+    
+        const handleMove = (e: TouchEvent) => {
+            if (!isDragging.current) return;
+            const touch = e.touches[0];
+            const idx = getClosestIndex(touch.clientX);
+            setFocusContent(idx);
+        };
+    
+        const handleEnd = () => {
+            isDragging.current = false;
+            window.removeEventListener("touchmove", handleMove);
+            window.removeEventListener("touchend", handleEnd);
+        };
+    
+        window.addEventListener("touchmove", handleMove);
+        window.addEventListener("touchend", handleEnd);
+    }
 
-		window.addEventListener("mousemove", handleMouseMove);
-		window.addEventListener("mouseup", handleMouseUp);
-	};
 
-	const handleMouseUp = () => {
-		// console.log("handleMouseUp");
-		isDragging.current = false;
-		window.removeEventListener("mousemove", handleMouseMove);
-		window.removeEventListener("mouseup", handleMouseUp);
-	};
-
-	return (
-		<div className="w-full mx-2 mt-1">
-			<div
-				ref={trackRef}
-				className={`relative flex items-center`}
-				style={{
-					height: `${BAR.HEIGHT}px`,
-				}}
-				onMouseDown={handleMouseDown}
-			>
-				{/* 전체 바 배경 */}
-				<div
-					className={`absolute rounded-full bg-line-tertiary`}
-					style={{
-						height: `${BAR.HEIGHT}px`,
-						width: `calc(100% + ${BAR.SLIDER_RADIUS * 2}px)`, // 16px 양쪽 추가
-						left: `-${BAR.SLIDER_RADIUS}px`, // 왼쪽으로 16px 이동
-					}}
-				></div>
+    return (
+        <div className="w-full mx-2 mt-1">
+            <div 
+                ref={trackRef}
+                className={`relative flex items-center`}
+                style={{
+                    height: `${BAR.HEIGHT}px`,
+                }}
+                onMouseDown={handleMouseDown}
+                onTouchStart={handleTouch}
+            >
+                {/* 전체 바 배경 */}
+                <div 
+                    className={`absolute rounded-full bg-line-tertiary`}
+                    style={{
+                        height: `${BAR.HEIGHT}px`,
+                        width: `calc(100% + ${BAR.SLIDER_RADIUS*2}px)`, // 16px 양쪽 추가
+                        left: `-${BAR.SLIDER_RADIUS}px`,              // 왼쪽으로 16px 이동
+                    }}
+                ></div>
 
 				{/* 선택된 채워진 부분 */}
 				<div
@@ -107,15 +132,17 @@ const RetrospectFocusContent = ({
 					))}
 				</div>
 
-				{/* 슬라이더 핸들 */}
-				<div
-					className={`absolute m-3 z-20 w-${(BAR.SLIDER_RADIUS * 2) / 4} h-${(BAR.SLIDER_RADIUS * 2) / 4} rounded-full border-2 border-white bg-white shadow`}
-					style={{
-						left: `calc(${(retrospectContent.focus / 5) * 100}% - ${BAR.SLIDER_RADIUS * 2}px)`,
-						transition: "left 0.2s ease",
-					}}
-				/>
-			</div>
+                {/* 슬라이더 핸들 */}
+                <div
+                className={`absolute m-3 z-30 rounded-full border-2 border-white bg-white shadow`}
+                style={{
+                    width: `${BAR.SLIDER_RADIUS*2}px`,
+                    height: `${BAR.SLIDER_RADIUS*2}px`,
+                    left: `calc(${(retrospectContent.focus / 5) * 100}% - ${BAR.SLIDER_RADIUS*2}px)`,
+                    transition: "left 0.2s ease",
+                }}
+                />
+                </div>
 
 			{/* 아래 숫자 레이블 */}
 			<div className="mt-1.5 flex justify-between c3 text-gray-alternative font-medium">
