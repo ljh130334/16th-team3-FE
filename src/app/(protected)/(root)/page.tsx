@@ -1,6 +1,5 @@
 "use client";
 
-import AllTaskItem from "@/app/(protected)/(root)/_components/AllTaskItem";
 import AllTasksTab from "@/app/(protected)/(root)/_components/AllTasksTab";
 import CreateTaskSheet from "@/app/(protected)/(root)/_components/CreateTaskSheet";
 import InProgressTaskItem from "@/app/(protected)/(root)/_components/InProgressTaskItem";
@@ -14,7 +13,6 @@ import {
 	useStartTask,
 } from "@/hooks/useTasks";
 import type { Task, TaskWithPersona } from "@/types/task";
-import { parseDateAndTime } from "@/utils/dateFormat";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState, useEffect, useMemo, Suspense } from "react";
@@ -27,7 +25,7 @@ import FailedDialog from "../(create)/_components/failedDialog/FailedDialog";
 
 const HomePageContent = () => {
 	const router = useRouter();
-	const { data: homeData, isLoading: isLoadingHome, isPending } = useHomeData();
+	const { data: homeData, isPending } = useHomeData();
 
 	const isUserProfileLoading = useAuthStore(
 		(state) => state.isUserProfileLoading,
@@ -486,6 +484,7 @@ const HomePageContent = () => {
 											key={task.id}
 											task={task}
 											index={index}
+											taskType={taskType}
 											onShowDetails={() => handleDetailTask(task)}
 										/>
 									))}
@@ -597,6 +596,7 @@ const HomePageContent = () => {
 											key={task.id}
 											task={task}
 											index={index}
+											taskType={taskType}
 											onShowDetails={() => handleDetailTask(task)}
 										/>
 									))}

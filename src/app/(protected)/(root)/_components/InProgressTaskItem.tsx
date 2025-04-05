@@ -18,6 +18,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 interface InProgressTaskItemProps {
 	task: Task;
 	index: number;
+	taskType: string;
 	onShowDetails?: (task: Task) => void;
 }
 
@@ -33,6 +34,7 @@ const buttonContentVariants = {
 const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 	task,
 	index,
+	taskType,
 	onShowDetails,
 }) => {
 	const router = useRouter();
@@ -165,11 +167,11 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 	}, [calculateRemainingTimeLocal]);
 
 	useEffect(() => {
-		if (!isFirstVisit) {
+		if (!isFirstVisit && taskType !== "instant") {
 			setShowBottomSheet(true);
 			sessionStorage.setItem("visited", "true");
 		}
-	}, [isFirstVisit]);
+	}, [isFirstVisit, taskType]);
 
 	// 마감 지난 경우 강조 표시
 	const getTimeDisplay = () => {
