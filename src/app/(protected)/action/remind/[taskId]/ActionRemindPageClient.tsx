@@ -37,10 +37,11 @@ interface ActionRemindPageClientProps {
 const calculateReminderTimes = (
   count: number,
   interval: number,
+  baseTime: Date,
 ): ReminderTime[] => {
   const now = new Date();
   return Array.from({ length: count }, (_, i) => {
-    const time = new Date(now.getTime() + interval * 60000 * (i + 1));
+    const time = new Date(baseTime.getTime() + interval * 60000 * (i + 1));
     const hours = time.getHours();
     const minutes = time.getMinutes();
     const period = hours >= 12 ? '오후' : '오전';
@@ -59,7 +60,7 @@ const useReminderCount = (initialCount: number = DEFAULT_VALUES.COUNT) => {
   const [toastMessage, setToastMessage] = useState<string>('');
   const [toggleForRepeatableToast, setToggleForRepeatableToast] = useState(false);
 
-  const handleCountChange = (action: 'increase' | 'decrease') => {
+  const handleCountChange = (action: 'increase' | 'decrease', reminderBaseTime: Date) => {
     console.log(count);
     setCount((prev) => {
       if (action === 'increase' && prev < REMINDER_LIMITS.MAX) return prev + 1;
@@ -111,7 +112,7 @@ export default function ActionRemindPageClient({
     });
   };
 
-  const reminderTimes = calculateReminderTimes(count, selectedInterval);
+  const reminderTimes = calculateReminderTimes(count, selectedInterval, new Date(initialTask.triggerActionAlarmTime));
 
   const calculateRemainTime = () => {
     const now = new Date();
