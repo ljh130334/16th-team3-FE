@@ -103,7 +103,7 @@ export default function RetrospectionPageClient({ task }: Props) {
 							몰입했던 순간을 돌아보고 기록해보세요.
 						</p>
 					</div>
-					<div className="flex flex-col gap-3">
+					<div className="flex flex-col gap-5">
 						{" "}
 						{/* 실제 유저 회고 부분 */}
 						{/* 몰입 결과 회고 */}
