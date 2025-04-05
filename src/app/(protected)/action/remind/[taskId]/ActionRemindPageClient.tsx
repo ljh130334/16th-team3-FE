@@ -100,6 +100,13 @@ export default function ActionRemindPageClient({
   const router = useRouter();
   const [openLeaveModal, setOpenLeaveModal] = useState(false);
   const handlePatch = () => {
+    if (count === 0) {
+      setToggleForRepeatableToast(!toggleForRepeatableToast);
+      setToastMessage('최소 1회 이상 설정해주세요.');
+      return;
+    }
+    setToggleForRepeatableToast(!toggleForRepeatableToast);
+    setToastMessage('');
     console.log(selectedInterval, count);
     console.log(initialTask.triggerActionAlarmTime);
     console.log(formatTimestamp(initialTask.triggerActionAlarmTime));
@@ -199,7 +206,7 @@ export default function ActionRemindPageClient({
       </div>
       
       
-      <CompleteButton onClick={handlePatch} />
+      <CompleteButton onClick={handlePatch} disabled={count === 0} />
       {toastMessage && <Toast key={Date.now()} message={toastMessage} />}
     </div>
   );
