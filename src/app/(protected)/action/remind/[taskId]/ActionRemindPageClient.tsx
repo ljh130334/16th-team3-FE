@@ -3,7 +3,7 @@
 import { usePatchTaskHoldOff } from '@/hooks/useTask';
 import type { TaskResponse } from '@/types/task';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 import CompleteButton from './_component/CompleteButton';
@@ -55,18 +55,25 @@ const calculateReminderTimes = (
 const useReminderCount = (initialCount: number = DEFAULT_VALUES.COUNT) => {
   const [count, setCount] = useState(initialCount);
   const [toastMessage, setToastMessage] = useState<string>('');
+  const [toggleForRepeatableToast, setToggleForRepeatableToast] = useState(false);
 
   const handleCountChange = (action: 'increase' | 'decrease') => {
+    console.log(count);
     setCount((prev) => {
       if (action === 'increase' && prev < REMINDER_LIMITS.MAX) return prev + 1;
       if (action === 'decrease' && prev > REMINDER_LIMITS.MIN) return prev - 1;
       return prev;
     });
-    if (action === 'decrease' && count === 1) {
+    if (action === 'decrease' && count <= 1) {
+      setToggleForRepeatableToast(!toggleForRepeatableToast);
       setToastMessage('최소 1회 이상 설정해주세요.');
     }
-    if (action === 'increase' && count === REMINDER_LIMITS.MAX) {
+    else if (action === 'increase' && count >= REMINDER_LIMITS.MAX) {
+      setToggleForRepeatableToast(!toggleForRepeatableToast);
       setToastMessage('최대 3개까지만 설정할 수 있어요.');
+    }
+    else {
+      setToastMessage('');
     }
   };
 
@@ -147,7 +154,7 @@ export default function ActionRemindPageClient({
       
       
       <CompleteButton onClick={handlePatch} />
-      {toastMessage && <Toast message={toastMessage} />}
+      {toastMessage && <Toast key={Date.now()} message={toastMessage} />}
     </div>
   );
 }
