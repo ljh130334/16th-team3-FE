@@ -157,7 +157,10 @@ export default function ActionRemindPageClient({
           alt="왼쪽 화살표"
           width={24}
           height={24}
-          onClick={() => setOpenLeaveModal(true)}
+          onClick={() => {
+            setToastMessage('')
+            setOpenLeaveModal(true)
+          }}
         />
       </div>
       {openLeaveModal && (
