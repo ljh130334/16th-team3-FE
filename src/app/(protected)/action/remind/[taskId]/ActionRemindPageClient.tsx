@@ -83,7 +83,9 @@ const useReminderCount = (initialCount: number = DEFAULT_VALUES.COUNT) => {
 };
 
 function formatTimestamp(timestamp: string): string {
-  return timestamp.replace('T', ' ');
+  console.log(timestamp);
+  return timestamp.slice(0, 19).replace('T', ' ');
+  // return timestamp.replace('T', ' ');
 }
 
 export default function ActionRemindPageClient({
@@ -106,12 +108,12 @@ export default function ActionRemindPageClient({
       data: {
         remindInterval: selectedInterval,
         remindCount: count,
-        remindBaseTime: formatTimestamp(initialTask.triggerActionAlarmTime),
+        remindBaseTime: formatTimestamp(new Date().toISOString()),
       },
     });
   };
 
-  const reminderTimes = calculateReminderTimes(count, selectedInterval, new Date(initialTask.triggerActionAlarmTime));
+  const reminderTimes = calculateReminderTimes(count, selectedInterval, new Date());
 
   const calculateRemainTime = () => {
     const now = new Date();
@@ -137,7 +139,7 @@ export default function ActionRemindPageClient({
   }
 
   const validateNextReminderTime = () => {
-    const baseTime = new Date(initialTask.triggerActionAlarmTime);
+    const baseTime = new Date();
     const dueDate = new Date(initialTask.dueDatetime);
     const nextReminderTime = new Date(baseTime.getTime() + selectedInterval * 60000 * (count + 1));
     if (nextReminderTime.getTime() > dueDate.getTime()) {
