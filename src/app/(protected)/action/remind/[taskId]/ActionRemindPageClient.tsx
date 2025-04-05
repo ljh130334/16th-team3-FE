@@ -60,8 +60,7 @@ const useReminderCount = (initialCount: number = DEFAULT_VALUES.COUNT) => {
   const [toastMessage, setToastMessage] = useState<string>('');
   const [toggleForRepeatableToast, setToggleForRepeatableToast] = useState(false);
 
-  const handleCountChange = (action: 'increase' | 'decrease', reminderBaseTime: Date) => {
-    console.log(count);
+  const handleCountChange = (action: 'increase' | 'decrease') => {
     setCount((prev) => {
       if (action === 'increase' && prev < REMINDER_LIMITS.MAX) return prev + 1;
       if (action === 'decrease' && prev > REMINDER_LIMITS.MIN) return prev - 1;
@@ -80,7 +79,7 @@ const useReminderCount = (initialCount: number = DEFAULT_VALUES.COUNT) => {
     }
   };
 
-  return { count, handleCountChange, toastMessage, setToastMessage };
+  return { count, handleCountChange, toastMessage, setToastMessage, toggleForRepeatableToast, setToggleForRepeatableToast };
 };
 
 function formatTimestamp(timestamp: string): string {
@@ -90,7 +89,7 @@ function formatTimestamp(timestamp: string): string {
 export default function ActionRemindPageClient({
   initialTask,
 }: ActionRemindPageClientProps) {
-  const { count, handleCountChange, toastMessage, setToastMessage } =
+  const { count, handleCountChange, toastMessage, setToastMessage, toggleForRepeatableToast, setToggleForRepeatableToast } =
     useReminderCount();
   const [selectedInterval, setSelectedInterval] = useState<number>(
     DEFAULT_VALUES.INTERVAL,
@@ -126,6 +125,29 @@ export default function ActionRemindPageClient({
     return `${hours}시간 ${minutes}분`;
   }
 
+  const handleIncrease = () => {
+    if(!validateNextReminderTime()) {
+      return;
+    }
+    handleCountChange('increase')
+  }
+
+  const handleDecrease = () => {
+    handleCountChange('decrease')
+  }
+
+  const validateNextReminderTime = () => {
+    const baseTime = new Date(initialTask.triggerActionAlarmTime);
+    const dueDate = new Date(initialTask.dueDatetime);
+    const nextReminderTime = new Date(baseTime.getTime() + selectedInterval * 60000 * (count + 1));
+    if (nextReminderTime.getTime() > dueDate.getTime()) {
+      setToggleForRepeatableToast(!toggleForRepeatableToast);
+      setToastMessage('선택한 주기가 마감 시간을 초과할 수 없어요.');
+      return false;
+    }
+    return true;
+  }
+
   return (
     <div className="flex h-full flex-col bg-background-primary pb-[30px]">
       {/* TODO : 헤더 컴포넌트로 변경 예정 */}
@@ -157,8 +179,8 @@ export default function ActionRemindPageClient({
           />
           <CountSelector
             count={count}
-            onIncrease={() => handleCountChange('increase')}
-            onDecrease={() => handleCountChange('decrease')}
+            onIncrease={handleIncrease}
+            onDecrease={handleDecrease}
           />
           <TimesList times={reminderTimes} />
         </div>
