@@ -6,7 +6,7 @@ import { calculateRemainingTime } from "@/utils/dateFormat";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 import DetailGoals from "@/app/(protected)/immersion/_components/DetailGoals/DetailGoals";
 import TasksDropdown from "@/app/(protected)/immersion/_components/TasksDropdown/TasksDropdown";
@@ -14,6 +14,7 @@ import { Badge } from "@/components/component/Badge";
 import { Button } from "@/components/ui/button";
 import { useCompleteTask, useInProgressTasks } from "@/hooks/useTasks";
 import { getPersonaImage } from "@/utils/getPersonaImage";
+import { Playlist } from "../_components/Playlist";
 
 // 페르소나와 dueDatetime이 모두 필수인 Task 타입 정의
 interface TaskWithPersona extends Omit<Task, "persona" | "dueDatetime"> {
@@ -32,6 +33,10 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 	const [showTimeExpiredSheet, setShowTimeExpiredSheet] = useState(false);
 	const personaId = initialTask.persona.id;
 	const personaImageSrc = getPersonaImage(personaId);
+	const personaTaskType =
+		initialTask.persona.taskKeywordsCombination.taskType.name;
+	const personaTaskMode =
+		initialTask.persona.taskKeywordsCombination.taskMode.name;
 
 	const nickname = useUserStore((state) => state.userData.nickname);
 	const { data: inProgressTasks = [] } = useInProgressTasks();
@@ -212,6 +217,17 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 					{/* 디테일 목표 영역 */}
 					<div className="px-5 mt-8 w-full max-w-lg mx-auto relative z-30">
 						<DetailGoals taskId={initialTask.id} />
+					</div>
+
+					{/* 플레이리스트 */}
+					<div className="px-5 pt-7">
+						<Suspense>
+							<Playlist
+								personaId={personaId}
+								personaTaskMode={personaTaskMode}
+								personaTaskType={personaTaskType}
+							/>
+						</Suspense>
 					</div>
 				</div>
 			</div>

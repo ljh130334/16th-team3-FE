@@ -6,36 +6,36 @@ const BAR = {
 }
 
 const RetrospectFocusContent = ({
-    retrospectContent,
-    setRetrospectContent,
-} : RetrospectContentProps) => {
-    const FOCUS_STEPS = [0, 1, 2, 3, 4, 5];
+	retrospectContent,
+	setRetrospectContent,
+}: RetrospectContentProps) => {
+	const FOCUS_STEPS = [0, 1, 2, 3, 4, 5];
 
-    const trackRef = useRef<HTMLDivElement>(null);
-    const isDragging = useRef(false);
+	const trackRef = useRef<HTMLDivElement>(null);
+	const isDragging = useRef(false);
 
-    const setFocusContent = (selected: number) => {
-        const selectedFocus = selected as FocusContent;
-        setRetrospectContent((prev) => ({
-            ...prev,
-            focus: selectedFocus,
-        }));
-    };
+	const setFocusContent = (selected: number) => {
+		const selectedFocus = selected as FocusContent;
+		setRetrospectContent((prev) => ({
+			...prev,
+			focus: selectedFocus,
+		}));
+	};
 
-    const getClosestIndex = (x: number): number => {
-        // console.log(`getClosestIndex: ${x}`);
-        const track = trackRef.current;
-        if (!track) return retrospectContent.focus;
-      
-        const MAX_INDEX = FOCUS_STEPS.length - 1;
+	const getClosestIndex = (x: number): number => {
+		// console.log(`getClosestIndex: ${x}`);
+		const track = trackRef.current;
+		if (!track) return retrospectContent.focus;
 
-        const rect = track.getBoundingClientRect();
-        const offsetX = x - rect.left;
-        const ratio = offsetX / rect.width;
-        const rawIndex = Math.round(ratio * MAX_INDEX);
-        // console.log(`rawIndex: ${rawIndex}`);
-        return Math.min(Math.max(rawIndex, 0), MAX_INDEX);
-    };
+		const MAX_INDEX = FOCUS_STEPS.length - 1;
+
+		const rect = track.getBoundingClientRect();
+		const offsetX = x - rect.left;
+		const ratio = offsetX / rect.width;
+		const rawIndex = Math.round(ratio * MAX_INDEX);
+		// console.log(`rawIndex: ${rawIndex}`);
+		return Math.min(Math.max(rawIndex, 0), MAX_INDEX);
+	};
 
     const handleMouseMove = (e: MouseEvent) => {
         // console.log(`handleMouseMove: ${e.clientX}`);
@@ -107,30 +107,30 @@ const RetrospectFocusContent = ({
                     }}
                 ></div>
 
-                {/* 선택된 채워진 부분 */}
-                <div
-                className={`absolute rounded-full bg-gradient-to-r from-blue-200 to-purple-200 transition-all duration-200`}
-                style={{
-                    height: `${BAR.HEIGHT}px`,
-                    width: `calc(${(retrospectContent.focus / 5) * 100}% + ${BAR.SLIDER_RADIUS*2}px)`,
-                    left: `-${BAR.SLIDER_RADIUS}px`,
-                }}
-                ></div>
+				{/* 선택된 채워진 부분 */}
+				<div
+					className={`absolute rounded-full bg-gradient-to-r from-blue-200 to-purple-200 transition-all duration-200`}
+					style={{
+						height: `${BAR.HEIGHT}px`,
+						width: `calc(${(retrospectContent.focus / 5) * 100}% + ${BAR.SLIDER_RADIUS * 2}px)`,
+						left: `-${BAR.SLIDER_RADIUS}px`,
+					}}
+				></div>
 
-                {/* 점들 */}
-                <div className="relative z-10 flex justify-between w-full">
-                    {FOCUS_STEPS.map((step, i) => (
-                        <div
-                        key={i}
-                        className={`w-[6px] h-[6px] rounded-full transition-all duration-200 ${
-                            retrospectContent.focus >= step
-                            ? "bg-background-skyblue opacity-90"
-                            : "bg-background-skyblue opacity-30"
-                        }`}
-                        onClick={() => setFocusContent(i)}
-                        />
-                    ))}
-                </div>
+				{/* 점들 */}
+				<div className="relative z-10 flex justify-between w-full">
+					{FOCUS_STEPS.map((step, i) => (
+						<div
+							key={i}
+							className={`w-[6px] h-[6px] rounded-full transition-all duration-200 ${
+								retrospectContent.focus >= step
+									? "bg-background-skyblue opacity-90"
+									: "bg-background-skyblue opacity-30"
+							}`}
+							onClick={() => setFocusContent(i)}
+						/>
+					))}
+				</div>
 
                 {/* 슬라이더 핸들 */}
                 <div
@@ -144,18 +144,23 @@ const RetrospectFocusContent = ({
                 />
                 </div>
 
-                {/* 아래 숫자 레이블 */}
-                <div className="mt-1.5 flex justify-between c3 text-gray-alternative font-medium">
-                    {FOCUS_STEPS.map((step, i) => (
-                        <div key={i} className="w-[6px] flex justify-center">
-                            <span key={i} className={retrospectContent.focus === step ? "text-gray-alternative" : ""}>
-                                {`${step*20}`}
-                            </span>
-                        </div>
-                    ))}
-                </div>
-        </div>
-    )
-}
+			{/* 아래 숫자 레이블 */}
+			<div className="mt-1.5 flex justify-between c3 text-gray-alternative font-medium">
+				{FOCUS_STEPS.map((step, i) => (
+					<div key={i} className="w-[6px] flex justify-center">
+						<span
+							key={i}
+							className={
+								retrospectContent.focus === step ? "text-gray-alternative" : ""
+							}
+						>
+							{`${step * 20}`}
+						</span>
+					</div>
+				))}
+			</div>
+		</div>
+	);
+};
 
 export default RetrospectFocusContent;
