@@ -27,6 +27,12 @@ export default function RootLayout({
   return (
     <ViewTransitions>
       <html lang="ko" className={pretendard.variable}>
+        <head>
+          <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+          />
+        </head>
         <body
           className={`${pretendard.className} mt-[44px] h-[calc(100vh-44px)] antialiased`}
         >
