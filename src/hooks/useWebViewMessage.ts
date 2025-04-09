@@ -8,7 +8,7 @@ import { useEffect } from "react";
 export const useWebViewMessage = (router?: ReturnType<typeof useRouter>) => {
 	const setDeviceInfo = useUserStore((state) => state.setDeviceInfo);
 
-	  const { mutate: postFcmTokenMutation } = useMutation({
+	const { mutate: postFcmTokenMutation } = useMutation({
     mutationFn: async (data: FcmDeviceType) => {
       const res = await postFcmToken(data);
       return res;
@@ -41,10 +41,21 @@ export const useWebViewMessage = (router?: ReturnType<typeof useRouter>) => {
 	};
 
 	useEffect(() => {
+		console.log("useWebViewMessage useEffect 실행됨");
 		const handleMessage = (event: MessageEvent) => {
 			try {
+				console.log('메시지 이벤트 발생:', event);
+				console.log('메시지 데이터 원본:', event.data);
+				
 				const data =
 					typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+				
+				console.log('파싱된 데이터:', data);
+				console.log('메시지 타입:', data.type);
+				
+				if (data.payload) {
+					console.log('페이로드 확인:', data.payload);
+				}
 
 				if (data.type === "CAPTURED_IMAGE") {
 					localStorage.setItem("capturedImage", data.payload.image);
@@ -53,23 +64,35 @@ export const useWebViewMessage = (router?: ReturnType<typeof useRouter>) => {
 					console.log("이미지 받음");
 					router?.push("/action/complete");
 				}
-				if (data.type === 'GET_DEVICE_TOKEN' && data.payload.fcmToken) {
-					console.log("웹뷰 환경 토큰 전송");
-
-					// 토큰 전송
-					postFcmTokenMutation({
-						fcmRegistrationToken: data.payload.fcmToken,
-						deviceType: data.payload.deviceType,
-					});
-					console.log('토큰 전송 성공');
+				
+				if (data.type === 'GET_DEVICE_TOKEN') {
+					console.log("GET_DEVICE_TOKEN 타입 메시지 감지됨");
+					
+					if (data.payload && data.payload.fcmToken) {
+						console.log("토큰 존재 확인:", data.payload.fcmToken);
+						console.log("디바이스 타입:", data.payload.deviceType);
+						
+						// 토큰 전송
+						postFcmTokenMutation({
+							fcmRegistrationToken: data.payload.fcmToken,
+							deviceType: data.payload.deviceType,
+						});
+						console.log('토큰 전송 요청 완료');
+					} else {
+						console.error('페이로드에 fcmToken이 없음:', data.payload);
+					}
 				}
 			} catch (error) {
 				console.error("메시지 파싱 에러:", error);
 			}
 		};
 
+		console.log("message 이벤트 리스너 등록됨");
 		window.addEventListener("message", handleMessage);
-		return () => window.removeEventListener("message", handleMessage);
+		return () => {
+			console.log("message 이벤트 리스너 제거됨");
+			window.removeEventListener("message", handleMessage);
+		};
 	}, [router, postFcmTokenMutation]);
 
 	return { handleTakePicture, handleGetDeviceToken };
