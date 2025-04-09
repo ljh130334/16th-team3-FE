@@ -483,8 +483,6 @@ export default function OnboardingPage() {
     const isWebView = () => {
       return !!(window as any).ReactNativeWebView;
     };
-    console.log('handleClickAccess 함수 호출됨');
-    console.log('ReactNativeWebView 존재 여부:', isWebView());
 
     if (isWebView()) {
       // 웹뷰 환경이면 네이티브 쪽에서 디바이스 토큰을 받아오도록 처리
@@ -494,45 +492,6 @@ export default function OnboardingPage() {
       console.log('웹 환경 감지됨, 토큰 요청 불가');
     }
   };
-
-  // 직접 window 이벤트를 테스트하기 위한 함수 추가
-  const testMessageEvent = () => {
-    console.log('테스트 메시지 생성');
-    const testEvent = {
-      type: 'GET_DEVICE_TOKEN',
-      payload: {
-        fcmToken: 'test-token-123',
-        deviceType: 'ANDROID',
-        message: '테스트 메시지',
-      },
-    };
-
-    // 이벤트 디스패치
-    window.dispatchEvent(
-      new MessageEvent('message', {
-        data: JSON.stringify(testEvent),
-      }),
-    );
-
-    console.log('테스트 메시지 전송 완료');
-  };
-
-  useEffect(() => {
-    // 컴포넌트 마운트 시 기본 정보 로깅
-    console.log('온보딩 페이지 마운트됨');
-    console.log(
-      'ReactNativeWebView 존재 여부:',
-      !!(window as any).ReactNativeWebView,
-    );
-
-    // 3페이지에서 자동으로 테스트 메시지 트리거 (개발용)
-    if (currentPage === 3) {
-      setTimeout(() => {
-        console.log('3초 후 테스트 메시지 실행');
-        testMessageEvent();
-      }, 3000);
-    }
-  }, [currentPage]);
 
   return (
     <div className="flex h-full flex-col overflow-hidden bg-background-primary px-5 pb-[46px] pt-2">
