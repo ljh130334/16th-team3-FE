@@ -89,9 +89,20 @@ export const useWebViewMessage = (router?: ReturnType<typeof useRouter>) => {
 
 		console.log("message 이벤트 리스너 등록됨");
 		window.addEventListener("message", handleMessage);
+		
+		// Android 웹뷰 지원 - 타입 안전하게 핸들러 작성
+		const documentMessageHandler = (event: Event) => {
+			// 수동으로 MessageEvent로 변환하여 처리
+			if (event instanceof Event && 'data' in event) {
+				handleMessage(event as unknown as MessageEvent);
+			}
+		};
+		document.addEventListener("message", documentMessageHandler);
+
 		return () => {
 			console.log("message 이벤트 리스너 제거됨");
 			window.removeEventListener("message", handleMessage);
+			document.removeEventListener("message", documentMessageHandler);
 		};
 	}, [router, postFcmTokenMutation]);
 
