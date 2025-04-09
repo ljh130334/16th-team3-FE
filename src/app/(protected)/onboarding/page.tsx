@@ -23,18 +23,18 @@ export default function OnboardingPage() {
   const { userData } = useUserStore();
   const { handleGetDeviceToken } = useWebViewMessage();
 
-  const { mutate: postFcmTokenMutation } = useMutation({
-    mutationFn: async (data: FcmDeviceType) => {
-      const res = await postFcmToken(data);
-      return res;
-    },
-    onSuccess: () => {
-      console.log('FCM 토큰 전송 성공');
-    },
-    onError: (error) => {
-      console.error('FCM 토큰 전송 실패:', error);
-    },
-  });
+  // const { mutate: postFcmTokenMutation } = useMutation({
+  //   mutationFn: async (data: FcmDeviceType) => {
+  //     const res = await postFcmToken(data);
+  //     return res;
+  //   },
+  //   onSuccess: () => {
+  //     console.log('FCM 토큰 전송 성공');
+  //   },
+  //   onError: (error) => {
+  //     console.error('FCM 토큰 전송 실패:', error);
+  //   },
+  // });
 
   const formatNickname = (name: string) => {
     if (!name) return '';
@@ -451,33 +451,33 @@ export default function OnboardingPage() {
     }
   };
 
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      try {
-        console.log('event', event);
-        const data =
-          typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+  // useEffect(() => {
+  //   const handleMessage = (event: MessageEvent) => {
+  //     try {
+  //       console.log('event', event);
+  //       const data =
+  //         typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
 
-        if (data.type === 'GET_DEVICE_TOKEN' && data.payload.fcmToken) {
-          console.log('웹뷰 환경 토큰 전송');
-          Cookies.set('deviceId', data.payload.fcmToken, COOKIE_OPTIONS);
-          Cookies.set('deviceType', data.payload.deviceType, COOKIE_OPTIONS);
+  //       if (data.type === 'GET_DEVICE_TOKEN' && data.payload.fcmToken) {
+  //         console.log('웹뷰 환경 토큰 전송');
+  //         Cookies.set('deviceId', data.payload.fcmToken, COOKIE_OPTIONS);
+  //         Cookies.set('deviceType', data.payload.deviceType, COOKIE_OPTIONS);
 
-          // 토큰 전송
-          postFcmTokenMutation({
-            fcmRegistrationToken: data.payload.fcmToken,
-            deviceType: data.payload.deviceType,
-          });
-          console.log('토큰 전송 성공');
-        }
-      } catch (error) {
-        console.error('Failed to parse message:', error);
-      }
-    };
+  //         // 토큰 전송
+  //         postFcmTokenMutation({
+  //           fcmRegistrationToken: data.payload.fcmToken,
+  //           deviceType: data.payload.deviceType,
+  //         });
+  //         console.log('토큰 전송 성공');
+  //       }
+  //     } catch (error) {
+  //       console.error('Failed to parse message:', error);
+  //     }
+  //   };
 
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, [postFcmTokenMutation]);
+  //   window.addEventListener('message', handleMessage);
+  //   return () => window.removeEventListener('message', handleMessage);
+  // }, [postFcmTokenMutation]);
 
   const handleClickAccess = () => {
     const isWebView = () => {

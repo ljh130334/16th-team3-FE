@@ -1,10 +1,26 @@
+import { postFcmToken } from "@/lib/fcmToken";
 import { useUserStore } from "@/store/useUserStore";
-import Cookies from "js-cookie";
+import { FcmDeviceType } from "@/types/create";
+import { useMutation } from "@tanstack/react-query";
 import type { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export const useWebViewMessage = (router?: ReturnType<typeof useRouter>) => {
 	const setDeviceInfo = useUserStore((state) => state.setDeviceInfo);
+
+	  const { mutate: postFcmTokenMutation } = useMutation({
+    mutationFn: async (data: FcmDeviceType) => {
+      const res = await postFcmToken(data);
+      return res;
+    },
+    onSuccess: () => {
+      console.log('FCM 토큰 전송 성공');
+    },
+    onError: (error) => {
+      console.error('FCM 토큰 전송 실패:', error);
+    },
+  });
+
 
 	const handleTakePicture = (action: string) => {
 		try {
@@ -37,28 +53,16 @@ export const useWebViewMessage = (router?: ReturnType<typeof useRouter>) => {
 					console.log("이미지 받음");
 					router?.push("/action/complete");
 				}
-				// if (data.type === "GET_DEVICE_TOKEN") {
-				// 	alert(
-				// 		`rn으로부터 수신한 메세지: ${data.payload.message}${data.payload.fcmToken}`,
-				// 	);
-				// 	localStorage.setItem("deviceToken", data.payload.fcmToken);
-				// 	console.log("data.payload.message", data.payload.message);
-				// 	console.log("data.payload.fcmToken", data.payload.fcmToken);
+				if (data.type === 'GET_DEVICE_TOKEN' && data.payload.fcmToken) {
+					console.log("웹뷰 환경 토큰 전송");
 
-				// 	if (data.payload.fcmToken) {
-				// 		Cookies.set("deviceId", data.payload.fcmToken, {
-				// 			expires: 30, // 30일
-				// 			path: "/",
-				// 			secure: false,
-				// 		});
-
-				// 		Cookies.set("deviceType", data.payload.deviceType, {
-				// 			expires: 30,
-				// 			path: "/",
-				// 			secure: false,
-				// 		});
-				// 	}
-				// }
+					// 토큰 전송
+					postFcmTokenMutation({
+						fcmRegistrationToken: data.payload.fcmToken,
+						deviceType: data.payload.deviceType,
+					});
+					console.log('토큰 전송 성공');
+				}
 			} catch (error) {
 				console.error("메시지 파싱 에러:", error);
 			}
@@ -66,7 +70,7 @@ export const useWebViewMessage = (router?: ReturnType<typeof useRouter>) => {
 
 		window.addEventListener("message", handleMessage);
 		return () => window.removeEventListener("message", handleMessage);
-	}, [router]);
+	}, [router, postFcmTokenMutation]);
 
 	return { handleTakePicture, handleGetDeviceToken };
 };
