@@ -28,7 +28,7 @@ const CharactersPageContent = () => {
 	return (
 		<TooltipProvider>
 			<div className="background-primary flex h-[calc(100vh-80px)] w-full flex-col items-center justify-start overflow-y-auto px-5">
-				<div className="z-20 fixed top-0 w-[100vw] flex items-center justify-between px-5 py-[14px] bg-background-primary pt-[60px]">
+				<div className="z-30 fixed top-0 w-[100vw] flex items-center justify-between px-5 py-[14px] bg-background-primary pt-[60px]">
 					<Link href="/my-page" shallow={true}>
 						<Image
 							src="/icons/ArrowLeft.svg"
