@@ -39,14 +39,17 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 }) => {
 	const router = useRouter();
 	const [showRemaining, setShowRemaining] = useState(true);
-	const [remainingTime, setRemainingTime] = useState("");
-	const [isUrgent, setIsUrgent] = useState(false);
-	const [timeLeftMs, setTimeLeftMs] = useState(0);
-	const [showBottomSheet, setShowBottomSheet] = useState(false);
-	const [isExpired, setIsExpired] = useState(false);
+	const [remainingTime, setRemainingTime] = useState<string>("");
+	const [isUrgent, setIsUrgent] = useState<boolean>(false);
+	const [timeLeftMs, setTimeLeftMs] = useState<number>(0);
+	const [showBottomSheet, setShowBottomSheet] = useState<boolean>(false);
+	const [isExpired, setIsExpired] = useState<boolean>(false);
 	const personaImageUrl = getPersonaImage(task.persona?.id);
 
-	const isFirstVisit = sessionStorage.getItem("visited");
+	const isFirstVisit =
+		typeof sessionStorage !== "undefined"
+			? sessionStorage.getItem("visited")
+			: null;
 
 	// 남은 시간 계산 함수 개선
 	const calculateRemainingTimeLocal = useCallback(() => {
@@ -54,7 +57,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 		const now = new Date().getTime();
 
 		// dueDatetime이 있으면 사용, 없으면 dueDate와 dueTime에서 계산
-		let dueDatetime;
+		let dueDatetime: Date;
 		if (task.dueDatetime) {
 			dueDatetime = new Date(task.dueDatetime);
 		} else {
@@ -123,7 +126,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 			const ampm = hours >= 12 ? "오후" : "오전";
 			const hour12 = hours % 12 || 12;
 
-			let formattedTime;
+			let formattedTime: string;
 			if (minutes === 0) {
 				formattedTime = `${ampm} ${hour12}시까지`;
 			} else {
@@ -169,7 +172,9 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 	useEffect(() => {
 		if (!isFirstVisit && taskType !== "instant") {
 			setShowBottomSheet(true);
-			sessionStorage.setItem("visited", "true");
+			if (typeof sessionStorage !== "undefined") {
+				sessionStorage.setItem("visited", "true");
+			}
 		}
 	}, [isFirstVisit, taskType]);
 
@@ -205,6 +210,8 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 					<button
 						className="l2 w-full rounded-[16px] bg-component-accent-primary py-4 mt-3 text-white"
 						onClick={handleContinueToFocus}
+						type="button"
+						aria-label="이어서 몰입하기"
 					>
 						이어서 몰입
 					</button>
@@ -212,6 +219,8 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 					<button
 						className="l2 w-full py-4 text-text-neutral"
 						onClick={handleCloseBottomSheet}
+						type="button"
+						aria-label="닫기"
 					>
 						닫기
 					</button>
@@ -224,9 +233,11 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 	if (!isUrgent) {
 		return (
 			<>
-				<div
-					className="mb-5 rounded-[12px] bg-component-gray-secondary p-4"
+				<button
+					className="mb-5 rounded-[12px] bg-component-gray-secondary p-4 w-full text-left"
 					onClick={handleCardClick}
+					type="button"
+					aria-label="태스크 상세 보기"
 				>
 					<div className="mb-5 flex items-center gap-4">
 						<div className="flex h-12 w-12 items-center justify-center rounded-[20px] bg-component-gray-tertiary p-2">
@@ -246,6 +257,8 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 					<button
 						onClick={handleContinueClick}
 						className="l1 flex h-[52px] w-full items-center justify-center rounded-[12px] bg-component-accent-primary p-3.5 text-center text-text-strong"
+						type="button"
+						aria-label="이어서 몰입하기"
 					>
 						<AnimatePresence mode="wait">
 							<motion.div
@@ -260,7 +273,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 							</motion.div>
 						</AnimatePresence>
 					</button>
-				</div>
+				</button>
 
 				{index === 0 && renderBottomSheet()}
 			</>
@@ -270,9 +283,11 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 	// 시간 임박 컴포넌트 (1시간 이내)
 	return (
 		<>
-			<div
-				className="bg-gradient-component-01 mb-5 flex h-auto flex-col justify-between rounded-[20px] p-4"
+			<button
+				className="bg-gradient-component-01 mb-5 flex h-auto w-full flex-col justify-between rounded-[20px] p-4 text-left"
 				onClick={handleCardClick}
+				type="button"
+				aria-label="태스크 상세 보기"
 			>
 				<div>
 					<h2 className="s1 mb-1 text-text-strong">{task.title}</h2>
@@ -302,6 +317,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 					variant="hologram"
 					onClick={handleContinueClick}
 					className="l1 z-10 w-full h-[52px] rounded-[12px] p-3.5 text-center text-text-inverse"
+					aria-label="이어서 몰입하기"
 				>
 					<AnimatePresence mode="wait">
 						<motion.div
@@ -316,7 +332,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 						</motion.div>
 					</AnimatePresence>
 				</Button>
-			</div>
+			</button>
 
 			{index === 0 && renderBottomSheet()}
 		</>
@@ -355,12 +371,12 @@ const HMSFormatTimeDisplay = ({
 
 	// 이전 자릿수 값 저장을 위한 ref
 	const prevDigitsRef = useRef({
-		h1: h1,
-		h2: h2,
-		m1: m1,
-		m2: m2,
-		s1: s1,
-		s2: s2,
+		h1,
+		h2,
+		m1,
+		m2,
+		s1,
+		s2,
 	});
 
 	// 변경된 값 감지
@@ -381,7 +397,7 @@ const HMSFormatTimeDisplay = ({
 			s1,
 			s2,
 		};
-	}, [timeString, h1, h2, m1, m2, s1, s2]);
+	}, [h1, h2, m1, m2, s1, s2]);
 
 	if (isUrgent) {
 		return (
@@ -506,11 +522,11 @@ const TimeDisplay = ({
 	time: string;
 	isUrgent?: boolean;
 }) => {
+	// 시간 포맷에 따라 적절한 컴포넌트 반환
 	if (time.includes("일")) {
 		return <DayFormatTimeDisplay time={time} />;
-	} else {
-		return <HMSFormatTimeDisplay time={time} isUrgent={isUrgent} />;
 	}
+	return <HMSFormatTimeDisplay time={time} isUrgent={isUrgent} />;
 };
 
 export default InProgressTaskItem;
