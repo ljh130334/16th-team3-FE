@@ -6,25 +6,29 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import ProfileImage from "@/components/ProfileImage";
+import Loader from "@/components/loader/Loader";
+import type { MyData } from "@/types/myPage";
+import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import Persona from "./_component/Persona";
 import RetrospectSection from "./_component/RetroSpectSection";
 import TaskContainer from "./_component/TaskContainer";
 
 export default function MyPage() {
+	const router = useRouter();
 	const userData = useUserStore((state) => state.userData);
 	const setUser = useUserStore((state) => state.setUser);
 
 	const [pageLoading, setPageLoading] = useState(true);
 
-	const mockTasks = {
-		completed: [
-			{ id: 1, title: "디프만 리서치 준비", due: "2월 5일 (수) 자정까지" },
-			{ id: 2, title: "디프만 리서치 준비", due: "2월 5일 (수) 자정까지" },
-			{ id: 3, title: "디프만 리서치 준비", due: "2월 5일 (수) 자정까지" },
-		],
-		postponed: [
-			{ id: 4, title: "미룬 작업 예시", due: "2월 6일 (목) 자정까지" },
-			{ id: 5, title: "미룬 작업 예시", due: "2월 6일 (목) 자정까지" },
-		],
+	const { data: myPageData } = useQuery<MyData>({
+		queryKey: ["my-page"],
+		queryFn: async () => await fetch("/api/my-page").then((res) => res.json()),
+		enabled: !!userData.memberId,
+	});
+
+	const handlePersonaClick = (id: number) => {
+		router.push(`/my-page/characters?id=${id}`);
 	};
 
 	useEffect(() => {
@@ -59,9 +63,9 @@ export default function MyPage() {
 	}, [userData.memberId, setUser]);
 
 	return (
-		<div className="flex min-h-screen flex-col">
+		<div className="flex min-h-screen flex-col pb-[34px]">
 			{/* 헤더 부분 */}
-			<div className="relative flex items-center justify-between px-5 py-[14px]">
+			<div className="z-20 fixed top-0 w-[100vw] flex items-center justify-between px-5 py-[14px] pt-[44px] bg-background-primary">
 				<Link href="/">
 					<Image
 						src="/icons/ArrowLeft.svg"
@@ -84,13 +88,10 @@ export default function MyPage() {
 
 			{/* 프로필 정보 */}
 			{pageLoading ? (
-				<div className="mb-8 mt-[23px] flex flex-col items-center justify-center">
-					<div className="mb-[14px] h-20 w-20 animate-pulse rounded-full bg-gray-200" />
-					<div className="h-6 w-24 animate-pulse rounded bg-gray-200" />
-				</div>
+				<Loader />
 			) : (
 				<>
-					<div className="mb-8 mt-[23px] flex flex-col items-center justify-center">
+					<div className="mb-8 mt-[65px] flex flex-col items-center justify-center">
 						<div className="mb-[14px]">
 							<ProfileImage imageUrl={userData.profileImageUrl} />
 						</div>
@@ -107,15 +108,65 @@ export default function MyPage() {
 			)}
 			{/* 나의 회고 */}
 			<RetrospectSection
-				satisfactionPercentage={50}
-				concentrationPercentage={30}
+				satisfactionPercentage={myPageData?.satisfactionAvg || 0}
+				concentrationPercentage={myPageData?.concentrationAvg || 0}
 			/>
 
+			<div className="px-5 mt-2">
+				<div className="flex items-center justify-between py-4">
+					<div className="text-s2 text-gray-normal">역대 몰입 캐릭터</div>
+					<Link href="/my-page/characters">
+						<span className="c1 text-gray-neutral">전체 보기</span>
+					</Link>
+				</div>
+				<div
+					className="flex items-center justify-between gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden"
+					style={{
+						scrollbarWidth: "none",
+						msOverflowStyle: "none",
+					}}
+				>
+					{myPageData?.personas.map((persona) => (
+						<Persona
+							key={persona.id}
+							id={persona.id}
+							name={persona.name}
+							onClick={() => handlePersonaClick(persona.id)}
+						/>
+					))}
+
+					{(myPageData?.personas?.length ?? 0) < 4 &&
+						Array.from({
+							length: 24 - (myPageData?.personas?.length ?? 0),
+						}).map((_, idx) => (
+							<div
+								key={`lock-${
+									// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+									idx
+								}`}
+								className="flex flex-col items-center justify-between gap-3"
+							>
+								<div className="flex items-center justify-center w-[72px] h-[72px] rounded-[24px] bg-component-gray-secondary">
+									<Image
+										src="/icons/mypage/lock.svg"
+										alt="lock"
+										width={24}
+										height={24}
+									/>
+								</div>
+								<span className="text-gray-neutral c2">???</span>
+							</div>
+						))}
+				</div>
+			</div>
+
 			{/* 완료한 일, 미룬 일 */}
-			<TaskContainer
-				completedTasks={mockTasks.completed}
-				postponedTasks={mockTasks.postponed}
-			/>
+			{myPageData && (
+				<TaskContainer
+					completedTasks={myPageData.completedTasks}
+					postponedTasks={myPageData.procrastinatedTasks}
+				/>
+			)}
 		</div>
 	);
 }
