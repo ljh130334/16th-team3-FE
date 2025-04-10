@@ -1,7 +1,11 @@
 "use client";
 
 import type { TaskStatus } from "@/types/task";
-import { calculateRemainingTime, parseDateAndTime } from "@/utils/dateFormat";
+import {
+	calculateRemainingTime,
+	convertEstimatedTime,
+	parseDateAndTime,
+} from "@/utils/dateFormat";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type React from "react";
@@ -159,6 +163,44 @@ const TaskItem: React.FC<TaskItemProps> = ({
 		return dueTime;
 	}, [dueTime, formatTaskDate]);
 
+	const formatTimeRequired = (timeRequired: string | undefined): string => {
+		if (!timeRequired) return "시간 미정";
+
+		// "n시간 소요" 형식에서 시간 추출
+		const hourMatch = timeRequired.match(/(\d+)시간/);
+		const minuteMatch = timeRequired.match(/(\d+)분/);
+
+		if (!hourMatch) return timeRequired;
+
+		const hours = parseInt(hourMatch[1], 10);
+		const minutes = minuteMatch ? parseInt(minuteMatch[1], 10) : 0;
+
+		// 24시간 이상인 경우에만 변환
+		if (hours >= 24) {
+			const totalMinutes = hours * 60 + minutes;
+			const { estimatedDay, estimatedHour, estimatedMinute } =
+				convertEstimatedTime(totalMinutes);
+
+			let result = "";
+			if (estimatedDay > 0) {
+				result += `${estimatedDay}일 `;
+			}
+
+			if (estimatedHour > 0) {
+				result += `${estimatedHour}시간 `;
+			}
+
+			if (estimatedMinute > 0) {
+				result += `${estimatedMinute}분 `;
+			}
+
+			result += "소요";
+			return result;
+		}
+
+		return timeRequired;
+	};
+
 	return (
 		<>
 			<div
@@ -179,7 +221,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
 									className="mr-[4px]"
 								/>
 								<span className="c3 text-text-neutral">
-									{timeRequired || "1시간 소요"}
+									{formatTimeRequired(timeRequired || "1시간 소요")}
 								</span>
 							</span>
 						</div>

@@ -1,6 +1,7 @@
 "use client";
 
 import type { Task } from "@/types/task";
+import { convertEstimatedTime } from "@/utils/dateFormat";
 import Image from "next/image";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
@@ -74,6 +75,44 @@ const WeeklyTaskItem: React.FC<WeeklyTaskItemProps> = ({
 		return `${month}월 ${day}일 ${task.dueDay} ${timeDisplay}`;
 	};
 
+	const formatTimeRequired = (timeRequired: string | undefined): string => {
+		if (!timeRequired) return "시간 미정";
+
+		// "n시간 소요" 형식에서 시간 추출
+		const hourMatch = timeRequired.match(/(\d+)시간/);
+		const minuteMatch = timeRequired.match(/(\d+)분/);
+
+		if (!hourMatch) return timeRequired;
+
+		const hours = parseInt(hourMatch[1], 10);
+		const minutes = minuteMatch ? parseInt(minuteMatch[1], 10) : 0;
+
+		// 24시간 이상인 경우에만 변환
+		if (hours >= 24) {
+			const totalMinutes = hours * 60 + minutes;
+			const { estimatedDay, estimatedHour, estimatedMinute } =
+				convertEstimatedTime(totalMinutes);
+
+			let result = "";
+			if (estimatedDay > 0) {
+				result += `${estimatedDay}일 `;
+			}
+
+			if (estimatedHour > 0) {
+				result += `${estimatedHour}시간 `;
+			}
+
+			if (estimatedMinute > 0) {
+				result += `${estimatedMinute}분 `;
+			}
+
+			result += "소요";
+			return result;
+		}
+
+		return timeRequired;
+	};
+
 	return (
 		<div
 			className="relative mb-4 rounded-[20px] bg-component-gray-secondary p-4"
@@ -96,7 +135,9 @@ const WeeklyTaskItem: React.FC<WeeklyTaskItemProps> = ({
 							height={14}
 							className="mr-[4px]"
 						/>
-						<span className="c3 text-text-neutral">{task.timeRequired}</span>
+						<span className="c3 text-text-neutral">
+							{formatTimeRequired(task.timeRequired)}
+						</span>
 					</div>
 					<div className="s2 mt-[3px] text-text-strong">{truncatedTitle}</div>
 				</div>
