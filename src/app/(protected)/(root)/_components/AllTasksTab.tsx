@@ -5,7 +5,7 @@ import TaskFilterDropdown from "@/app/(protected)/(root)/_components/TaskFilterD
 import type { Task } from "@/types/task";
 import { useCallback, useMemo, useState } from "react";
 
-// 유형별 우선순위 정의 (WeeklyTasksPage.tsx에서 가져옴)
+// 유형별 우선순위 정의
 const CATEGORY_PRIORITY: Record<string, number> = {
 	과제: 1,
 	"그림∙디자인": 2,
@@ -32,7 +32,6 @@ const AllTasksTab: React.FC<AllTasksTabProps> = ({
 	onTaskClick,
 	onDeleteTask,
 }) => {
-	// 필터 옵션 정의
 	const filterOptions = [
 		{ id: "due-asc", label: "마감일 가까운 순" },
 		{ id: "duration-desc", label: "소요시간 긴 순" },
