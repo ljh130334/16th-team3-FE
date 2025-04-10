@@ -36,7 +36,7 @@ const Persona = ({
 			{isCharacterPage ? (
 				<Badge>{name}</Badge>
 			) : (
-				<span className="text-gray-neutral c2">{name}dwqdqw</span>
+				<span className="text-gray-neutral c2">{name}</span>
 			)}
 		</div>
 	);
