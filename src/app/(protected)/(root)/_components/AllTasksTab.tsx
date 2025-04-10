@@ -124,7 +124,6 @@ const AllTasksTab: React.FC<AllTasksTabProps> = ({
 					}
 					case "category": {
 						// 마감 유형별
-						// persona.taskKeywordsCombination.taskType.name에 카테고리 정보가 있음
 						const aCategory =
 							a.persona?.taskKeywordsCombination?.taskType?.name || "기타";
 						const bCategory =
@@ -148,10 +147,8 @@ const AllTasksTab: React.FC<AllTasksTabProps> = ({
 		[getDurationInMinutes],
 	);
 
-	// 모든 작업을 하나의 배열로 병합 (진행 중인 작업은 제외할 수 있습니다)
 	const allTasksCombined = useMemo(() => {
 		if (selectedFilter.id === "category") {
-			// 카테고리별 정렬 시 진행 중인 작업도 포함
 			return [
 				...inProgressTasks,
 				...todayTasks,
@@ -160,7 +157,7 @@ const AllTasksTab: React.FC<AllTasksTabProps> = ({
 			];
 		}
 
-		return [...todayTasks, ...weeklyTasks, ...futureTasks];
+		return [...inProgressTasks, ...todayTasks, ...weeklyTasks, ...futureTasks];
 	}, [
 		inProgressTasks,
 		todayTasks,
@@ -187,13 +184,67 @@ const AllTasksTab: React.FC<AllTasksTabProps> = ({
 		return sortTasksByFilter(tasks, selectedFilter.id);
 	}, [futureTasks, selectedFilter.id, sortTasksByFilter]);
 
-	// 정렬된 진행 중 작업
-	const sortedInProgressTasks = useMemo(() => {
-		const tasks = [...inProgressTasks];
-		return sortTasksByFilter(tasks, selectedFilter.id);
-	}, [inProgressTasks, selectedFilter.id, sortTasksByFilter]);
+	// 진행 중인 작업 분류
+	const categorizedInProgressTasks = useMemo(() => {
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+		const tomorrow = new Date(today);
+		tomorrow.setDate(tomorrow.getDate() + 1);
 
-	// 카테고리별 분류를 위한 데이터 가공
+		// 이번주의 월요일 찾기
+		const dayOfWeek = today.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
+		const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+		const mondayOfThisWeek = new Date(today);
+		mondayOfThisWeek.setDate(today.getDate() - daysFromMonday);
+
+		// 이번주의 일요일 찾기
+		const sundayOfThisWeek = new Date(mondayOfThisWeek);
+		sundayOfThisWeek.setDate(mondayOfThisWeek.getDate() + 6);
+		sundayOfThisWeek.setHours(23, 59, 59, 999);
+
+		// 오늘, 이번주, 이후 할일로 분류
+		const todayIPTasks: Task[] = [];
+		const weeklyIPTasks: Task[] = [];
+		const futureIPTasks: Task[] = [];
+
+		for (const task of inProgressTasks) {
+			const taskDueDate = task.dueDatetime
+				? new Date(task.dueDatetime)
+				: task.dueDate
+					? new Date(task.dueDate)
+					: null;
+
+			if (!taskDueDate) {
+				// 마감일이 없으면 오늘로 분류
+				todayIPTasks.push(task);
+				continue;
+			}
+
+			const taskDateOnly = new Date(taskDueDate);
+			taskDateOnly.setHours(0, 0, 0, 0);
+
+			if (taskDateOnly.getTime() === today.getTime()) {
+				// 오늘인 경우
+				todayIPTasks.push(task);
+			} else if (taskDateOnly < sundayOfThisWeek && taskDateOnly >= tomorrow) {
+				// 내일부터 이번주 일요일까지
+				weeklyIPTasks.push(task);
+			} else if (taskDateOnly >= sundayOfThisWeek) {
+				// 이번주 이후
+				futureIPTasks.push(task);
+			} else {
+				// 지난 날짜의 경우 오늘로 분류
+				todayIPTasks.push(task);
+			}
+		}
+
+		return {
+			todayIPTasks,
+			weeklyIPTasks,
+			futureIPTasks,
+		};
+	}, [inProgressTasks]);
+
 	const groupedTasksData = useMemo(() => {
 		if (selectedFilter.id === "category") {
 			return groupTasksByCategory(allTasksCombined);
@@ -236,12 +287,14 @@ const AllTasksTab: React.FC<AllTasksTabProps> = ({
 					))}
 				</>
 			) : (
-				// 다른 정렬 옵션일 때는 기존 구조 유지
+				// 다른 정렬 옵션일 때는 오늘/이번주/이후 할일로 구조 변경
 				<>
-					{sortedInProgressTasks.length > 0 && (
+					{(sortedTodayTasks.length > 0 ||
+						categorizedInProgressTasks.todayIPTasks.length > 0) && (
 						<div className="mb-6">
-							<h3 className="s3 mb-2 text-text-neutral">진행 중</h3>
-							{sortedInProgressTasks.map((task) => (
+							<h3 className="s3 mb-2 text-text-neutral">오늘</h3>
+							{/* 진행 중이면서 오늘 마감인 작업 */}
+							{categorizedInProgressTasks.todayIPTasks.map((task) => (
 								<AllTaskItem
 									key={task.id}
 									task={task}
@@ -249,12 +302,7 @@ const AllTasksTab: React.FC<AllTasksTabProps> = ({
 									onDelete={onDeleteTask}
 								/>
 							))}
-						</div>
-					)}
-
-					{sortedTodayTasks.length > 0 && (
-						<div className="mb-6">
-							<h3 className="s3 mb-2 text-text-neutral">오늘</h3>
+							{/* 오늘 마감인 작업 */}
 							{sortedTodayTasks.map((task) => (
 								<AllTaskItem
 									key={task.id}
@@ -266,9 +314,20 @@ const AllTasksTab: React.FC<AllTasksTabProps> = ({
 						</div>
 					)}
 
-					{sortedWeeklyTasks.length > 0 && (
+					{(sortedWeeklyTasks.length > 0 ||
+						categorizedInProgressTasks.weeklyIPTasks.length > 0) && (
 						<div className="mb-6">
 							<h3 className="s3 mb-2 text-text-neutral">이번주</h3>
+							{/* 진행 중이면서 이번주 마감인 작업 */}
+							{categorizedInProgressTasks.weeklyIPTasks.map((task) => (
+								<AllTaskItem
+									key={task.id}
+									task={task}
+									onClick={onTaskClick}
+									onDelete={onDeleteTask}
+								/>
+							))}
+							{/* 이번주 마감인 작업 */}
 							{sortedWeeklyTasks.map((task) => (
 								<AllTaskItem
 									key={task.id}
@@ -280,9 +339,20 @@ const AllTasksTab: React.FC<AllTasksTabProps> = ({
 						</div>
 					)}
 
-					{sortedFutureTasks.length > 0 && (
+					{(sortedFutureTasks.length > 0 ||
+						categorizedInProgressTasks.futureIPTasks.length > 0) && (
 						<div className="mb-6">
 							<h3 className="s3 mb-2 text-text-neutral">이후 할일</h3>
+							{/* 진행 중이면서 이후 마감인 작업 */}
+							{categorizedInProgressTasks.futureIPTasks.map((task) => (
+								<AllTaskItem
+									key={task.id}
+									task={task}
+									onClick={onTaskClick}
+									onDelete={onDeleteTask}
+								/>
+							))}
+							{/* 이후 마감인 작업 */}
 							{sortedFutureTasks.map((task) => (
 								<AllTaskItem
 									key={task.id}
