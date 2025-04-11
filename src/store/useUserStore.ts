@@ -19,7 +19,7 @@ export const useUserStore = create<UserState>()((set) => ({
 		isNewUser: true,
 	},
 	deviceId: "",
-	deviceType: "",
+	deviceType: "IOS",
 
 	setUser: (user) =>
 		set((state) => ({ userData: { ...state.userData, ...user } })),

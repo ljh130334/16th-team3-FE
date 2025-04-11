@@ -82,7 +82,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 	};
 
 	const handleReflection = () => {
-		router.push(`/reflection?taskId=${initialTask.id}`);
+		router.push(`/retrospection/${initialTask.id}`);
 	};
 
 	// 마감 시간 지남 확인
@@ -176,7 +176,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 						{/* 캐릭터 및 배지 영역 */}
 						<div className="relative mt-4 flex flex-col items-center justify-center gap-4">
-							<div className="flex flex-col items-center gap-4 z-20">
+							<div className="z-20 flex flex-col items-center gap-4">
 								<div
 									className="s3 flex items-center justify-center whitespace-nowrap rounded-[999px] px-[14px] py-[10px] text-[#BDBDF5]"
 									style={{
@@ -221,7 +221,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 					</div>
 
 					{/* 디테일 목표 영역 */}
-					<div className="px-5 mt-8 w-full max-w-lg mx-auto relative z-30">
+					<div className="relative z-30 mx-auto mt-8 w-full max-w-lg px-5">
 						<DetailGoals taskId={initialTask.id} />
 					</div>
 
@@ -239,7 +239,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			</div>
 
 			{/* 하단 영역 */}
-			<div className="relative flex flex-col items-center px-5 py-3 mb-[37px] z-40">
+			<div className="relative z-40 mb-[37px] flex flex-col items-center px-5 py-3">
 				<Button
 					variant={isUrgent(initialTask) ? "hologram" : "primary"}
 					className={`relative w-full ${isUrgent(initialTask) ? "l2 h-[56px] rounded-[16px] px-[18.5px] text-center text-gray-inverse" : ""}`}
@@ -252,14 +252,14 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			{/* 할일 완료 바텀시트 */}
 			{showBottomSheet && (
 				<div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
-					<div className="flex w-full flex-col items-center rounded-t-[28px] bg-component-gray-secondary px-5 pt-10 pb-[34px]">
+					<div className="flex w-full flex-col items-center rounded-t-[28px] bg-component-gray-secondary px-5 pb-[34px] pt-10">
 						<h2 className="t3 text-center text-gray-normal">
 							{initialTask.name}
 						</h2>
 						<p className="t3 mb-2 text-center text-gray-normal">
 							정말 다 끝내셨나요?
 						</p>
-						<p className="b3 text-text-neutral mb-7 text-center">
+						<p className="b3 mb-7 text-center text-text-neutral">
 							마감까지 {remainingTime}
 						</p>
 						<button
@@ -272,7 +272,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 						<button
 							type="button"
-							className="b2 w-full pt-4 pb-2 text-text-neutral"
+							className="b2 w-full pb-2 pt-4 text-text-neutral"
 							onClick={() => setShowBottomSheet(false)}
 						>
 							몰입으로 돌아가기
@@ -284,7 +284,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			{/* 시간 만료 바텀시트 */}
 			{showTimeExpiredSheet && (
 				<div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
-					<div className="flex w-full flex-col items-center rounded-t-[28px] bg-component-gray-secondary px-5 pt-6 pb-[34px]">
+					<div className="flex w-full flex-col items-center rounded-t-[28px] bg-component-gray-secondary px-5 pb-[34px] pt-6">
 						<h2 className="t3 mt-4 text-center text-gray-normal">
 							{initialTask.name}
 						</h2>
@@ -293,7 +293,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 						</p>
 						<button
 							type="button"
-							className="l2 w-full rounded-[16px] bg-component-accent-primary py-4 my-3 text-gray-strong"
+							className="l2 my-3 w-full rounded-[16px] bg-component-accent-primary py-4 text-gray-strong"
 							onClick={handleReflection}
 						>
 							회고하기
@@ -304,44 +304,44 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 			{/* CSS Animations */}
 			<style jsx global>{`
-				@keyframes expandDown {
-					from {
-						opacity: 0;
-						max-height: 0;
-					}
-					to {
-						opacity: 1;
-						max-height: 300px;
-					}
-				}
-	
-				@keyframes expandListWidth {
-					from {
-						width: 172px;
-					}
-					to {
-						width: 243px;
-					}
-				}
+        @keyframes expandDown {
+          from {
+            opacity: 0;
+            max-height: 0;
+          }
+          to {
+            opacity: 1;
+            max-height: 300px;
+          }
+        }
 
-				@keyframes floating {
-					0% {
-						transform: translateY(8px);
-					}
-					50% {
-						transform: translateY(-8px);
-					}
-					100% {
-						transform: translateY(8px);
-					}
-				}
+        @keyframes expandListWidth {
+          from {
+            width: 172px;
+          }
+          to {
+            width: 243px;
+          }
+        }
 
-				.floating-persona {
-					animation: floating 3s ease-in-out infinite;
-					display: flex;
-					justify-content: center;
-				}
-			`}</style>
+        @keyframes floating {
+          0% {
+            transform: translateY(8px);
+          }
+          50% {
+            transform: translateY(-8px);
+          }
+          100% {
+            transform: translateY(8px);
+          }
+        }
+
+        .floating-persona {
+          animation: floating 3s ease-in-out infinite;
+          display: flex;
+          justify-content: center;
+        }
+      `}</style>
 		</div>
 	);
 }

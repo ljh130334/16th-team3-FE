@@ -40,6 +40,15 @@ export const useWebViewMessage = (router?: ReturnType<typeof useRouter>) => {
 		}
 	};
 
+	const handleGetDeviceType = () => {
+		try {
+			const message = JSON.stringify({ type: "GET_DEVICE_TYPE" });
+			window.ReactNativeWebView?.postMessage(message);
+		} catch (error) {
+			console.error("메시지 전송 에러:", error);
+		}
+	};
+
 	useEffect(() => {
 		console.log("useWebViewMessage useEffect 실행됨");
 		const handleMessage = (event: MessageEvent) => {
@@ -82,6 +91,12 @@ export const useWebViewMessage = (router?: ReturnType<typeof useRouter>) => {
 						console.error('페이로드에 fcmToken이 없음:', data.payload);
 					}
 				}
+
+				if (data.type === 'GET_DEVICE_TYPE') {
+					console.log("GET_DEVICE_TYPE 타입 메시지 감지됨");
+					console.log("디바이스 타입:", data.payload.deviceType);
+					setDeviceInfo(data.payload.deviceId || "", data.payload.deviceType);
+				}
 			} catch (error) {
 				console.error("메시지 파싱 에러:", error);
 			}
@@ -104,7 +119,7 @@ export const useWebViewMessage = (router?: ReturnType<typeof useRouter>) => {
 			window.removeEventListener("message", handleMessage);
 			document.removeEventListener("message", documentMessageHandler);
 		};
-	}, [router, postFcmTokenMutation]);
+	}, [router, postFcmTokenMutation, setDeviceInfo]);
 
-	return { handleTakePicture, handleGetDeviceToken };
+	return { handleTakePicture, handleGetDeviceToken, handleGetDeviceType };
 };

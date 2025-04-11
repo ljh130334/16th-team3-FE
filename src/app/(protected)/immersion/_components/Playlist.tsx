@@ -151,7 +151,7 @@ export default function SingleMusicItem({
 	>("THUMBNAIL");
 
 	// 유튜브 embed URL
-	const youtubeEmbedUrl = `https://www.youtube.com/embed/${videoInfo.id}`;
+	const youtubeEmbedUrl = `https://www.youtube.com/embed/${videoInfo.id}&playsinline=1`;
 
 	// ↓ [확대 로직] 별도 함수
 	const handleExpand = () => {
