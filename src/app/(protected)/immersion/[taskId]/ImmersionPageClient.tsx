@@ -220,7 +220,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 					</div>
 
 					{/* 플레이리스트 */}
-					<div className="px-5 pt-7">
+					{/* <div className="px-5 pt-7">
 						<Suspense>
 							<Playlist
 								personaId={personaId}
@@ -228,7 +228,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 								personaTaskType={personaTaskType}
 							/>
 						</Suspense>
-					</div>
+					</div> */}
 				</div>
 			</div>
 
