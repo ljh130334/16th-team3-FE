@@ -48,6 +48,11 @@ body {
 	font-family: var(--font-pretendard);
 }
 
+/* 배경색 설정 */
+html {
+	@apply bg-background-primary;
+  }
+
 /* 기본 헤더 스타일 */
 .h1 {
 	@apply text-h1;
