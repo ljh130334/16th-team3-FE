@@ -15,11 +15,7 @@ export default function ActionCard({
 }: ActionCardProps) {
   return (
     <div
-      className={`cursor-pointer rounded-2xl bg-[#17191F] ${
-        variant === 'gradient1'
-          ? 'bg-gradient-component-01'
-          : 'bg-gradient-component-02'
-      }`}
+      className={`cursor-pointer rounded-2xl bg-[#17191F]`}
       onClick={onClick}
     >
       <div className="relative flex flex-col gap-3 rounded-2xl bg-[#6B6BE1]/[0.16] py-4 pl-4">
