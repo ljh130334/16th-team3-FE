@@ -101,12 +101,12 @@ export default function TasksDropdown({
 			<div
 				className={`bg-component-gray-tertiary rounded-t-[8px] ${!isDropdownOpen ? "rounded-b-[8px]" : "rounded-t-[8px]"} overflow-hidden`}
 				style={{
-					width: isDropdownOpen ? "243px" : "178px",
+					width: isDropdownOpen ? "243px" : hasUrgentTask() ? "200px" : "178px",
 					transition: "width 0.3s ease-out",
 				}}
 			>
 				<button
-					className="flex w-full items-center justify-center px-[14px] py-[8px] cursor-pointer"
+					className="flex w-full items-center justify-center px-[25px] py-[8px] cursor-pointer"
 					onClick={toggleDropdown}
 					onKeyDown={(e) => handleKeyDown(e, toggleDropdown)}
 					aria-expanded={isDropdownOpen}

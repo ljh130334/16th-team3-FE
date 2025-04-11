@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import type { Task } from "@/types/task";
+import { convertEstimatedTime } from "@/utils/dateFormat";
 import Image from "next/image";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
@@ -19,7 +20,7 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({
 	const menuRef = useRef<HTMLDivElement>(null);
 	const buttonRef = useRef<HTMLButtonElement>(null);
 	const truncatedTitle =
-		task.title.length > 16 ? task.title.substring(0, 16) + "..." : task.title;
+		task.title.length > 16 ? `${task.title.substring(0, 16)}...` : task.title;
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -58,7 +59,7 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({
 
 	const renderDayChip = () => {
 		// D-Day 계산 - dDayCount가 없는 경우 직접 계산
-		let dDayCount = task.dDayCount;
+		let dDayCount: number | undefined = task.dDayCount;
 		if (dDayCount === undefined) {
 			const today = new Date();
 			today.setHours(0, 0, 0, 0);
@@ -82,7 +83,7 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({
 			}
 		}
 
-		let dDayText;
+		let dDayText: string;
 		if (dDayCount > 0) {
 			// 미래 날짜 (D-Day)
 			dDayText = dDayCount > 99 ? "D-99+" : `D-${dDayCount}`;
@@ -96,7 +97,7 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({
 		}
 
 		// 타입이 없는 경우 날짜 기반으로 타입 추론
-		let taskType = task.type;
+		let taskType: string | undefined = task.type;
 		if (!taskType) {
 			const today = new Date();
 			today.setHours(0, 0, 0, 0);
@@ -137,28 +138,29 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({
 				<Button
 					variant="hologram"
 					size="sm"
-					className="text-text-inverse z-10 rounded-[6px] px-[15px] py-[3px] h-auto flex items-center justify-center"
+					className="z-10 flex h-auto items-center justify-center rounded-[6px] px-[15px] py-[3px] text-text-inverse"
+					type="button"
 				>
 					<span className="c2 flex items-center justify-center">D-DAY</span>
 				</Button>
 			);
-		} else if (taskType === "weekly") {
+		}
+
+		if (taskType === "weekly") {
 			return (
-				<div className="bg-component-accent-secondary text-text-primary rounded-[6px] px-[15px] py-[3px] flex items-center justify-center">
-					<span className="c2 flex items-center justify-center">
-						{dDayText}
-					</span>
-				</div>
-			);
-		} else {
-			return (
-				<div className="bg-component-gray-tertiary text-text-neutral rounded-[6px] px-[15px] py-[3px] flex items-center justify-center">
+				<div className="flex items-center justify-center rounded-[6px] bg-component-accent-secondary px-[15px] py-[3px] text-text-primary">
 					<span className="c2 flex items-center justify-center">
 						{dDayText}
 					</span>
 				</div>
 			);
 		}
+
+		return (
+			<div className="flex items-center justify-center rounded-[6px] bg-component-gray-tertiary px-[15px] py-[3px] text-text-neutral">
+				<span className="c2 flex items-center justify-center">{dDayText}</span>
+			</div>
+		);
 	};
 
 	// 날짜 및 시간 표시 형식 수정
@@ -226,24 +228,63 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({
 		// 오늘 날짜는 "오늘"로만 표시, 그 외 날짜는 "n월 n일 (요일)"로 표시
 		if (isToday) {
 			return `오늘 ${timeDisplay}`;
-		} else {
-			const month = Number(dueDate.substring(5, 7)).toString();
-			const day = Number(dueDate.substring(8, 10)).toString();
-			return `${month}월 ${day}일 ${dueDay || ""} ${timeDisplay}`;
 		}
+
+		const month = Number.parseInt(dueDate.substring(5, 7), 10).toString();
+		const day = Number.parseInt(dueDate.substring(8, 10), 10).toString();
+		return `${month}월 ${day}일 ${dueDay || ""} ${timeDisplay}`;
+	};
+
+	const formatTimeRequired = (timeRequired: string | undefined): string => {
+		if (!timeRequired) return "시간 미정";
+
+		// "n시간 소요" 형식에서 시간 추출
+		const hourMatch = timeRequired.match(/(\d+)시간/);
+		const minuteMatch = timeRequired.match(/(\d+)분/);
+
+		if (!hourMatch) return timeRequired;
+
+		const hours = Number.parseInt(hourMatch[1], 10);
+		const minutes = minuteMatch ? Number.parseInt(minuteMatch[1], 10) : 0;
+
+		// 24시간 이상인 경우에만 변환
+		if (hours >= 24) {
+			const totalMinutes = hours * 60 + minutes;
+			const { estimatedDay, estimatedHour, estimatedMinute } =
+				convertEstimatedTime(totalMinutes);
+
+			let result = "";
+			if (estimatedDay > 0) {
+				result += `${estimatedDay}일 `;
+			}
+
+			if (estimatedHour > 0) {
+				result += `${estimatedHour}시간 `;
+			}
+
+			if (estimatedMinute > 0) {
+				result += `${estimatedMinute}분 `;
+			}
+
+			result += "소요";
+			return result;
+		}
+
+		return timeRequired;
 	};
 
 	return (
-		<div
-			className="bg-component-gray-secondary rounded-[20px] p-4 mb-4 relative"
+		<button
+			className="relative mb-4 rounded-[20px] bg-component-gray-secondary p-4 w-full text-left"
 			onClick={handleTaskClick}
+			type="button"
 		>
-			<div className="flex justify-between items-start">
+			<div className="flex items-start justify-between">
 				<div className="flex-1">
-					<div className="flex items-center mb-2">{renderDayChip()}</div>
+					<div className="mb-2 flex items-center">{renderDayChip()}</div>
 					<div className="c3 flex items-center text-text-primary">
 						<span>{formatDateTime()}</span>
-						<span className="c3 text-text-neutral mx-1">•</span>
+						<span className="c3 mx-1 text-text-neutral">•</span>
 						<Image
 							src="/icons/home/clock.svg"
 							alt="Clock"
@@ -251,11 +292,19 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({
 							height={14}
 							className="mr-[4px]"
 						/>
-						<span className="c3 text-text-neutral">{task.timeRequired}</span>
+						<span className="c3 text-text-neutral">
+							{formatTimeRequired(task.timeRequired)}
+						</span>
 					</div>
 					<div className="s2 mt-[3px] text-text-strong">{truncatedTitle}</div>
 				</div>
-				<button ref={buttonRef} className="mt-1 px-2" onClick={handleMoreClick}>
+				<button
+					ref={buttonRef}
+					className="mt-1 px-2"
+					onClick={handleMoreClick}
+					type="button"
+					aria-label="더 많은 옵션"
+				>
 					<Image
 						src="/icons/home/dots-vertical.svg"
 						alt="More"
@@ -268,12 +317,13 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({
 			{showMenu && (
 				<div
 					ref={menuRef}
-					className="absolute right-[0px] top-[57px] bg-component-gray-tertiary rounded-[16px] drop-shadow-lg z-10 w-[190px]"
+					className="absolute right-[0px] top-[57px] z-10 w-[190px] rounded-[16px] bg-component-gray-tertiary drop-shadow-lg"
 				>
 					<div className="c2 p-5 pb-0 text-text-alternative">편집</div>
-					<div
-						className="l3 p-5 pt-3 flex justify-between items-center text-text-red"
+					<button
+						className="l3 flex w-full items-center justify-between p-5 pt-3 text-text-red"
 						onClick={handleDeleteClick}
+						type="button"
 					>
 						삭제하기
 						<Image
@@ -283,10 +333,10 @@ const AllTaskItem: React.FC<AllTaskItemProps> = ({
 							height={16}
 							className="ml-2"
 						/>
-					</div>
+					</button>
 				</div>
 			)}
-		</div>
+		</button>
 	);
 };
 

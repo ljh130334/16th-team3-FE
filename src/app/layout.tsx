@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Providers from "@/app/providers/providers";
 import * as gtag from "@/lib/gtag";
 import { ViewTransitions } from "next-view-transitions";
 import localFont from "next/font/local";
@@ -36,7 +37,8 @@ export default function RootLayout({
 				<body
 					className={`${pretendard.className} mt-[44px] h-[calc(100vh-44px)] antialiased bg-background-primary`}
 				>
-					{children}
+					{/* Providers 컴포넌트를 children을 감싸도록 추가 */}
+					<Providers>{children}</Providers>
 					<Script
 						src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js"
 						integrity={process.env.NEXT_PUBLIC_KAKAO_INTEGRITY}

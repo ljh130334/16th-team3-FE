@@ -1,7 +1,11 @@
 "use client";
 
 import type { TaskStatus } from "@/types/task";
-import { calculateRemainingTime, parseDateAndTime } from "@/utils/dateFormat";
+import {
+	calculateRemainingTime,
+	convertEstimatedTime,
+	parseDateAndTime,
+} from "@/utils/dateFormat";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type React from "react";
@@ -31,22 +35,23 @@ const TaskItem: React.FC<TaskItemProps> = ({
 	timeRequired,
 	onDelete,
 	onPreviewStart = () => {},
-	ignoredAlerts = 0, // 기본값은 0
+	ignoredAlerts = 0,
 	resetAlerts = () => {},
 	dueDatetime,
 	status,
 }) => {
 	const router = useRouter();
-	const [showUrgentBottomSheet, setShowUrgentBottomSheet] = useState(false);
-	const [remainingTime, setRemainingTime] = useState("");
-	const [isUrgent, setIsUrgent] = useState(false);
+	const [showUrgentBottomSheet, setShowUrgentBottomSheet] =
+		useState<boolean>(false);
+	const [remainingTime, setRemainingTime] = useState<string>("");
+	const [isUrgent, setIsUrgent] = useState<boolean>(false);
 
 	// 진행 중인 태스크인지 확인
 	const isInProgress = status === "inProgress";
 
 	// 남은 시간 계산 함수
 	const calculateRemainingTimeLocal = useCallback(() => {
-		let dueDateObj;
+		let dueDateObj: Date;
 		if (dueDatetime) {
 			dueDateObj = new Date(dueDatetime);
 		} else {
@@ -159,10 +164,49 @@ const TaskItem: React.FC<TaskItemProps> = ({
 		return dueTime;
 	}, [dueTime, formatTaskDate]);
 
+	const formatTimeRequired = (timeRequired: string | undefined): string => {
+		if (!timeRequired) return "시간 미정";
+
+		// "n시간 소요" 형식에서 시간 추출
+		const hourMatch = timeRequired.match(/(\d+)시간/);
+		const minuteMatch = timeRequired.match(/(\d+)분/);
+
+		if (!hourMatch) return timeRequired;
+
+		const hours = Number.parseInt(hourMatch[1], 10);
+		const minutes = minuteMatch ? Number.parseInt(minuteMatch[1], 10) : 0;
+
+		// 24시간 이상인 경우에만 변환
+		if (hours >= 24) {
+			const totalMinutes = hours * 60 + minutes;
+			const { estimatedDay, estimatedHour, estimatedMinute } =
+				convertEstimatedTime(totalMinutes);
+
+			let result = "";
+			if (estimatedDay > 0) {
+				result += `${estimatedDay}일 `;
+			}
+
+			if (estimatedHour > 0) {
+				result += `${estimatedHour}시간 `;
+			}
+
+			if (estimatedMinute > 0) {
+				result += `${estimatedMinute}분 `;
+			}
+
+			result += "소요";
+			return result;
+		}
+
+		return timeRequired;
+	};
+
 	return (
 		<>
-			<div
-				className="mb-4 rounded-[20px] bg-component-gray-secondary p-4"
+			<button
+				type="button"
+				className="mb-4 w-full text-left rounded-[20px] bg-component-gray-secondary p-4"
 				onClick={onClick}
 			>
 				<div className="flex items-center justify-between">
@@ -179,13 +223,14 @@ const TaskItem: React.FC<TaskItemProps> = ({
 									className="mr-[4px]"
 								/>
 								<span className="c3 text-text-neutral">
-									{timeRequired || "1시간 소요"}
+									{formatTimeRequired(timeRequired || "1시간 소요")}
 								</span>
 							</span>
 						</div>
 						<div className="s2 mt-[3px] text-text-strong">{title}</div>
 					</div>
 					<button
+						type="button"
 						className={`l4 rounded-[10px] px-[12px] py-[9.5px] ${
 							isUrgent
 								? "bg-hologram text-text-inverse"
@@ -202,7 +247,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
 								: "미리 시작"}
 					</button>
 				</div>
-			</div>
+			</button>
 
 			{showUrgentBottomSheet && (
 				<div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
@@ -215,6 +260,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
 							마감까지 {remainingTime}
 						</p>
 						<button
+							type="button"
 							className="l2 mb-3 w-full rounded-xl bg-component-accent-primary py-4 text-white"
 							onClick={handleStart}
 						>
@@ -222,6 +268,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
 						</button>
 
 						<button
+							type="button"
 							className="l2 w-full py-4 text-text-neutral"
 							onClick={handleCloseUrgentSheet}
 						>
