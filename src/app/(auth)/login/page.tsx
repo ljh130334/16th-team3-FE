@@ -194,7 +194,7 @@ const LoginPage = () => {
           <span className="pt-0.5">카카오로 계속하기</span>
         </Button>
 
-        {deviceType !== 'Android' && (
+        {deviceType !== 'ANDROID' && (
           <Button
             variant="default"
             className="l2 i gap-2 rounded-[16px] bg-[#e6edf8] text-[#0f1114]"
