@@ -106,7 +106,13 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 	return (
 		<div className="flex h-full flex-col bg-background-primary">
 			{/* 상단 헤더 영역 */}
-			<div className="flex items-center justify-between px-5 py-[14px]">
+			<div
+				className="fixed top-[44px] left-0 w-full z-50 flex items-center justify-between px-5 py-[14px]"
+				style={{
+					background:
+						"linear-gradient(180deg, #0F1114 20%, rgba(15, 17, 20, 0.00) 70%)",
+				}}
+			>
 				{/* 이전 페이지 버튼 */}
 				<Link href="/">
 					<div className="flex items-center">
@@ -129,7 +135,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			</div>
 
 			{/* 스크롤 영역이 될 중간 부분 */}
-			<div className="flex-1 overflow-y-auto">
+			<div className="flex-1 overflow-y-auto pt-[65px]">
 				<div className="relative z-10">
 					<div className="relative">
 						<div className="absolute inset-0 -top-5 h-[500px]">
