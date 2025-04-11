@@ -254,7 +254,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 				<div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
 					<div className="flex w-full flex-col items-center rounded-t-[28px] bg-component-gray-secondary px-5 pb-[34px] pt-10">
 						<h2 className="t3 text-center text-gray-normal">
-							{initialTask.name}
+							{initialTask.title}
 						</h2>
 						<p className="t3 mb-2 text-center text-gray-normal">
 							정말 다 끝내셨나요?
@@ -286,7 +286,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 				<div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
 					<div className="flex w-full flex-col items-center rounded-t-[28px] bg-component-gray-secondary px-5 pb-[34px] pt-6">
 						<h2 className="t3 mt-4 text-center text-gray-normal">
-							{initialTask.name}
+							{initialTask.title}
 						</h2>
 						<p className="t3 mb-4 text-center text-gray-normal">
 							설정했던 마감일이 끝났어요!
@@ -304,44 +304,44 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 			{/* CSS Animations */}
 			<style jsx global>{`
-        @keyframes expandDown {
-          from {
-            opacity: 0;
-            max-height: 0;
-          }
-          to {
-            opacity: 1;
-            max-height: 300px;
-          }
-        }
+			@keyframes expandDown {
+			from {
+				opacity: 0;
+				max-height: 0;
+			}
+			to {
+				opacity: 1;
+				max-height: 300px;
+			}
+			}
 
-        @keyframes expandListWidth {
-          from {
-            width: 172px;
-          }
-          to {
-            width: 243px;
-          }
-        }
+			@keyframes expandListWidth {
+			from {
+				width: 172px;
+			}
+			to {
+				width: 243px;
+			}
+			}
 
-        @keyframes floating {
-          0% {
-            transform: translateY(8px);
-          }
-          50% {
-            transform: translateY(-8px);
-          }
-          100% {
-            transform: translateY(8px);
-          }
-        }
+			@keyframes floating {
+			0% {
+				transform: translateY(8px);
+			}
+			50% {
+				transform: translateY(-8px);
+			}
+			100% {
+				transform: translateY(8px);
+			}
+			}
 
-        .floating-persona {
-          animation: floating 3s ease-in-out infinite;
-          display: flex;
-          justify-content: center;
-        }
-      `}</style>
+			.floating-persona {
+			animation: floating 3s ease-in-out infinite;
+			display: flex;
+			justify-content: center;
+			}
+		`}</style>
 		</div>
 	);
 }

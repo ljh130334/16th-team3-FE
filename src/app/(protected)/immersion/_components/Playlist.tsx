@@ -93,16 +93,16 @@ export function Playlist({
 		<div className="flex flex-col w-full">
 			{/* 지금 딱 맞는 음악 */}
 			{currentYoutubeInfo && (
-				<section className="mt-3">
-					<h2 className="s2 text-white mb-4">지금 딱 맞는 음악</h2>
+				<section>
+					<div className="s2 text-gray-normal my-[18px]">재생 중 음악</div>
 					<SingleMusicItem videoInfo={currentYoutubeInfo} />
 				</section>
 			)}
 
 			{/* 긴급한 글쓰기를 돕는 음악 (전체 리스트) */}
 			{vInfos && vInfos.length > 1 && (
-				<section className="mt-8">
-					<h2 className="s2 text-white mb-2">
+				<section className="mt-7">
+					<h2 className="s2 text-white my-[10px]">
 						{personaTaskMode} {josa(personaTaskType, "을/를")} 돕는 음악
 					</h2>
 					<div className="flex flex-col gap-1">
@@ -185,7 +185,7 @@ export default function SingleMusicItem({
 		<motion.div
 			layout // 레이아웃 애니메이션 (박스 높이 변화 시, 아래가 밀려남)
 			transition={{ duration: 0.3 }}
-			className="bg-component-gray-primary rounded-xl mb-6"
+			className="bg-component-gray-primary rounded-[16px] my-[10px]"
 		>
 			{/* 
         (A) 썸네일 
@@ -272,13 +272,13 @@ function ThumbnailView({
 	onExpand: () => void;
 }) {
 	return (
-		<div className="p-3 flex gap-3 items-start">
+		<div className="p-3 flex items-start">
 			<img
 				src={thumbnail}
 				alt={title}
 				className="w-14 h-14 rounded-[10px] object-cover"
 			/>
-			<div className="flex flex-col flex-1">
+			<div className="flex flex-col flex-1 ml-4 mr-2">
 				<p className="text-sm font-medium text-white line-clamp-2 overflow-hidden text-ellipsis">
 					{title}
 				</p>
@@ -324,7 +324,7 @@ function EmbedView({
 			<div className="flex items-start gap-4 px-4 pb-4 pt-3">
 				<div className="flex justify-between items-center flex-1">
 					<div className="flex flex-col leading-tight">
-						<p className="b3 text-grey line-clamp-1 overflow-hidden text-ellipsis">
+						<p className="b3 text-gray-normal line-clamp-1 overflow-hidden text-ellipsis">
 							{title}
 						</p>
 						<p className="c2 text-gray-alternative mt-1">{remainingTime}</p>
