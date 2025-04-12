@@ -5,7 +5,7 @@
 
 [![AppStore](http://img.shields.io/badge/AppStore-A9A9EE?style=flat&logo=ios&logoColor=black&link=https://apps.apple.com/kr/app/spurt/id6743025568)](https://apps.apple.com/kr/app/spurt/id6743025568)
 [![Instagram](http://img.shields.io/badge/Instagram-E4405F?style=flat&logo=instagram&logoColor=white&link=https://www.instagram.com/spurt_on/)](https://www.instagram.com/spurt_on/)
-[![서비스 소개]([http://img.shields.io/badge/서비스_소개-1976D2?style=flat&logo=notion&logoColor=white&link=https://bit.ly/3YxsqXe)](https://bit.ly/3YxsqXe](http://img.shields.io/badge/서비스_소개-1976D2?style=flat&logo=notion&logoColor=white&link=https://verdant-flax-c80.notion.site/SPURT-1b0d6a7e188a80aebfceda8f8cd6a86c))
+[![서비스 소개](http://img.shields.io/badge/서비스_소개-1976D2?style=flat&logo=notion&logoColor=white&link=https://verdant-flax-c80.notion.site/SPURT-1b0d6a7e188a80aebfceda8f8cd6a86c)](https://verdant-flax-c80.notion.site/SPURT-1b0d6a7e188a80aebfceda8f8cd6a86c)
 
 ## **여유 시간을 확보하고, 작은행동으로 바로 시작하세요 🔥**
 ⏰ 아직도 "지금 말고 조금 이따가..." 하고 있나요?
