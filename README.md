@@ -38,12 +38,12 @@
 </br>
 
 ## 🛠️ TECH STACK
-
+![2224670](https://github.com/user-attachments/assets/e45db2d8-ba7a-434e-9729-62235bb200c9)
 </br>
 </br>
 
 ## 🕸️ SOFTWARE ARCHITECTURE
-
+![2224672](https://github.com/user-attachments/assets/5734796a-7010-4e66-9507-61d2c90e7c09)
 </br>
 </br>
 
