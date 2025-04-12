@@ -1,26 +1,4 @@
-# Project Name
+<img src="![SPURT LOGO](https://github.com/user-attachments/assets/3f8bb97c-9b3d-499a-9036-cb4adb7be481)" width=120 />
 
-- 타임어택 (가제)
-
-## 기술 스택
-
-- React 19
-- Next.js 15
-- TypeScript
-
-### UI
-
-- Tailwind CSS
-- shadcn/ui
-
-### 상태 관리
-
-- Zustand (클라이언트)
-- TanStack Query (서버)
-
-### 개발 환경
-
-- ESLint
-- Prettier
-
-<!-- test -->
+# ⏰✨ SPURT - 미루는 당신을 위한 마지막 스퍼트
+<p align="center"><img src="![0](https://github.com/user-attachments/assets/afd07d93-70f2-4eea-b2d8-9edda7bdf872)" width=1300></p>
