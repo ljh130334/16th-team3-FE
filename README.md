@@ -24,8 +24,12 @@
 ### 3️⃣ 할 일을 시작할 때까지 알려줘요.
 ![3](https://github.com/user-attachments/assets/4bfda55c-cd0c-437f-b9fc-ba692e6e8896)
 
-### 5️⃣ 몰입했던 순간을 간단하게 기록해요.
+### 4️⃣ 캐릭터와 함께 스퍼트를 내요.
 ![4](https://github.com/user-attachments/assets/54af266f-71d9-476a-a585-c7f9afbf7cdb)
+
+### 5️⃣ 몰입했던 순간을 간단하게 기록해요.
+![5](https://github.com/user-attachments/assets/305e25eb-875c-4c25-b943-27f8fc631799)
+
 </br>
 </br>
 
