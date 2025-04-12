@@ -3,6 +3,10 @@
 # ⏰✨ SPURT - 미루는 당신을 위한 마지막 스퍼트
 <p align="center"><img src="https://github.com/user-attachments/assets/a48e4526-7041-4c8c-ba4f-2eead05e9631" width=1300></p>
 
+[![AppStore](http://img.shields.io/badge/AppStore-A9A9EE?style=flat&logo=ios&logoColor=black&link=https://apps.apple.com/kr/app/spurt/id6743025568)](https://apps.apple.com/kr/app/spurt/id6743025568)
+[![Instagram](http://img.shields.io/badge/Instagram-E4405F?style=flat&logo=instagram&logoColor=white&link=https://www.instagram.com/spurt_on/)](https://www.instagram.com/spurt_on/)
+[![서비스 소개](http://img.shields.io/badge/서비스_소개-1976D2?style=flat&logo=notion&logoColor=white&link=https://verdant-flax-c80.notion.site/SPURT-1b0d6a7e188a80aebfceda8f8cd6a86c)
+
 ## **여유 시간을 확보하고, 작은행동으로 바로 시작하세요 🔥**
 ⏰ 아직도 "지금 말고 조금 이따가..." 하고 있나요?
 </br>
@@ -33,17 +37,17 @@
 </br>
 </br>
 
-## 🛠️ Tech Stack
+## 🛠️ TECH STACK
 
 </br>
 </br>
 
-## 🕸️ Software Architecture
+## 🕸️ SOFTWARE ARCHITECTURE
 
 </br>
 </br>
 
-## 🧑🏻‍💻DEVELOPERS
+## 🧑🏻‍💻 DEVELOPERS
 <table>
   <tbody>
     <tr>
