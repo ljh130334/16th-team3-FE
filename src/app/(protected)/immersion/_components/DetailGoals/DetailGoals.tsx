@@ -1,6 +1,5 @@
 "use client";
 
-import Toast from "@/components/toast/Toast";
 import {
 	useCreateSubtask,
 	useDeleteSubtask,
@@ -12,18 +11,17 @@ import { useEffect, useRef, useState } from "react";
 
 interface DetailGoalsProps {
 	taskId: number;
+	onError?: (type: "length" | "maxCount") => void;
 }
 
 const MAX_DETAIL_GOAL_LENGTH = 40;
 const LINE_BREAK_AT = 20;
 const MAX_DETAIL_GOALS_COUNT = 10;
 
-export default function DetailGoals({ taskId }: DetailGoalsProps) {
+export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 	const [isAddingGoal, setIsAddingGoal] = useState(false);
 	const [newGoalTitle, setNewGoalTitle] = useState("");
 	const [editingGoalId, setEditingGoalId] = useState<number | null>(null);
-	const [showLengthWarning, setShowLengthWarning] = useState(false);
-	const [showMaxCountWarning, setShowMaxCountWarning] = useState(false);
 	const [editingText, setEditingText] = useState<string>("");
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const editInputRef = useRef<HTMLTextAreaElement>(null);
@@ -38,7 +36,9 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 	useEffect(() => {
 		if (isAddingGoal && inputRef.current) {
 			const timer = setTimeout(() => {
-				inputRef.current?.focus();
+				if (inputRef.current) {
+					inputRef.current.focus();
+				}
 			}, 50);
 
 			return () => clearTimeout(timer);
@@ -46,36 +46,33 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 
 		if (editingGoalId !== null && editInputRef.current) {
 			const timer = setTimeout(() => {
-				editInputRef.current?.focus();
+				if (editInputRef.current) {
+					editInputRef.current.focus();
+				}
 			}, 50);
 
 			return () => clearTimeout(timer);
 		}
 	}, [isAddingGoal, editingGoalId]);
 
-	// 글자수 경고 메시지 표시 관리
+	// 글자수 경고 메시지 관리
 	useEffect(() => {
-		setShowLengthWarning(
+		if (
 			newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH ||
-				editingText.length > MAX_DETAIL_GOAL_LENGTH,
-		);
-	}, [newGoalTitle, editingText]);
-
-	// 최대 개수 토스트 자동 닫기
-	useEffect(() => {
-		if (showMaxCountWarning) {
-			const timer = setTimeout(() => {
-				setShowMaxCountWarning(false);
-			}, 3000);
-
-			return () => clearTimeout(timer);
+			editingText.length > MAX_DETAIL_GOAL_LENGTH
+		) {
+			if (onError) {
+				onError("length");
+			}
 		}
-	}, [showMaxCountWarning]);
+	}, [newGoalTitle, editingText, onError]);
 
 	// 세부 목표 추가 핸들러
 	const handleAddGoal = () => {
 		if (subtasks.length >= MAX_DETAIL_GOALS_COUNT) {
-			setShowMaxCountWarning(true);
+			if (onError) {
+				onError("maxCount");
+			}
 			return;
 		}
 
@@ -500,7 +497,11 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 											e.preventDefault();
 											e.stopPropagation();
 											setNewGoalTitle("");
-											setTimeout(() => inputRef.current?.focus(), 0);
+											setTimeout(() => {
+												if (inputRef.current) {
+													inputRef.current.focus();
+												}
+											}, 0);
 										}}
 										className="flex-shrink-0"
 										type="button"
@@ -519,14 +520,6 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 						</div>
 					</div>
 				</div>
-			)}
-
-			{/* 토스트 경고 메시지 */}
-			{showLengthWarning && (
-				<Toast message="최대 40자까지만 입력할 수 있어요." />
-			)}
-			{showMaxCountWarning && (
-				<Toast message="세부 목표는 10개까지만 입력할 수 있어요." />
 			)}
 		</div>
 	);
