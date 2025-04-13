@@ -8,6 +8,27 @@ import ImmersionPageClient from "./ImmersionPageClient";
 interface TaskWithPersona extends Omit<Task, "persona" | "dueDatetime"> {
 	persona: NonNullable<Task["persona"]>;
 	dueDatetime: string;
+	estimatedHours: number;
+}
+
+// Task 객체로부터 예상 소요시간(시간 단위)을 계산하는 함수
+function calculateEstimatedHours(task: Task): number {
+	// estimatedTime이 있으면 분 단위에서 시간 단위로 변환
+	if (task.estimatedTime) {
+		return task.estimatedTime / 60;
+	}
+
+	// estimatedHour와 estimatedMinute가 있는 경우
+	if (task.estimatedHour) {
+		const hours = Number(task.estimatedHour) || 0;
+		const minutes = task.estimatedMinute
+			? Number(task.estimatedMinute) / 60
+			: 0;
+		return hours + minutes;
+	}
+
+	// 특정 필드가 없을 경우 기본값 반환
+	return 1;
 }
 
 export default async function Immersion({
@@ -30,6 +51,7 @@ export default async function Immersion({
 		...convertedTask,
 		persona: convertedTask.persona,
 		dueDatetime: convertedTask.dueDatetime,
+		estimatedHours: calculateEstimatedHours(convertedTask),
 	};
 
 	return (
