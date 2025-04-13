@@ -165,11 +165,23 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 		setter: (value: string) => void,
 	) => {
 		const value = e.target.value;
-		setter(value);
 
-		// 자동 높이 조절
-		e.target.style.height = "auto";
-		e.target.style.height = `${e.target.scrollHeight}px`;
+		// 최대 글자 수 제한
+		if (value.length <= MAX_DETAIL_GOAL_LENGTH) {
+			setter(value);
+
+			// 자동 높이 조절
+			e.target.style.height = "auto";
+			e.target.style.height = `${e.target.scrollHeight}px`;
+		} else {
+			// 최대 글자 수 초과 시 이전 값 유지
+			setter(value.slice(0, MAX_DETAIL_GOAL_LENGTH));
+
+			// 경고 표시
+			if (onError) {
+				onError("length");
+			}
+		}
 	};
 
 	// 완료되지 않은 목표와 완료된 목표를 분리하여 정렬
