@@ -25,6 +25,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 	const [editingText, setEditingText] = useState<string>("");
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const editInputRef = useRef<HTMLTextAreaElement>(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	// API 연동 훅 사용
 	const { data: subtasks = [], isLoading } = useSubtasks(taskId);
@@ -90,14 +91,21 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 		const trimmedTitle = newGoalTitle.trim();
 		if (
 			trimmedTitle.length >= 1 &&
-			trimmedTitle.length <= MAX_DETAIL_GOAL_LENGTH
+			trimmedTitle.length <= MAX_DETAIL_GOAL_LENGTH &&
+			!isSubmitting
 		) {
+			setIsSubmitting(true);
+
 			createSubtaskMutation(
 				{ taskId, name: trimmedTitle },
 				{
 					onSuccess: () => {
 						setNewGoalTitle("");
 						setIsAddingGoal(false);
+						setIsSubmitting(false);
+					},
+					onError: () => {
+						setIsSubmitting(false);
 					},
 				},
 			);
@@ -106,18 +114,34 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 
 	// 완료 상태 토글 핸들러
 	const handleToggleComplete = (goalId: number) => {
+		if (isSubmitting) return;
+
 		const goal = subtasks.find((subtask) => subtask.id === goalId);
 		if (goal) {
-			updateSubtaskMutation({
-				id: goalId,
-				taskId,
-				isCompleted: !goal.isCompleted,
-			});
+			setIsSubmitting(true);
+
+			updateSubtaskMutation(
+				{
+					id: goalId,
+					taskId,
+					isCompleted: !goal.isCompleted,
+				},
+				{
+					onSuccess: () => {
+						setIsSubmitting(false);
+					},
+					onError: () => {
+						setIsSubmitting(false);
+					},
+				},
+			);
 		}
 	};
 
 	// 편집 시작 핸들러
 	const handleStartEditing = (goalId: number, originalText: string) => {
+		if (isSubmitting) return;
+
 		setEditingGoalId(goalId);
 		setEditingText(originalText);
 		setTimeout(() => {
@@ -133,14 +157,27 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 		if (
 			editingGoalId !== null &&
 			editingText.trim().length >= 1 &&
-			editingText.length <= MAX_DETAIL_GOAL_LENGTH
+			editingText.length <= MAX_DETAIL_GOAL_LENGTH &&
+			!isSubmitting
 		) {
-			updateSubtaskMutation({
-				id: editingGoalId,
-				taskId,
-				name: editingText,
-			});
-			setEditingGoalId(null);
+			setIsSubmitting(true);
+
+			updateSubtaskMutation(
+				{
+					id: editingGoalId,
+					taskId,
+					name: editingText,
+				},
+				{
+					onSuccess: () => {
+						setEditingGoalId(null);
+						setIsSubmitting(false);
+					},
+					onError: () => {
+						setIsSubmitting(false);
+					},
+				},
+			);
 		}
 	};
 
@@ -241,6 +278,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 							onChange={onChange}
 							className="absolute inset-0 w-full h-full opacity-0 z-10"
 							aria-label="세부 목표 완료 체크"
+							disabled={isSubmitting}
 						/>
 
 						<svg
@@ -291,6 +329,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 						onChange={onChange}
 						className="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
 						aria-label="세부 목표 완료 체크"
+						disabled={isSubmitting}
 					/>
 					<svg
 						width="20"
@@ -352,6 +391,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 					aria-label="세부 목표 추가"
 					className="flex items-center justify-center"
 					type="button"
+					disabled={isSubmitting}
 				>
 					<Image
 						src="/icons/immersion/plus.svg"
@@ -368,6 +408,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 					className="py-2 text-start text-gray-disabled cursor-pointer w-full"
 					onClick={handleAddGoal}
 					aria-label="세부 목표 추가하기"
+					disabled={isSubmitting}
 				>
 					<p className="text-b2">세부 목표를 추가하세요</p>
 				</button>
@@ -403,6 +444,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 											ref={editInputRef}
 											aria-label="세부 목표 수정"
 											rows={1}
+											disabled={isSubmitting}
 										/>
 										{editingText && (
 											<>
@@ -410,7 +452,8 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 													onClick={handleFinishEditing}
 													disabled={
 														editingText.trim().length === 0 ||
-														editingText.length > MAX_DETAIL_GOAL_LENGTH
+														editingText.length > MAX_DETAIL_GOAL_LENGTH ||
+														isSubmitting
 													}
 													className="flex-shrink-0 pr-3 text-s2 text-[#8484E6]"
 													type="button"
@@ -430,6 +473,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 													className="flex-shrink-0"
 													type="button"
 													aria-label="텍스트 지우기"
+													disabled={isSubmitting}
 												>
 													<Image
 														src="/icons/x-circle.svg"
@@ -456,6 +500,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 									}}
 									onClick={() => handleStartEditing(goal.id, goal.name)}
 									aria-label={`${goal.name} 편집하기`}
+									disabled={isSubmitting}
 								>
 									{formatGoalText(goal.name)}
 								</button>
@@ -489,6 +534,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 								autoComplete="off"
 								autoCorrect="off"
 								spellCheck="false"
+								disabled={isSubmitting}
 							/>
 							{newGoalTitle && (
 								<>
@@ -496,7 +542,8 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 										onClick={handleSaveGoal}
 										disabled={
 											newGoalTitle.trim().length === 0 ||
-											newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH
+											newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH ||
+											isSubmitting
 										}
 										className="flex-shrink-0 pr-3 text-s2 text-[#8484E6]"
 										type="button"
@@ -518,6 +565,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 										className="flex-shrink-0"
 										type="button"
 										aria-label="텍스트 지우기"
+										disabled={isSubmitting}
 									>
 										<Image
 											src="/icons/immersion/delete.svg"
