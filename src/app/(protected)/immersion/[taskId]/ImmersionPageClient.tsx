@@ -9,8 +9,10 @@ import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
 import DetailGoals from "@/app/(protected)/immersion/_components/DetailGoals/DetailGoals";
+import PersonaMessage from "@/app/(protected)/immersion/_components/PersonaMessage";
 import TasksDropdown from "@/app/(protected)/immersion/_components/TasksDropdown/TasksDropdown";
 import { Badge } from "@/components/component/Badge";
+import Toast from "@/components/toast/Toast";
 import { Button } from "@/components/ui/button";
 import { useCompleteTask, useInProgressTasks } from "@/hooks/useTasks";
 import { getPersonaImage } from "@/utils/getPersonaImage";
@@ -20,6 +22,8 @@ import { Playlist } from "../_components/Playlist";
 interface TaskWithPersona extends Omit<Task, "persona" | "dueDatetime"> {
 	persona: NonNullable<Task["persona"]>;
 	dueDatetime: string;
+	// 예상 소요시간 필드 추가
+	estimatedHours: number;
 }
 
 interface Props {
@@ -31,6 +35,8 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 	const [remainingTime, setRemainingTime] = useState("");
 	const [showBottomSheet, setShowBottomSheet] = useState(false);
 	const [showTimeExpiredSheet, setShowTimeExpiredSheet] = useState(false);
+	const [showLengthWarning, setShowLengthWarning] = useState(false);
+	const [showMaxCountWarning, setShowMaxCountWarning] = useState(false);
 	const personaId = initialTask.persona.id;
 	const personaImageSrc = getPersonaImage(personaId);
 	const personaTaskType =
@@ -101,6 +107,17 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 		// 마감이 1시간 미만으로 남았거나 이미 시간이 다 된 경우에도 긴급으로 처리
 		return diffInHours <= 1;
+	};
+
+	// DetailGoals에서 경고 토스트를 표시하기 위한 핸들러
+	const handleSubtaskError = (type: "length" | "maxCount") => {
+		if (type === "length") {
+			setShowLengthWarning(true);
+			setTimeout(() => setShowLengthWarning(false), 3000);
+		} else if (type === "maxCount") {
+			setShowMaxCountWarning(true);
+			setTimeout(() => setShowMaxCountWarning(false), 3000);
+		}
 	};
 
 	return (
@@ -177,28 +194,12 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 						{/* 캐릭터 및 배지 영역 */}
 						<div className="relative mt-4 flex flex-col items-center justify-center gap-4">
 							<div className="z-20 flex flex-col items-center gap-4">
-								<div
-									className="s3 flex items-center justify-center whitespace-nowrap rounded-[999px] px-[14px] py-[10px] text-[#BDBDF5]"
-									style={{
-										background:
-											"var(--Elevated-PointPriamry, rgba(107, 107, 225, 0.20))",
-										backdropFilter: "blur(30px)",
-									}}
-								>
-									<Image
-										src="/icons/onboarding/clap.svg"
-										alt="박수"
-										width={16}
-										height={15}
-										className="mr-1"
-										priority
-									/>
-									<span>
-										{isUrgent(initialTask)
-											? "마지막 한 시간! 스퍼트 올릴 타이밍이에요!"
-											: "시작 준비 끝! 가볍게 들어가볼까요?"}
-									</span>
-								</div>
+								{/* PersonaMessage 컴포넌트로 교체 */}
+								<PersonaMessage
+									personaId={String(personaId)}
+									dueDatetime={initialTask.dueDatetime}
+									estimatedHours={initialTask.estimatedHours}
+								/>
 
 								<div className="relative z-10">
 									{/* 페르소나 이미지에만 floating 클래스 적용 */}
@@ -222,7 +223,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 					{/* 디테일 목표 영역 */}
 					<div className="relative z-30 mx-auto mt-8 w-full max-w-lg px-5">
-						<DetailGoals taskId={initialTask.id} />
+						<DetailGoals taskId={initialTask.id} onError={handleSubtaskError} />
 					</div>
 
 					{/* 플레이리스트 */}
@@ -236,6 +237,20 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 						</Suspense>
 					</div>
 				</div>
+			</div>
+
+			{/* 토스트 메시지 컨테이너 - CTA 버튼 상단 16px에 고정 */}
+			<div className="relative z-50">
+				{showLengthWarning && (
+					<div className="fixed bottom-[10px] left-0 w-full px-4">
+						<Toast message="최대 40자까지만 입력할 수 있어요." />
+					</div>
+				)}
+				{showMaxCountWarning && (
+					<div className="fixed bottom-[10px] left-0 w-full px-4">
+						<Toast message="세부 목표는 10개까지만 입력할 수 있어요." />
+					</div>
+				)}
 			</div>
 
 			{/* 하단 영역 */}

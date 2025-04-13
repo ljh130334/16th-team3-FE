@@ -1,6 +1,5 @@
 "use client";
 
-import Toast from "@/components/toast/Toast";
 import {
 	useCreateSubtask,
 	useDeleteSubtask,
@@ -12,21 +11,21 @@ import { useEffect, useRef, useState } from "react";
 
 interface DetailGoalsProps {
 	taskId: number;
+	onError?: (type: "length" | "maxCount") => void;
 }
 
 const MAX_DETAIL_GOAL_LENGTH = 40;
 const LINE_BREAK_AT = 20;
 const MAX_DETAIL_GOALS_COUNT = 10;
 
-export default function DetailGoals({ taskId }: DetailGoalsProps) {
+export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 	const [isAddingGoal, setIsAddingGoal] = useState(false);
 	const [newGoalTitle, setNewGoalTitle] = useState("");
 	const [editingGoalId, setEditingGoalId] = useState<number | null>(null);
-	const [showLengthWarning, setShowLengthWarning] = useState(false);
-	const [showMaxCountWarning, setShowMaxCountWarning] = useState(false);
 	const [editingText, setEditingText] = useState<string>("");
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const editInputRef = useRef<HTMLTextAreaElement>(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	// API 연동 훅 사용
 	const { data: subtasks = [], isLoading } = useSubtasks(taskId);
@@ -38,7 +37,9 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 	useEffect(() => {
 		if (isAddingGoal && inputRef.current) {
 			const timer = setTimeout(() => {
-				inputRef.current?.focus();
+				if (inputRef.current) {
+					inputRef.current.focus();
+				}
 			}, 50);
 
 			return () => clearTimeout(timer);
@@ -46,36 +47,33 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 
 		if (editingGoalId !== null && editInputRef.current) {
 			const timer = setTimeout(() => {
-				editInputRef.current?.focus();
+				if (editInputRef.current) {
+					editInputRef.current.focus();
+				}
 			}, 50);
 
 			return () => clearTimeout(timer);
 		}
 	}, [isAddingGoal, editingGoalId]);
 
-	// 글자수 경고 메시지 표시 관리
+	// 글자수 경고 메시지 관리
 	useEffect(() => {
-		setShowLengthWarning(
+		if (
 			newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH ||
-				editingText.length > MAX_DETAIL_GOAL_LENGTH,
-		);
-	}, [newGoalTitle, editingText]);
-
-	// 최대 개수 토스트 자동 닫기
-	useEffect(() => {
-		if (showMaxCountWarning) {
-			const timer = setTimeout(() => {
-				setShowMaxCountWarning(false);
-			}, 3000);
-
-			return () => clearTimeout(timer);
+			editingText.length > MAX_DETAIL_GOAL_LENGTH
+		) {
+			if (onError) {
+				onError("length");
+			}
 		}
-	}, [showMaxCountWarning]);
+	}, [newGoalTitle, editingText, onError]);
 
 	// 세부 목표 추가 핸들러
 	const handleAddGoal = () => {
 		if (subtasks.length >= MAX_DETAIL_GOALS_COUNT) {
-			setShowMaxCountWarning(true);
+			if (onError) {
+				onError("maxCount");
+			}
 			return;
 		}
 
@@ -93,14 +91,21 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 		const trimmedTitle = newGoalTitle.trim();
 		if (
 			trimmedTitle.length >= 1 &&
-			trimmedTitle.length <= MAX_DETAIL_GOAL_LENGTH
+			trimmedTitle.length <= MAX_DETAIL_GOAL_LENGTH &&
+			!isSubmitting
 		) {
+			setIsSubmitting(true);
+
 			createSubtaskMutation(
 				{ taskId, name: trimmedTitle },
 				{
 					onSuccess: () => {
 						setNewGoalTitle("");
 						setIsAddingGoal(false);
+						setIsSubmitting(false);
+					},
+					onError: () => {
+						setIsSubmitting(false);
 					},
 				},
 			);
@@ -109,18 +114,34 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 
 	// 완료 상태 토글 핸들러
 	const handleToggleComplete = (goalId: number) => {
+		if (isSubmitting) return;
+
 		const goal = subtasks.find((subtask) => subtask.id === goalId);
 		if (goal) {
-			updateSubtaskMutation({
-				id: goalId,
-				taskId,
-				isCompleted: !goal.isCompleted,
-			});
+			setIsSubmitting(true);
+
+			updateSubtaskMutation(
+				{
+					id: goalId,
+					taskId,
+					isCompleted: !goal.isCompleted,
+				},
+				{
+					onSuccess: () => {
+						setIsSubmitting(false);
+					},
+					onError: () => {
+						setIsSubmitting(false);
+					},
+				},
+			);
 		}
 	};
 
 	// 편집 시작 핸들러
 	const handleStartEditing = (goalId: number, originalText: string) => {
+		if (isSubmitting) return;
+
 		setEditingGoalId(goalId);
 		setEditingText(originalText);
 		setTimeout(() => {
@@ -136,14 +157,27 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 		if (
 			editingGoalId !== null &&
 			editingText.trim().length >= 1 &&
-			editingText.length <= MAX_DETAIL_GOAL_LENGTH
+			editingText.length <= MAX_DETAIL_GOAL_LENGTH &&
+			!isSubmitting
 		) {
-			updateSubtaskMutation({
-				id: editingGoalId,
-				taskId,
-				name: editingText,
-			});
-			setEditingGoalId(null);
+			setIsSubmitting(true);
+
+			updateSubtaskMutation(
+				{
+					id: editingGoalId,
+					taskId,
+					name: editingText,
+				},
+				{
+					onSuccess: () => {
+						setEditingGoalId(null);
+						setIsSubmitting(false);
+					},
+					onError: () => {
+						setIsSubmitting(false);
+					},
+				},
+			);
 		}
 	};
 
@@ -168,11 +202,23 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 		setter: (value: string) => void,
 	) => {
 		const value = e.target.value;
-		setter(value);
 
-		// 자동 높이 조절
-		e.target.style.height = "auto";
-		e.target.style.height = `${e.target.scrollHeight}px`;
+		// 최대 글자 수 제한
+		if (value.length <= MAX_DETAIL_GOAL_LENGTH) {
+			setter(value);
+
+			// 자동 높이 조절
+			e.target.style.height = "auto";
+			e.target.style.height = `${e.target.scrollHeight}px`;
+		} else {
+			// 최대 글자 수 초과 시 이전 값 유지
+			setter(value.slice(0, MAX_DETAIL_GOAL_LENGTH));
+
+			// 경고 표시
+			if (onError) {
+				onError("length");
+			}
+		}
 	};
 
 	// 완료되지 않은 목표와 완료된 목표를 분리하여 정렬
@@ -232,6 +278,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 							onChange={onChange}
 							className="absolute inset-0 w-full h-full opacity-0 z-10"
 							aria-label="세부 목표 완료 체크"
+							disabled={isSubmitting}
 						/>
 
 						<svg
@@ -282,6 +329,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 						onChange={onChange}
 						className="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
 						aria-label="세부 목표 완료 체크"
+						disabled={isSubmitting}
 					/>
 					<svg
 						width="20"
@@ -343,6 +391,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 					aria-label="세부 목표 추가"
 					className="flex items-center justify-center"
 					type="button"
+					disabled={isSubmitting}
 				>
 					<Image
 						src="/icons/immersion/plus.svg"
@@ -359,6 +408,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 					className="py-2 text-start text-gray-disabled cursor-pointer w-full"
 					onClick={handleAddGoal}
 					aria-label="세부 목표 추가하기"
+					disabled={isSubmitting}
 				>
 					<p className="text-b2">세부 목표를 추가하세요</p>
 				</button>
@@ -394,6 +444,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 											ref={editInputRef}
 											aria-label="세부 목표 수정"
 											rows={1}
+											disabled={isSubmitting}
 										/>
 										{editingText && (
 											<>
@@ -401,7 +452,8 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 													onClick={handleFinishEditing}
 													disabled={
 														editingText.trim().length === 0 ||
-														editingText.length > MAX_DETAIL_GOAL_LENGTH
+														editingText.length > MAX_DETAIL_GOAL_LENGTH ||
+														isSubmitting
 													}
 													className="flex-shrink-0 pr-3 text-s2 text-[#8484E6]"
 													type="button"
@@ -421,6 +473,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 													className="flex-shrink-0"
 													type="button"
 													aria-label="텍스트 지우기"
+													disabled={isSubmitting}
 												>
 													<Image
 														src="/icons/x-circle.svg"
@@ -447,6 +500,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 									}}
 									onClick={() => handleStartEditing(goal.id, goal.name)}
 									aria-label={`${goal.name} 편집하기`}
+									disabled={isSubmitting}
 								>
 									{formatGoalText(goal.name)}
 								</button>
@@ -480,6 +534,7 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 								autoComplete="off"
 								autoCorrect="off"
 								spellCheck="false"
+								disabled={isSubmitting}
 							/>
 							{newGoalTitle && (
 								<>
@@ -487,7 +542,8 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 										onClick={handleSaveGoal}
 										disabled={
 											newGoalTitle.trim().length === 0 ||
-											newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH
+											newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH ||
+											isSubmitting
 										}
 										className="flex-shrink-0 pr-3 text-s2 text-[#8484E6]"
 										type="button"
@@ -500,11 +556,16 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 											e.preventDefault();
 											e.stopPropagation();
 											setNewGoalTitle("");
-											setTimeout(() => inputRef.current?.focus(), 0);
+											setTimeout(() => {
+												if (inputRef.current) {
+													inputRef.current.focus();
+												}
+											}, 0);
 										}}
 										className="flex-shrink-0"
 										type="button"
 										aria-label="텍스트 지우기"
+										disabled={isSubmitting}
 									>
 										<Image
 											src="/icons/immersion/delete.svg"
@@ -519,14 +580,6 @@ export default function DetailGoals({ taskId }: DetailGoalsProps) {
 						</div>
 					</div>
 				</div>
-			)}
-
-			{/* 토스트 경고 메시지 */}
-			{showLengthWarning && (
-				<Toast message="최대 40자까지만 입력할 수 있어요." />
-			)}
-			{showMaxCountWarning && (
-				<Toast message="세부 목표는 10개까지만 입력할 수 있어요." />
 			)}
 		</div>
 	);
