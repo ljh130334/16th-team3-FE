@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
 import DetailGoals from "@/app/(protected)/immersion/_components/DetailGoals/DetailGoals";
+import PersonaMessage from "@/app/(protected)/immersion/_components/PersonaMessage";
 import TasksDropdown from "@/app/(protected)/immersion/_components/TasksDropdown/TasksDropdown";
 import { Badge } from "@/components/component/Badge";
 import Toast from "@/components/toast/Toast";
@@ -21,6 +22,8 @@ import { Playlist } from "../_components/Playlist";
 interface TaskWithPersona extends Omit<Task, "persona" | "dueDatetime"> {
 	persona: NonNullable<Task["persona"]>;
 	dueDatetime: string;
+	// 예상 소요시간 필드 추가
+	estimatedHours: number;
 }
 
 interface Props {
@@ -191,28 +194,12 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 						{/* 캐릭터 및 배지 영역 */}
 						<div className="relative mt-4 flex flex-col items-center justify-center gap-4">
 							<div className="z-20 flex flex-col items-center gap-4">
-								<div
-									className="s3 flex items-center justify-center whitespace-nowrap rounded-[999px] px-[14px] py-[10px] text-[#BDBDF5]"
-									style={{
-										background:
-											"var(--Elevated-PointPriamry, rgba(107, 107, 225, 0.20))",
-										backdropFilter: "blur(30px)",
-									}}
-								>
-									<Image
-										src="/icons/onboarding/clap.svg"
-										alt="박수"
-										width={16}
-										height={15}
-										className="mr-1"
-										priority
-									/>
-									<span>
-										{isUrgent(initialTask)
-											? "마지막 한 시간! 스퍼트 올릴 타이밍이에요!"
-											: "시작 준비 끝! 가볍게 들어가볼까요?"}
-									</span>
-								</div>
+								{/* PersonaMessage 컴포넌트로 교체 */}
+								<PersonaMessage
+									personaId={String(personaId)}
+									dueDatetime={initialTask.dueDatetime}
+									estimatedHours={initialTask.estimatedHours}
+								/>
 
 								<div className="relative z-10">
 									{/* 페르소나 이미지에만 floating 클래스 적용 */}
