@@ -37,11 +37,32 @@ export default function TasksDropdown({
 
 		let formattedTime = timeStr.replace(" 남음", "");
 
+		if (formattedTime.includes("일")) {
+			const parts = formattedTime.split(" ");
+			if (parts.length >= 3) {
+				formattedTime = `${parts[0]} ${parts[1]}`;
+			}
+		}
+
 		if (isUrgent(task) && formattedTime.startsWith("00:")) {
 			formattedTime = formattedTime.substring(3);
 		}
 
 		return formattedTime;
+	};
+
+	// 시간 칩 너비 결정 함수
+	const getTimeChipWidth = (task: Task) => {
+		if (!task.dueDatetime) return "60px";
+
+		const targetDate = new Date(task.dueDatetime);
+		const timeStr = calculateRemainingTime(targetDate);
+
+		if (timeStr.includes("일")) {
+			return "72px";
+		}
+
+		return "60px";
 	};
 
 	// 긴급 작업 판단 함수
@@ -178,7 +199,7 @@ export default function TasksDropdown({
 									{truncateText(task.title)}
 								</span>
 								<div
-									className={`flex items-center px-[9.5px] py-[3px] rounded-[8px] ml-2 ${
+									className={`flex items-center px-[9.5px] py-[3px] rounded-[8px] ml-2 justify-center ${
 										isUrgent(task)
 											? "c2 text-gray-strong"
 											: "c2 bg-component-gray-primary text-gray-neutral"
@@ -188,8 +209,11 @@ export default function TasksDropdown({
 											? {
 													background:
 														"linear-gradient(180deg, #DD6875 0%, #ED98A2 100%)",
+													width: getTimeChipWidth(task),
 												}
-											: {}
+											: {
+													width: getTimeChipWidth(task),
+												}
 									}
 								>
 									{isUrgent(task) && (
