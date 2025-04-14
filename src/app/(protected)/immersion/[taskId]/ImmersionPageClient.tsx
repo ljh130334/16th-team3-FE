@@ -6,7 +6,7 @@ import { calculateRemainingTime } from "@/utils/dateFormat";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 
 import DetailGoals from "@/app/(protected)/immersion/_components/DetailGoals/DetailGoals";
 import PersonaMessage from "@/app/(protected)/immersion/_components/PersonaMessage";
@@ -38,6 +38,8 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 	const [showLengthWarning, setShowLengthWarning] = useState(false);
 	const [showMaxCountWarning, setShowMaxCountWarning] = useState(false);
 	const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+	const originalWindowHeight = useRef(0);
+
 	const personaId = initialTask.persona.id;
 	const personaImageSrc = getPersonaImage(personaId);
 	const personaTaskType =
@@ -50,69 +52,74 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 	const { mutate: completeTask } = useCompleteTask();
 
+	// 초기 화면 높이 저장 및 키보드 상태 감지
 	useEffect(() => {
-		// 키보드가 표시될 때 실행되는 이벤트 핸들러
-		const handleKeyboardShow = () => {
-			setIsKeyboardVisible(true);
-		};
+		// 모바일 브라우저에서는 첫 로드시 window.innerHeight가
+		// 툴바 등을 포함한 화면 높이일 수 있으므로 setTimeout 사용
+		const timer = setTimeout(() => {
+			if (typeof window !== "undefined") {
+				originalWindowHeight.current = window.innerHeight;
+			}
+		}, 300);
 
-		// 키보드가 숨겨질 때 실행되는 이벤트 핸들러
-		const handleKeyboardHide = () => {
-			setIsKeyboardVisible(false);
-		};
+		const handleResize = () => {
+			if (originalWindowHeight.current === 0 || typeof window === "undefined")
+				return;
 
-		// visualViewport 리사이즈 이벤트 핸들러
-		const handleViewportResize = () => {
-			if (window.visualViewport) {
-				const isKeyboard = window.visualViewport.height < window.innerHeight;
-				setIsKeyboardVisible(isKeyboard);
+			const currentHeight = window.innerHeight;
+			const heightDifference = originalWindowHeight.current - currentHeight;
+
+			// 화면 높이가 원래 높이보다 20% 이상 작아지면 키보드가 열린 것으로 간주
+			if (heightDifference > originalWindowHeight.current * 0.2) {
+				setIsKeyboardVisible(true);
+			} else {
+				setIsKeyboardVisible(false);
 			}
 		};
 
-		// iOS에서는 'resize' 이벤트로 키보드 표시 여부 감지
-		if (
-			typeof window !== "undefined" &&
-			"visualViewport" in window &&
-			window.visualViewport
-		) {
-			window.visualViewport.addEventListener("resize", handleViewportResize);
-		} else {
-			window.addEventListener("focusin", (e) => {
-				// input이나 textarea에 포커스가 가면 키보드가 표시된 것으로 간주
-				if (
-					e.target instanceof HTMLInputElement ||
-					e.target instanceof HTMLTextAreaElement
-				) {
-					handleKeyboardShow();
-				}
-			});
-
-			window.addEventListener("focusout", (e) => {
-				// input이나 textarea에서 포커스가 빠지면 키보드가 숨겨진 것으로 간주
-				if (
-					e.target instanceof HTMLInputElement ||
-					e.target instanceof HTMLTextAreaElement
-				) {
-					handleKeyboardHide();
-				}
-			});
+		// 이벤트 리스너 등록
+		if (typeof window !== "undefined") {
+			window.addEventListener("resize", handleResize);
 		}
+
+		// input, textarea에 포커스 이벤트 처리
+		const handleFocusIn = (e: FocusEvent) => {
+			if (
+				e.target instanceof HTMLInputElement ||
+				e.target instanceof HTMLTextAreaElement
+			) {
+				setIsKeyboardVisible(true);
+			}
+		};
+
+		const handleFocusOut = (e: FocusEvent) => {
+			if (
+				e.target instanceof HTMLInputElement ||
+				e.target instanceof HTMLTextAreaElement
+			) {
+				// 살짝 딜레이를 줘서 resize 이벤트가 처리될 시간 확보
+				setTimeout(() => {
+					if (
+						originalWindowHeight.current > 0 &&
+						window.innerHeight >= originalWindowHeight.current * 0.9
+					) {
+						setIsKeyboardVisible(false);
+					}
+				}, 100);
+			}
+		};
+
+		document.addEventListener("focusin", handleFocusIn);
+		document.addEventListener("focusout", handleFocusOut);
 
 		// 클린업 함수
 		return () => {
-			if (
-				typeof window !== "undefined" &&
-				"visualViewport" in window &&
-				window.visualViewport
-			) {
-				window.visualViewport.removeEventListener(
-					"resize",
-					handleViewportResize,
-				);
-			} else {
-				window.removeEventListener("focusin", () => {});
-				window.removeEventListener("focusout", () => {});
+			clearTimeout(timer);
+			if (typeof window !== "undefined") {
+				window.removeEventListener("resize", handleResize);
 			}
+			document.removeEventListener("focusin", handleFocusIn);
+			document.removeEventListener("focusout", handleFocusOut);
 		};
 	}, []);
 
@@ -306,7 +313,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 				</div>
 			</div>
 
-			{/* 토스트 메시지 컨테이너 - CTA 버튼 상단 16px에 고정 */}
+			{/* 토스트 메시지 컨테이너 */}
 			<div className="relative z-50">
 				{showLengthWarning && (
 					<div className="fixed bottom-[10px] left-0 w-full px-4">
@@ -320,18 +327,17 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 				)}
 			</div>
 
-			{/* 하단 영역 - 키보드 상태에 따라 위치 조정 */}
-			<div
-				className={`relative z-40 flex flex-col items-center px-5 py-3 ${isKeyboardVisible ? "fixed bottom-0 left-0 w-full bg-background-primary" : "mb-[37px]"}`}
-			>
-				<Button
-					variant={isUrgent(initialTask) ? "hologram" : "primary"}
-					className={`relative w-full ${isUrgent(initialTask) ? "l2 h-[56px] rounded-[16px] px-[18.5px] text-center text-gray-inverse" : ""}`}
-					onClick={handleComplete}
-				>
-					다했어요!
-				</Button>
-			</div>
+			{!isKeyboardVisible && (
+				<div className="relative z-40 mb-[37px] flex flex-col items-center px-5 py-3">
+					<Button
+						variant={isUrgent(initialTask) ? "hologram" : "primary"}
+						className={`relative w-full ${isUrgent(initialTask) ? "l2 h-[56px] rounded-[16px] px-[18.5px] text-center text-gray-inverse" : ""}`}
+						onClick={handleComplete}
+					>
+						다했어요!
+					</Button>
+				</div>
+			)}
 
 			{/* 할일 완료 바텀시트 */}
 			{showBottomSheet && (
