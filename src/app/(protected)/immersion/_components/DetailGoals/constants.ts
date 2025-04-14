@@ -1,0 +1,5 @@
+export const constants = {
+	MAX_DETAIL_GOAL_LENGTH: 40,
+	LINE_BREAK_AT: 20,
+	MAX_DETAIL_GOALS_COUNT: 10,
+};
