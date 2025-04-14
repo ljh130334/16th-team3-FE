@@ -151,7 +151,7 @@ export default function SingleMusicItem({
 	>("THUMBNAIL");
 
 	// 유튜브 embed URL
-	const youtubeEmbedUrl = `https://www.youtube.com/embed/${videoInfo.id}&playsinline=1`;
+	const youtubeEmbedUrl = `https://www.youtube.com/embed/${videoInfo.id}?playsinline=1&fs=0&rel=0&modestbranding=1&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
 
 	// ↓ [확대 로직] 별도 함수
 	const handleExpand = () => {
@@ -314,7 +314,7 @@ function EmbedView({
 				<iframe
 					src={youtubeEmbedUrl}
 					className="w-full h-full rounded-t-[16px]"
-					allowFullScreen
+					allowFullScreen={false}
 					allow="autoplay; encrypted-media"
 					title="YouTube video"
 				/>
@@ -324,7 +324,7 @@ function EmbedView({
 			<div className="flex items-start gap-4 px-4 pb-4 pt-3">
 				<div className="flex justify-between items-center flex-1">
 					<div className="flex flex-col leading-tight">
-						<p className="b3 text-gray-normal line-clamp-1 overflow-hidden text-ellipsis">
+						<p className="b3 text-gray-normal line-clamp-2 overflow-hidden text-ellipsis">
 							{title}
 						</p>
 						<p className="c2 text-gray-alternative mt-1">{remainingTime}</p>
