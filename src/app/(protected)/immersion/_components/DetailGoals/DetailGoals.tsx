@@ -33,6 +33,14 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 	const { mutate: updateSubtaskMutation } = useUpdateSubtask();
 	const { mutate: deleteSubtaskMutation } = useDeleteSubtask();
 
+	// 로컬 상태로 서브태스크 관리 (삭제 즉시 UI 반영)
+	const [localSubtasks, setLocalSubtasks] = useState<typeof subtasks>([]);
+
+	// subtasks가 업데이트되면 localSubtasks도 업데이트
+	useEffect(() => {
+		setLocalSubtasks(subtasks);
+	}, [subtasks]);
+
 	// 입력 필드 포커스 처리
 	useEffect(() => {
 		if (isAddingGoal && inputRef.current) {
@@ -181,6 +189,36 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 		}
 	};
 
+	// 세부 목표 삭제 핸들러
+	const handleDeleteSubtask = (goalId: number) => {
+		if (isSubmitting) return;
+
+		setIsSubmitting(true);
+
+		// 편집 중이었다면 편집 모드 종료
+		if (editingGoalId === goalId) {
+			setEditingGoalId(null);
+		}
+
+		// UI에서 즉시 항목 제거 (낙관적 업데이트)
+		setLocalSubtasks((prev) => prev.filter((goal) => goal.id !== goalId));
+
+		deleteSubtaskMutation(
+			{ id: goalId },
+			{
+				onSuccess: () => {
+					setIsSubmitting(false);
+				},
+				onError: () => {
+					setIsSubmitting(false);
+					// 삭제 실패 시 다시 서버에서 데이터 가져오기
+					// useSubtasks 훅 내부에 refetch 함수가 있다면 호출
+					// 여기서는 API 호출이 실패해도 다음 데이터 새로고침에서 자동으로 동기화될 것임
+				},
+			},
+		);
+	};
+
 	// 텍스트에 20자 이후 줄바꿈 적용하는 함수
 	const formatGoalText = (text: string) => {
 		if (text.length <= LINE_BREAK_AT) return text;
@@ -222,7 +260,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 	};
 
 	// 완료되지 않은 목표와 완료된 목표를 분리하여 정렬
-	const sortedGoals = [...subtasks].sort((a, b) =>
+	const sortedGoals = [...localSubtasks].sort((a, b) =>
 		a.isCompleted === b.isCompleted ? 0 : a.isCompleted ? 1 : -1,
 	);
 
@@ -402,7 +440,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 				</button>
 			</div>
 
-			{subtasks.length === 0 && !isAddingGoal ? (
+			{localSubtasks.length === 0 && !isAddingGoal ? (
 				<button
 					type="button"
 					className="py-2 text-start text-gray-disabled cursor-pointer w-full"
@@ -428,7 +466,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 										<textarea
 											value={editingText}
 											onChange={(e) => handleTextareaInput(e, setEditingText)}
-											className={`text-b2 flex-grow min-w-0 break-words border-none bg-transparent p-0 outline-none resize-none overflow-hidden mr-3 ${
+											className={`text-b2 flex-grow min-w-0 break-words border-none bg-transparent p-0 outline-none resize-none overflow-hidden ${
 												goal.isCompleted
 													? "text-gray-neutral"
 													: "text-gray-normal"
@@ -447,7 +485,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 											disabled={isSubmitting}
 										/>
 										{editingText && (
-											<>
+											<div className="flex-shrink-0 flex items-center pr-4">
 												<button
 													onClick={handleFinishEditing}
 													disabled={
@@ -455,7 +493,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 														editingText.length > MAX_DETAIL_GOAL_LENGTH ||
 														isSubmitting
 													}
-													className="flex-shrink-0 pr-3 text-s2 text-[#8484E6]"
+													className="text-s2 text-[#8484E6] mr-4"
 													type="button"
 													aria-label="세부 목표 수정 완료"
 												>
@@ -465,45 +503,44 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 													onMouseDown={(e) => {
 														e.preventDefault();
 														e.stopPropagation();
-														setEditingText("");
-														if (editInputRef.current) {
-															editInputRef.current.focus();
-														}
+														handleDeleteSubtask(goal.id);
 													}}
 													className="flex-shrink-0"
 													type="button"
-													aria-label="텍스트 지우기"
+													aria-label="세부 목표 삭제"
 													disabled={isSubmitting}
 												>
 													<Image
 														src="/icons/x-circle.svg"
-														alt="제거"
+														alt="삭제"
 														width={24}
 														height={24}
 													/>
 												</button>
-											</>
+											</div>
 										)}
 									</div>
 								</div>
 							) : (
-								<button
-									type="button"
-									className={`text-b2 break-words cursor-text text-left w-full ${goal.isCompleted ? "text-gray-neutral" : "text-gray-normal"}`}
-									style={{
-										wordBreak: "break-word",
-										display: "block",
-										background: "transparent",
-										border: "none",
-										padding: 0,
-										margin: 0,
-									}}
-									onClick={() => handleStartEditing(goal.id, goal.name)}
-									aria-label={`${goal.name} 편집하기`}
-									disabled={isSubmitting}
-								>
-									{formatGoalText(goal.name)}
-								</button>
+								<div className="relative flex-grow">
+									<button
+										type="button"
+										className={`text-b2 break-words cursor-text text-left w-full ${goal.isCompleted ? "text-gray-neutral" : "text-gray-normal"}`}
+										style={{
+											wordBreak: "break-word",
+											display: "block",
+											background: "transparent",
+											border: "none",
+											padding: 0,
+											margin: 0,
+										}}
+										onClick={() => handleStartEditing(goal.id, goal.name)}
+										aria-label={`${goal.name} 편집하기`}
+										disabled={isSubmitting}
+									>
+										{formatGoalText(goal.name)}
+									</button>
+								</div>
 							)}
 						</li>
 					))}
@@ -521,7 +558,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 								value={newGoalTitle}
 								onChange={(e) => handleTextareaInput(e, setNewGoalTitle)}
 								placeholder="세부 목표를 적어주세요"
-								className="b2 flex-grow min-w-0 rounded border-none bg-transparent p-0 text-gray-normal outline-none resize-none overflow-hidden mr-3"
+								className="b2 flex-grow min-w-0 rounded border-none bg-transparent p-0 text-gray-normal outline-none resize-none overflow-hidden"
 								style={{
 									caretColor: "#5D6470",
 									height: "auto",
@@ -537,7 +574,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 								disabled={isSubmitting}
 							/>
 							{newGoalTitle && (
-								<>
+								<div className="flex-shrink-0 flex items-center pr-4">
 									<button
 										onClick={handleSaveGoal}
 										disabled={
@@ -545,7 +582,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 											newGoalTitle.length > MAX_DETAIL_GOAL_LENGTH ||
 											isSubmitting
 										}
-										className="flex-shrink-0 pr-3 text-s2 text-[#8484E6]"
+										className="text-s2 text-[#8484E6] mr-4"
 										type="button"
 										aria-label="세부 목표 생성"
 									>
@@ -556,26 +593,21 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 											e.preventDefault();
 											e.stopPropagation();
 											setNewGoalTitle("");
-											setTimeout(() => {
-												if (inputRef.current) {
-													inputRef.current.focus();
-												}
-											}, 0);
+											setIsAddingGoal(false);
 										}}
 										className="flex-shrink-0"
 										type="button"
-										aria-label="텍스트 지우기"
+										aria-label="추가 취소"
 										disabled={isSubmitting}
 									>
 										<Image
 											src="/icons/immersion/delete.svg"
-											alt="제거"
+											alt="취소"
 											width={24}
 											height={24}
-											className="mr-4"
 										/>
 									</button>
-								</>
+								</div>
 							)}
 						</div>
 					</div>
