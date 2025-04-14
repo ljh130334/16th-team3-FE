@@ -204,7 +204,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 		setLocalSubtasks((prev) => prev.filter((goal) => goal.id !== goalId));
 
 		deleteSubtaskMutation(
-			{ id: goalId },
+			{ id: goalId, taskId },
 			{
 				onSuccess: () => {
 					setIsSubmitting(false);
