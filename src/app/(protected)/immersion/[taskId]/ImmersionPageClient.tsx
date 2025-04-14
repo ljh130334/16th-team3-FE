@@ -159,7 +159,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			</div>
 
 			{/* 스크롤 영역이 될 중간 부분 */}
-			<div className="flex-1 overflow-y-auto pt-[65px]">
+			<div className="flex-1 overflow-y-auto pt-[65px] mb-[117px]">
 				<div className="relative z-10">
 					<div className="relative">
 						<div className="absolute inset-0 -top-5 h-[500px]">
@@ -264,18 +264,16 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 				)}
 			</div>
 
-			{/* CTA 버튼 - isFocused 상태에 따라 표시 여부 결정 */}
-			{!isFocused && (
-				<div className="relative z-40 mb-[37px] flex flex-col items-center px-5 py-3">
-					<Button
-						variant={isUrgent(initialTask) ? "hologram" : "primary"}
-						className={`relative w-full ${isUrgent(initialTask) ? "l2 h-[56px] rounded-[16px] px-[18.5px] text-center text-gray-inverse" : ""}`}
-						onClick={handleComplete}
-					>
-						다했어요!
-					</Button>
-				</div>
-			)}
+			{/* CTA 버튼  */}
+			<div className="fixed bottom-0 left-0 right-0 z-40 mb-[37px] bg-background-primary px-5 py-3">
+				<Button
+					variant={isUrgent(initialTask) ? "hologram" : "primary"}
+					className={`relative w-full ${isUrgent(initialTask) ? "l2 h-[56px] rounded-[16px] px-[18.5px] text-center text-gray-inverse" : ""}`}
+					onClick={handleComplete}
+				>
+					다했어요!
+				</Button>
+			</div>
 
 			{/* 할일 완료 바텀시트 */}
 			{showBottomSheet && (
