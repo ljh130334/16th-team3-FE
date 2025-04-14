@@ -14,7 +14,8 @@ import { constants } from "./constants";
 
 interface DetailGoalsProps {
 	taskId: number;
-	onError?: (type: "length" | "maxCount") => void;
+	onError: (type: "length" | "maxCount") => void;
+	onDeleteClick?: () => void;
 }
 
 export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {

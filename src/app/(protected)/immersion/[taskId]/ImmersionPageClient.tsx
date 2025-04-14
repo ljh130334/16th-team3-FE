@@ -6,7 +6,7 @@ import { calculateRemainingTime } from "@/utils/dateFormat";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 
 import DetailGoals from "@/app/(protected)/immersion/_components/DetailGoals/DetailGoals";
 import PersonaMessage from "@/app/(protected)/immersion/_components/PersonaMessage";
@@ -37,6 +37,8 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 	const [showTimeExpiredSheet, setShowTimeExpiredSheet] = useState(false);
 	const [showLengthWarning, setShowLengthWarning] = useState(false);
 	const [showMaxCountWarning, setShowMaxCountWarning] = useState(false);
+	const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+	const originalWindowHeight = useRef(0);
 
 	const personaId = initialTask.persona.id;
 	const personaImageSrc = getPersonaImage(personaId);
@@ -49,6 +51,132 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 	const { data: inProgressTasks = [] } = useInProgressTasks();
 
 	const { mutate: completeTask } = useCompleteTask();
+
+	// 초기 화면 높이 저장 및 키보드 상태 감지
+	useEffect(() => {
+		// 초기 화면 높이 저장
+		const timer = setTimeout(() => {
+			if (typeof window !== "undefined") {
+				originalWindowHeight.current = window.innerHeight;
+			}
+		}, 300);
+
+		// resize 이벤트 핸들러
+		const handleResize = () => {
+			if (originalWindowHeight.current === 0 || typeof window === "undefined")
+				return;
+
+			const currentHeight = window.innerHeight;
+			const heightDifference = originalWindowHeight.current - currentHeight;
+
+			if (heightDifference > originalWindowHeight.current * 0.2) {
+				setIsKeyboardVisible(true);
+			} else {
+				if (currentHeight >= originalWindowHeight.current * 0.9) {
+					setIsKeyboardVisible(false);
+				}
+			}
+		};
+
+		// focusin 이벤트 핸들러 (키보드가 올라올 때)
+		const handleFocusIn = (e: FocusEvent) => {
+			if (
+				e.target instanceof HTMLInputElement ||
+				e.target instanceof HTMLTextAreaElement
+			) {
+				setIsKeyboardVisible(true);
+			}
+		};
+
+		// focusout 이벤트 핸들러 (포커스가 빠질 때)
+		const handleFocusOut = (e: FocusEvent) => {
+			if (
+				e.target instanceof HTMLInputElement ||
+				e.target instanceof HTMLTextAreaElement
+			) {
+				// 포커스가 빠진 후 즉시 상태를 변경하지 않고 약간의 지연을 둠
+				setTimeout(() => checkKeyboardStatus(), 150);
+			}
+		};
+
+		// 화면 전체 클릭 이벤트 핸들러 (삭제 버튼 등 클릭 처리)
+		const handleClick = () => {
+			// 클릭 후 약간의 지연을 두고 키보드 상태 확인
+			setTimeout(() => checkKeyboardStatus(), 200);
+		};
+
+		// 키보드 상태 확인 유틸리티 함수 (여러 곳에서 재사용)
+		const checkKeyboardStatus = () => {
+			if (typeof window !== "undefined" && originalWindowHeight.current > 0) {
+				const currentHeight = window.innerHeight;
+
+				// 현재 높이가 원래 높이의 90% 이상이면 키보드가 내려간 것으로 판단
+				if (currentHeight >= originalWindowHeight.current * 0.9) {
+					// 현재 포커스된 입력 요소가 있는지 확인
+					const activeElement = document.activeElement;
+					const isInputActive =
+						activeElement instanceof HTMLInputElement ||
+						activeElement instanceof HTMLTextAreaElement;
+
+					// 입력 요소에 포커스가 없으면 키보드가 닫힌 것으로 간주
+					if (!isInputActive) {
+						setIsKeyboardVisible(false);
+					}
+				}
+			}
+		};
+
+		// 키보드 상태 주기적 확인
+		const intervalId = setInterval(() => {
+			checkKeyboardStatus();
+		}, 500);
+
+		// 이벤트 리스너 등록
+		if (typeof window !== "undefined") {
+			window.addEventListener("resize", handleResize);
+		}
+		document.addEventListener("focusin", handleFocusIn);
+		document.addEventListener("focusout", handleFocusOut);
+		document.addEventListener("click", handleClick);
+
+		const setupDeleteButtonListeners = () => {
+			setTimeout(() => {
+				const deleteButtons = document.querySelectorAll('[aria-label="삭제"]');
+				for (const button of deleteButtons) {
+					button.addEventListener("click", () => {
+						setTimeout(() => {
+							setIsKeyboardVisible(false);
+						}, 300);
+					});
+				}
+			}, 1000);
+		};
+
+		// 초기 렌더링 이후에 삭제 버튼 리스너 설정
+		setupDeleteButtonListeners();
+
+		// 클린업 함수
+		return () => {
+			clearTimeout(timer);
+			clearInterval(intervalId);
+
+			if (typeof window !== "undefined") {
+				window.removeEventListener("resize", handleResize);
+			}
+			document.removeEventListener("focusin", handleFocusIn);
+			document.removeEventListener("focusout", handleFocusOut);
+			document.removeEventListener("click", handleClick);
+
+			// 삭제 버튼 리스너 제거는 생략 (컴포넌트 언마운트 시 DOM 요소도 제거됨)
+		};
+	}, []);
+
+	const handleSubtaskDelete = () => {
+		// 삭제 버튼 클릭 시 키보드 상태 강제 업데이트
+		setTimeout(() => {
+			setIsKeyboardVisible(false);
+		}, 300);
+	};
 
 	// 남은 시간을 계산하고 상태 업데이트하는 함수
 	useEffect(() => {
@@ -153,7 +281,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			</div>
 
 			{/* 스크롤 영역이 될 중간 부분 */}
-			<div className="flex-1 overflow-y-auto pt-[65px] pb-[100px]">
+			<div className="flex-1 overflow-y-auto pt-[65px]">
 				<div className="relative z-10">
 					<div className="relative">
 						<div className="absolute inset-0 -top-5 h-[500px]">
@@ -243,27 +371,28 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			{/* 토스트 메시지 컨테이너 */}
 			<div className="relative z-50">
 				{showLengthWarning && (
-					<div className="fixed bottom-[100px] left-0 w-full px-4">
+					<div className="fixed bottom-[10px] left-0 w-full px-4">
 						<Toast message="최대 40자까지만 입력할 수 있어요." />
 					</div>
 				)}
 				{showMaxCountWarning && (
-					<div className="fixed bottom-[100px] left-0 w-full px-4">
+					<div className="fixed bottom-[10px] left-0 w-full px-4">
 						<Toast message="세부 목표는 10개까지만 입력할 수 있어요." />
 					</div>
 				)}
 			</div>
 
-			{/* 하단 영역 */}
-			<div className="fixed bottom-0 left-0 right-0 z-40 bg-background-primary px-5 py-3">
-				<Button
-					variant={isUrgent(initialTask) ? "hologram" : "primary"}
-					className={`relative w-full ${isUrgent(initialTask) ? "l2 h-[56px] rounded-[16px] px-[18.5px] text-center text-gray-inverse" : ""}`}
-					onClick={handleComplete}
-				>
-					다했어요!
-				</Button>
-			</div>
+			{!isKeyboardVisible && (
+				<div className="relative z-40 mb-[37px] flex flex-col items-center px-5 py-3">
+					<Button
+						variant={isUrgent(initialTask) ? "hologram" : "primary"}
+						className={`relative w-full ${isUrgent(initialTask) ? "l2 h-[56px] rounded-[16px] px-[18.5px] text-center text-gray-inverse" : ""}`}
+						onClick={handleComplete}
+					>
+						다했어요!
+					</Button>
+				</div>
+			)}
 
 			{/* 할일 완료 바텀시트 */}
 			{showBottomSheet && (
