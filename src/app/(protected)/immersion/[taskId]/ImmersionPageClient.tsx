@@ -60,7 +60,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			}
 		}, 300);
 
-		// resize 이벤트 핸들러 - 주로 키보드 올라오고 내려갈 때 발생
+		// resize 이벤트 핸들러
 		const handleResize = () => {
 			if (originalWindowHeight.current === 0 || typeof window === "undefined")
 				return;
@@ -68,17 +68,16 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			const currentHeight = window.innerHeight;
 			const heightDifference = originalWindowHeight.current - currentHeight;
 
-			// 화면 높이가 원래 높이보다 20% 이상 작아지면 키보드가 열린 것으로 간주
 			if (heightDifference > originalWindowHeight.current * 0.2) {
 				setIsKeyboardVisible(true);
 			} else {
-				if (currentHeight >= originalWindowHeight.current * 0.95) {
+				if (currentHeight >= originalWindowHeight.current * 0.9) {
 					setIsKeyboardVisible(false);
 				}
 			}
 		};
 
-		// 입력 요소에 대한 포커스 이벤트
+		// 포커스 이벤트
 		const handleFocusIn = (e: FocusEvent) => {
 			if (
 				e.target instanceof HTMLInputElement ||
@@ -88,36 +87,48 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			}
 		};
 
-		// 입력 요소에서 포커스가 빠졌을 때 이벤트
 		const handleFocusOut = (e: FocusEvent) => {
 			if (
 				e.target instanceof HTMLInputElement ||
 				e.target instanceof HTMLTextAreaElement
 			) {
-				// 포커스 아웃 직후 바로 상태를 변경하지 않고,
-				// resize 이벤트가 발생하길 기다림
 				setTimeout(() => {
 					if (
 						typeof window !== "undefined" &&
 						originalWindowHeight.current > 0
 					) {
-						// 현재 열려있는 input/textarea가 없는지 확인
 						const activeElement = document.activeElement;
 						const isInputActive =
 							activeElement instanceof HTMLInputElement ||
 							activeElement instanceof HTMLTextAreaElement;
 
-						// 현재 화면 높이가 원래 높이와 거의 같아졌고,
-						// 현재 포커스된 입력 요소가 없으면 키보드가 닫힌 것으로 간주
-						if (
-							!isInputActive &&
-							window.innerHeight >= originalWindowHeight.current * 0.95
-						) {
+						if (!isInputActive) {
 							setIsKeyboardVisible(false);
 						}
 					}
-				}, 300);
+				}, 100);
 			}
+		};
+
+		// 문서 전체 클릭 이벤트
+		const handleDocumentClick = () => {
+			// 모든 클릭에 대해 키보드 상태를 확인하는 것이 아니라,
+			// 짧은 지연 후 화면 높이를 확인하여 키보드가 내려갔는지 확인
+			setTimeout(() => {
+				if (typeof window !== "undefined" && originalWindowHeight.current > 0) {
+					const currentHeight = window.innerHeight;
+					if (currentHeight >= originalWindowHeight.current * 0.9) {
+						const activeElement = document.activeElement;
+						const isInputActive =
+							activeElement instanceof HTMLInputElement ||
+							activeElement instanceof HTMLTextAreaElement;
+
+						if (!isInputActive) {
+							setIsKeyboardVisible(false);
+						}
+					}
+				}
+			}, 300);
 		};
 
 		// 이벤트 리스너 등록
@@ -127,6 +138,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 		document.addEventListener("focusin", handleFocusIn);
 		document.addEventListener("focusout", handleFocusOut);
+		document.addEventListener("click", handleDocumentClick);
 
 		// 클린업 함수
 		return () => {
@@ -136,6 +148,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			}
 			document.removeEventListener("focusin", handleFocusIn);
 			document.removeEventListener("focusout", handleFocusOut);
+			document.removeEventListener("click", handleDocumentClick);
 		};
 	}, []);
 
