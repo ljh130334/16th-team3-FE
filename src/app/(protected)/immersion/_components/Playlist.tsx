@@ -80,6 +80,8 @@ export function Playlist({
 	const query = useSuspenseQuery(getPersonaVideoInfos(personaId));
 	const [currentYoutubeInfo, setCurrentYoutubeInfo] =
 		useState<YoutubeVideoInfo | null>(query.data?.[0] || null);
+	// 선택된 음악이 있는지를 추적하는 상태 추가
+	const [isSelected, setIsSelected] = useState<boolean>(false);
 
 	if (!currentYoutubeInfo) {
 		return <div className="text-white">Loading...</div>;
@@ -91,10 +93,12 @@ export function Playlist({
 
 	return (
 		<div className="flex flex-col w-full">
-			{/* 지금 딱 맞는 음악 */}
+			{/* 지금 딱 맞는 음악 또는 재생 중 음악 */}
 			{currentYoutubeInfo && (
 				<section>
-					<div className="s2 text-gray-normal my-[18px]">재생 중 음악</div>
+					<div className="s2 text-gray-normal my-[18px]">
+						{isSelected ? "재생 중 음악" : "지금 딱 맞는 음악"}
+					</div>
 					<SingleMusicItem videoInfo={currentYoutubeInfo} />
 				</section>
 			)}
@@ -114,6 +118,7 @@ export function Playlist({
 									const selectedVideo = vInfos.find((v) => v.id === id);
 									if (selectedVideo) {
 										setCurrentYoutubeInfo(selectedVideo);
+										setIsSelected(true);
 									}
 								}}
 							/>
