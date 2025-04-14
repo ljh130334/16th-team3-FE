@@ -485,7 +485,7 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 											disabled={isSubmitting}
 										/>
 										{editingText && (
-											<div className="flex-shrink-0 flex items-center pr-4">
+											<div className="flex-shrink-0 flex items-center">
 												<button
 													onClick={handleFinishEditing}
 													disabled={
