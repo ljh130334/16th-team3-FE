@@ -77,12 +77,28 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			}
 		};
 
+		const handleClickAnywhere = () => {
+			setTimeout(() => {
+				if (typeof window !== "undefined" && originalWindowHeight.current > 0) {
+					const currentHeight = window.innerHeight;
+
+					// 현재 높이가 원래 높이의 90% 이상이면 키보드가 닫힌 것으로 간주
+					if (currentHeight >= originalWindowHeight.current * 0.9) {
+						setIsKeyboardVisible(false);
+					}
+				}
+			}, 100);
+		};
+
 		// 이벤트 리스너 등록
 		if (typeof window !== "undefined") {
 			window.addEventListener("resize", handleResize);
+			// 클릭 이벤트 리스너 추가
+			document.addEventListener("click", handleClickAnywhere);
+			document.addEventListener("touchend", handleClickAnywhere);
 		}
 
-		// input, textarea에 포커스 이벤트 처리
+		// 기존 focusin/focusout 이벤트 처리
 		const handleFocusIn = (e: FocusEvent) => {
 			if (
 				e.target instanceof HTMLInputElement ||
@@ -97,7 +113,6 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 				e.target instanceof HTMLInputElement ||
 				e.target instanceof HTMLTextAreaElement
 			) {
-				// 살짝 딜레이를 줘서 resize 이벤트가 처리될 시간 확보
 				setTimeout(() => {
 					if (
 						originalWindowHeight.current > 0 &&
@@ -117,6 +132,8 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			clearTimeout(timer);
 			if (typeof window !== "undefined") {
 				window.removeEventListener("resize", handleResize);
+				document.removeEventListener("click", handleClickAnywhere);
+				document.removeEventListener("touchend", handleClickAnywhere);
 			}
 			document.removeEventListener("focusin", handleFocusIn);
 			document.removeEventListener("focusout", handleFocusOut);
