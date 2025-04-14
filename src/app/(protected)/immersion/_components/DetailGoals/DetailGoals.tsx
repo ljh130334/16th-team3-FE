@@ -16,6 +16,7 @@ interface DetailGoalsProps {
 	taskId: number;
 	onError: (type: "length" | "maxCount") => void;
 	onDeleteClick?: () => void;
+	handleInputFocus?: (value: boolean) => void;
 }
 
 export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
