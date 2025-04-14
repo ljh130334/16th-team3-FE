@@ -37,6 +37,7 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 	const [showTimeExpiredSheet, setShowTimeExpiredSheet] = useState(false);
 	const [showLengthWarning, setShowLengthWarning] = useState(false);
 	const [showMaxCountWarning, setShowMaxCountWarning] = useState(false);
+	const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 	const personaId = initialTask.persona.id;
 	const personaImageSrc = getPersonaImage(personaId);
 	const personaTaskType =
@@ -48,6 +49,72 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 	const { data: inProgressTasks = [] } = useInProgressTasks();
 
 	const { mutate: completeTask } = useCompleteTask();
+
+	useEffect(() => {
+		// 키보드가 표시될 때 실행되는 이벤트 핸들러
+		const handleKeyboardShow = () => {
+			setIsKeyboardVisible(true);
+		};
+
+		// 키보드가 숨겨질 때 실행되는 이벤트 핸들러
+		const handleKeyboardHide = () => {
+			setIsKeyboardVisible(false);
+		};
+
+		// visualViewport 리사이즈 이벤트 핸들러
+		const handleViewportResize = () => {
+			if (window.visualViewport) {
+				const isKeyboard = window.visualViewport.height < window.innerHeight;
+				setIsKeyboardVisible(isKeyboard);
+			}
+		};
+
+		// iOS에서는 'resize' 이벤트로 키보드 표시 여부 감지
+		if (
+			typeof window !== "undefined" &&
+			"visualViewport" in window &&
+			window.visualViewport
+		) {
+			window.visualViewport.addEventListener("resize", handleViewportResize);
+		} else {
+			window.addEventListener("focusin", (e) => {
+				// input이나 textarea에 포커스가 가면 키보드가 표시된 것으로 간주
+				if (
+					e.target instanceof HTMLInputElement ||
+					e.target instanceof HTMLTextAreaElement
+				) {
+					handleKeyboardShow();
+				}
+			});
+
+			window.addEventListener("focusout", (e) => {
+				// input이나 textarea에서 포커스가 빠지면 키보드가 숨겨진 것으로 간주
+				if (
+					e.target instanceof HTMLInputElement ||
+					e.target instanceof HTMLTextAreaElement
+				) {
+					handleKeyboardHide();
+				}
+			});
+		}
+
+		// 클린업 함수
+		return () => {
+			if (
+				typeof window !== "undefined" &&
+				"visualViewport" in window &&
+				window.visualViewport
+			) {
+				window.visualViewport.removeEventListener(
+					"resize",
+					handleViewportResize,
+				);
+			} else {
+				window.removeEventListener("focusin", () => {});
+				window.removeEventListener("focusout", () => {});
+			}
+		};
+	}, []);
 
 	// 남은 시간을 계산하고 상태 업데이트하는 함수
 	useEffect(() => {
@@ -253,8 +320,10 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 				)}
 			</div>
 
-			{/* 하단 영역 */}
-			<div className="relative z-40 mb-[37px] flex flex-col items-center px-5 py-3">
+			{/* 하단 영역 - 키보드 상태에 따라 위치 조정 */}
+			<div
+				className={`relative z-40 flex flex-col items-center px-5 py-3 ${isKeyboardVisible ? "fixed bottom-0 left-0 w-full bg-background-primary" : "mb-[37px]"}`}
+			>
 				<Button
 					variant={isUrgent(initialTask) ? "hologram" : "primary"}
 					className={`relative w-full ${isUrgent(initialTask) ? "l2 h-[56px] rounded-[16px] px-[18.5px] text-center text-gray-inverse" : ""}`}
