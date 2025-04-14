@@ -54,14 +54,13 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 	// 초기 화면 높이 저장 및 키보드 상태 감지
 	useEffect(() => {
-		// 모바일 브라우저에서는 첫 로드시 window.innerHeight가
-		// 툴바 등을 포함한 화면 높이일 수 있으므로 setTimeout 사용
 		const timer = setTimeout(() => {
 			if (typeof window !== "undefined") {
 				originalWindowHeight.current = window.innerHeight;
 			}
 		}, 300);
 
+		// resize 이벤트 핸들러 - 주로 키보드 올라오고 내려갈 때 발생
 		const handleResize = () => {
 			if (originalWindowHeight.current === 0 || typeof window === "undefined")
 				return;
@@ -73,32 +72,13 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			if (heightDifference > originalWindowHeight.current * 0.2) {
 				setIsKeyboardVisible(true);
 			} else {
-				setIsKeyboardVisible(false);
+				if (currentHeight >= originalWindowHeight.current * 0.95) {
+					setIsKeyboardVisible(false);
+				}
 			}
 		};
 
-		const handleClickAnywhere = () => {
-			setTimeout(() => {
-				if (typeof window !== "undefined" && originalWindowHeight.current > 0) {
-					const currentHeight = window.innerHeight;
-
-					// 현재 높이가 원래 높이의 90% 이상이면 키보드가 닫힌 것으로 간주
-					if (currentHeight >= originalWindowHeight.current * 0.9) {
-						setIsKeyboardVisible(false);
-					}
-				}
-			}, 100);
-		};
-
-		// 이벤트 리스너 등록
-		if (typeof window !== "undefined") {
-			window.addEventListener("resize", handleResize);
-			// 클릭 이벤트 리스너 추가
-			document.addEventListener("click", handleClickAnywhere);
-			document.addEventListener("touchend", handleClickAnywhere);
-		}
-
-		// 기존 focusin/focusout 이벤트 처리
+		// 입력 요소에 대한 포커스 이벤트
 		const handleFocusIn = (e: FocusEvent) => {
 			if (
 				e.target instanceof HTMLInputElement ||
@@ -108,21 +88,42 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			}
 		};
 
+		// 입력 요소에서 포커스가 빠졌을 때 이벤트
 		const handleFocusOut = (e: FocusEvent) => {
 			if (
 				e.target instanceof HTMLInputElement ||
 				e.target instanceof HTMLTextAreaElement
 			) {
+				// 포커스 아웃 직후 바로 상태를 변경하지 않고,
+				// resize 이벤트가 발생하길 기다림
 				setTimeout(() => {
 					if (
-						originalWindowHeight.current > 0 &&
-						window.innerHeight >= originalWindowHeight.current * 0.9
+						typeof window !== "undefined" &&
+						originalWindowHeight.current > 0
 					) {
-						setIsKeyboardVisible(false);
+						// 현재 열려있는 input/textarea가 없는지 확인
+						const activeElement = document.activeElement;
+						const isInputActive =
+							activeElement instanceof HTMLInputElement ||
+							activeElement instanceof HTMLTextAreaElement;
+
+						// 현재 화면 높이가 원래 높이와 거의 같아졌고,
+						// 현재 포커스된 입력 요소가 없으면 키보드가 닫힌 것으로 간주
+						if (
+							!isInputActive &&
+							window.innerHeight >= originalWindowHeight.current * 0.95
+						) {
+							setIsKeyboardVisible(false);
+						}
 					}
-				}, 100);
+				}, 300);
 			}
 		};
+
+		// 이벤트 리스너 등록
+		if (typeof window !== "undefined") {
+			window.addEventListener("resize", handleResize);
+		}
 
 		document.addEventListener("focusin", handleFocusIn);
 		document.addEventListener("focusout", handleFocusOut);
@@ -132,8 +133,6 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 			clearTimeout(timer);
 			if (typeof window !== "undefined") {
 				window.removeEventListener("resize", handleResize);
-				document.removeEventListener("click", handleClickAnywhere);
-				document.removeEventListener("touchend", handleClickAnywhere);
 			}
 			document.removeEventListener("focusin", handleFocusIn);
 			document.removeEventListener("focusout", handleFocusOut);
