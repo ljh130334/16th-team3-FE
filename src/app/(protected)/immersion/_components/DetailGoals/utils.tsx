@@ -1,21 +1,21 @@
 import type React from "react";
 import { constants } from "./constants";
 
-export const formatGoalText = (text: string) => {
-	const { LINE_BREAK_AT } = constants;
+// export const formatGoalText = (text: string) => {
+// 	const { LINE_BREAK_AT } = constants;
 
-	if (text.length <= LINE_BREAK_AT) return text;
+// 	if (text.length <= LINE_BREAK_AT) return text;
 
-	const firstLine = text.slice(0, LINE_BREAK_AT);
-	const secondLine = text.slice(LINE_BREAK_AT);
+// 	const firstLine = text.slice(0, LINE_BREAK_AT);
+// 	const secondLine = text.slice(LINE_BREAK_AT);
 
-	return (
-		<>
-			<div className="w-full">{firstLine}</div>
-			<div className="w-full">{secondLine}</div>
-		</>
-	);
-};
+// 	return (
+// 		<>
+// 			<div className="w-full">{firstLine}</div>
+// 			<div className="w-full">{secondLine}</div>
+// 		</>
+// 	);
+// };
 
 export const handleTextareaInput = (
 	e: React.ChangeEvent<HTMLTextAreaElement>,

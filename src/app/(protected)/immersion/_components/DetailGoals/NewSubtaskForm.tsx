@@ -38,7 +38,7 @@ export const NewSubtaskForm = ({
 				<GradientCheckbox />
 			</div>
 			<div className="relative flex-grow">
-				<div className="relative w-full flex items-center min-w-0">
+				<div className="relative w-full flex justify-between items-center min-w-0">
 					<textarea
 						value={newGoalTitle}
 						onChange={(e) =>
@@ -50,7 +50,7 @@ export const NewSubtaskForm = ({
 							)
 						}
 						placeholder="세부 목표를 적어주세요"
-						className="b2 flex-grow min-w-0 rounded border-none bg-transparent p-0 text-gray-normal outline-none resize-none overflow-hidden"
+						className="b2 flex-grow min-w-0 rounded border-none bg-transparent p-0 text-gray-normal outline-none resize-none overflow-hidden w-4/5"
 						style={{
 							caretColor: "#5D6470",
 							height: "auto",
@@ -66,7 +66,7 @@ export const NewSubtaskForm = ({
 						disabled={isSubmitting}
 					/>
 					{newGoalTitle && (
-						<div className="flex-shrink-0 flex items-center pr-4">
+						<div className="flex-shrink-0 flex items-center">
 							<button
 								onClick={() => onSave(newGoalTitle)}
 								disabled={

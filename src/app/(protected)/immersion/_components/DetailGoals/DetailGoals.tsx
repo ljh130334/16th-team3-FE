@@ -7,7 +7,7 @@ import {
 	useUpdateSubtask,
 } from "@/hooks/useSubtasks";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NewSubtaskForm } from "./NewSubtaskForm";
 import { SubtaskItem } from "./SubtaskItem";
 import { constants } from "./constants";
@@ -31,9 +31,20 @@ export default function DetailGoals({ taskId, onError }: DetailGoalsProps) {
 	// 로컬 상태로 서브태스크 관리 (삭제 즉시 UI 반영)
 	const [localSubtasks, setLocalSubtasks] = useState<typeof subtasks>([]);
 
-	// subtasks가 업데이트되면 localSubtasks도 업데이트
+	// 이전 subtasks 값을 저장할 ref
+	const prevSubtasksRef = useRef<typeof subtasks>([]);
+
+	// subtasks가 업데이트되면 localSubtasks도 업데이트 (깊은 비교를 통해 무한 루프 방지)
 	useEffect(() => {
-		setLocalSubtasks(subtasks);
+		// subtasks가 실제로 변경되었는지 확인
+		const subtasksChanged =
+			JSON.stringify(prevSubtasksRef.current) !== JSON.stringify(subtasks);
+
+		// 실제 변경이 있을 때만 localSubtasks 업데이트
+		if (subtasksChanged) {
+			setLocalSubtasks(subtasks);
+			prevSubtasksRef.current = subtasks;
+		}
 	}, [subtasks]);
 
 	// 세부 목표 추가 핸들러

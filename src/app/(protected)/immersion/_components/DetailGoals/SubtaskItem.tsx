@@ -2,7 +2,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { CheckboxWithGradientBorder } from "./Checkbox";
 import { constants } from "./constants";
-import { formatGoalText, handleTextareaInput } from "./utils";
+import { handleTextareaInput } from "./utils";
 
 interface SubtaskItemProps {
 	goal: {
@@ -89,7 +89,7 @@ export const SubtaskItem = ({
 									onError,
 								)
 							}
-							className={`text-b2 flex-grow min-w-0 break-words border-none bg-transparent p-0 outline-none resize-none overflow-hidden ${
+							className={`text-b2 flex-grow min-w-0 break-words border-none bg-transparent p-0 outline-none resize-none overflow-hidden w-4/5 ${
 								goal.isCompleted ? "text-gray-neutral" : "text-gray-normal"
 							}`}
 							style={{
@@ -159,7 +159,7 @@ export const SubtaskItem = ({
 						aria-label={`${goal.name} 편집하기`}
 						disabled={isSubmitting}
 					>
-						{formatGoalText(goal.name)}
+						{goal.name}
 					</button>
 				</div>
 			)}
