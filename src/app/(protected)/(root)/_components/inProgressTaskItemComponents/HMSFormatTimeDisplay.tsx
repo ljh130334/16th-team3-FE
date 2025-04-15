@@ -62,7 +62,7 @@ const HMSFormatTimeDisplay = ({
 
 	if (isUrgent) {
 		return (
-			<div className="l1 text-text-strong">
+			<div className="l1">
 				{timeString.replace(/\:/g, ":")}
 				{suffix && <span className="ml-1">{suffix}</span>}
 			</div>

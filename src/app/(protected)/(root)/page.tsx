@@ -12,13 +12,7 @@ import { useAuthStore } from "@/store";
 import dynamic from "next/dynamic";
 import Footer from "./_components/footer/Footer";
 import Header from "./_components/header/Header";
-
-const TodayTaskTabWrapper = dynamic(
-	() =>
-		import(
-			/* webpackPrefetch: true */ "./_components/todayTaskTabWrapper/TodayTaskTabWrapper"
-		),
-);
+import TodayTaskTabWrapper from "./_components/todayTaskTabWrapper/TodayTaskTabWrapper";
 
 const AllTaskTabWrapper = dynamic(
 	() =>

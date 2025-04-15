@@ -18,8 +18,6 @@ const NotUrgentTaskCard = ({
 	handleContinueClick,
 	handleCardClick,
 }: NotUrgentTaskCardProps) => {
-	const { remainingTime, isExpired, isUrgent } = useRemainingTime(task);
-
 	return (
 		<>
 			<button
