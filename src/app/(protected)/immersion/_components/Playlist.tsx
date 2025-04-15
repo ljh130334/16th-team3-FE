@@ -106,7 +106,7 @@ export function Playlist({
 			{/* 긴급한 글쓰기를 돕는 음악 (전체 리스트) */}
 			{vInfos && vInfos.length > 1 && (
 				<section className="mt-7">
-					<h2 className="s2 text-white my-[10px]">
+					<h2 className="s2 text-gray-normal my-[10px]">
 						{personaTaskMode} {josa(personaTaskType, "을/를")} 돕는 음악
 					</h2>
 					<div className="flex flex-col gap-1">
@@ -277,17 +277,17 @@ function ThumbnailView({
 	onExpand: () => void;
 }) {
 	return (
-		<div className="p-3 flex items-start">
+		<div className="p-4 flex items-start">
 			<img
 				src={thumbnail}
 				alt={title}
 				className="w-14 h-14 rounded-[10px] object-cover"
 			/>
 			<div className="flex flex-col flex-1 ml-4 mr-2">
-				<p className="text-sm font-medium text-white line-clamp-2 overflow-hidden text-ellipsis">
+				<p className="b3 text-gray-normal line-clamp-2 overflow-hidden text-ellipsis">
 					{title}
 				</p>
-				<p className="text-xs text-gray-400 mt-1">{remainingTime}</p>
+				<p className="c2 text-gray-alternative mt-1">{remainingTime}</p>
 			</div>
 
 			{/* biome-ignore lint/a11y/useButtonType: <explanation> */}
@@ -350,8 +350,8 @@ function EmbedView({
 function ZoomInSvg() {
 	return (
 		<svg
-			width="20"
-			height="20"
+			width="18"
+			height="18"
 			viewBox="0 0 20 20"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
@@ -414,13 +414,15 @@ function MultiMusicItem({
 				{/* 제목 - 2줄 말줄임 처리 */}
 				<p
 					className="
-            b3 text-white 
+            b3 text-gray-normal 
             line-clamp-2 overflow-hidden text-ellipsis
           "
 				>
 					{videoInfo.title}
 				</p>
-				<p className="mt-1 text-xs text-gray-400">{videoInfo.remainingTime}</p>
+				<p className="mt-1 c2 text-gray-alternative">
+					{videoInfo.remainingTime}
+				</p>
 			</div>
 		</div>
 	);
