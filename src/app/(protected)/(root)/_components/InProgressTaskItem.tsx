@@ -294,7 +294,7 @@ const InProgressTaskItem: React.FC<InProgressTaskItemProps> = ({
 					<p className="b3 text-text-neutral">{formatDueTime()}</p>
 				</div>
 
-				<div className="mt-[10px] mb-1 flex justify-center items-center relative">
+				<div className="mt-[10px] mb-1 flex justify-center items-center relative w-full">
 					<div
 						className="absolute top-1/2 left-1/2 w-1/2 h-1/2 transform -translate-x-1/2 -translate-y-1/2 mix-blend-color-dodge"
 						style={{
