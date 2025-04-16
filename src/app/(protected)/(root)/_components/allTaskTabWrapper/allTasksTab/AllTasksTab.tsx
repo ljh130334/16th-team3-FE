@@ -61,31 +61,6 @@ const AllTasksTab: React.FC<AllTasksTabProps> = ({
 		return estimatedHour * 60 + estimatedMinute;
 	}, []);
 
-	// 마감 유형별로 태스크를 그룹화하는 함수
-	const groupTasksByCategory = useCallback((tasks: Task[]) => {
-		const grouped: Record<string, Task[]> = {};
-
-		for (const task of tasks) {
-			// persona.taskKeywordsCombination.taskType.name에서 카테고리 정보 가져오기
-			const category =
-				task.persona?.taskKeywordsCombination?.taskType?.name || "기타";
-
-			if (!grouped[category]) {
-				grouped[category] = [];
-			}
-			grouped[category].push(task);
-		}
-
-		// 카테고리 우선순위에 따라 정렬
-		const sortedCategories = Object.keys(grouped).sort((a, b) => {
-			const aPriority = CATEGORY_PRIORITY[a] || 999;
-			const bPriority = CATEGORY_PRIORITY[b] || 999;
-			return aPriority - bPriority;
-		});
-
-		return { grouped, sortedCategories };
-	}, []);
-
 	// 필터에 따른 정렬 함수
 	const sortTasksByFilter = useCallback(
 		(tasks: Task[], filterId: string): Task[] => {
@@ -107,7 +82,10 @@ const AllTasksTab: React.FC<AllTasksTabProps> = ({
 
 				switch (filterId) {
 					case "due-asc": {
-						// 마감일 가까운 순
+						// 마감일 가까운 순, 마감일이 같으면 이름순
+						if (aDate.getTime() === bDate.getTime()) {
+							return (a.title || "").localeCompare(b.title || "");
+						}
 						return aDate.getTime() - bDate.getTime();
 					}
 					case "duration-desc": {
@@ -131,19 +109,59 @@ const AllTasksTab: React.FC<AllTasksTabProps> = ({
 						const aCategoryPriority = CATEGORY_PRIORITY[aCategory] || 999;
 						const bCategoryPriority = CATEGORY_PRIORITY[bCategory] || 999;
 
-						// 같은 카테고리면 마감일 기준으로 정렬
+						// 같은 카테고리면 마감일 기준으로 정렬, 마감일도 같으면 이름순
 						if (aCategoryPriority === bCategoryPriority) {
+							if (aDate.getTime() === bDate.getTime()) {
+								return (a.title || "").localeCompare(b.title || "");
+							}
 							return aDate.getTime() - bDate.getTime();
 						}
 						return aCategoryPriority - bCategoryPriority;
 					}
 					default: {
+						// 기본값도 마감일 가까운 순, 마감일이 같으면 이름순
+						if (aDate.getTime() === bDate.getTime()) {
+							return (a.title || "").localeCompare(b.title || "");
+						}
 						return aDate.getTime() - bDate.getTime();
 					}
 				}
 			});
 		},
 		[getDurationInMinutes],
+	);
+
+	// 마감 유형별로 태스크를 그룹화하는 함수
+	const groupTasksByCategory = useCallback(
+		(tasks: Task[]) => {
+			const grouped: Record<string, Task[]> = {};
+
+			for (const task of tasks) {
+				// persona.taskKeywordsCombination.taskType.name에서 카테고리 정보 가져오기
+				const category =
+					task.persona?.taskKeywordsCombination?.taskType?.name || "기타";
+
+				if (!grouped[category]) {
+					grouped[category] = [];
+				}
+				grouped[category].push(task);
+			}
+
+			// 카테고리 우선순위에 따라 정렬
+			const sortedCategories = Object.keys(grouped).sort((a, b) => {
+				const aPriority = CATEGORY_PRIORITY[a] || 999;
+				const bPriority = CATEGORY_PRIORITY[b] || 999;
+				return aPriority - bPriority;
+			});
+
+			// 각 카테고리 내에서 마감일 가까운 순으로 정렬
+			for (const category of sortedCategories) {
+				grouped[category] = sortTasksByFilter(grouped[category], "due-asc");
+			}
+
+			return { grouped, sortedCategories };
+		},
+		[sortTasksByFilter],
 	);
 
 	const allTasksCombined = useMemo(() => {
