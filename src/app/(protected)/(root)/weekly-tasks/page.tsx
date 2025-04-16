@@ -307,7 +307,7 @@ const WeeklyTasksPage = () => {
 				<div className="px-5 pt-[70px]">
 					{weeklyTasks.length > 0 ? (
 						<>
-							<div className="pt-[41px] pb-4 bg-background-primary z-10">
+							<div className="sticky top-0 pt-4 pb-4 bg-background-primary z-10">
 								<div className="flex justify-end">
 									<TaskFilterDropdown
 										options={filterOptions}
