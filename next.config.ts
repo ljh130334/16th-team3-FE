@@ -1,10 +1,10 @@
 const nextConfig = {
 	images: {
-		domains: ["img1.kakaocdn.net"], // 카카오 CDN 도메인 추가
+		domains: ["k.kakaocdn.net"], // 카카오 CDN 도메인 추가
 		remotePatterns: [
 			{
 				protocol: "http",
-				hostname: "img1.kakaocdn.net",
+				hostname: "k.kakaocdn.net",
 				pathname: "/**",
 			},
 		],
