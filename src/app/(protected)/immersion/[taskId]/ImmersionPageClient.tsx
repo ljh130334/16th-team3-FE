@@ -98,6 +98,30 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 		router.push(`/retrospection/${initialTask.id}`);
 	};
 
+	// 바텀시트 외부 클릭시 닫기 처리 함수
+	const handleOverlayClick = (
+		event:
+			| React.MouseEvent<HTMLDivElement, MouseEvent>
+			| React.KeyboardEvent<HTMLDivElement>,
+	) => {
+		// 이벤트가 오버레이에서 시작된 경우에만 닫기 (내부 요소의 버블링된 이벤트를 무시)
+		if (event.target === event.currentTarget) {
+			setShowBottomSheet(false);
+		}
+	};
+
+	// 시간 만료 시트 외부 클릭시 닫기 처리 함수
+	const handleTimeExpiredOverlayClick = (
+		event:
+			| React.MouseEvent<HTMLDivElement, MouseEvent>
+			| React.KeyboardEvent<HTMLDivElement>,
+	) => {
+		// 이벤트가 오버레이에서 시작된 경우에만 닫기
+		if (event.target === event.currentTarget) {
+			setShowTimeExpiredSheet(false);
+		}
+	};
+
 	// 마감 시간 지남 확인
 	const isExpired = (task: TaskWithPersona) => {
 		const now = new Date();
@@ -279,7 +303,14 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 			{/* 할일 완료 바텀시트 */}
 			{showBottomSheet && (
-				<div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
+				<div
+					className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60"
+					onClick={handleOverlayClick}
+					onKeyDown={handleOverlayClick}
+					tabIndex={0}
+					role="button"
+					aria-label="바텀시트 닫기"
+				>
 					<div className="flex w-full flex-col items-center rounded-t-[28px] bg-component-gray-secondary px-5 pb-[34px] pt-10">
 						<h2 className="t3 text-center text-gray-normal">
 							{initialTask.title}
@@ -311,7 +342,14 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 
 			{/* 시간 만료 바텀시트 */}
 			{showTimeExpiredSheet && (
-				<div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60">
+				<div
+					className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-60"
+					onClick={handleTimeExpiredOverlayClick}
+					onKeyDown={handleTimeExpiredOverlayClick}
+					tabIndex={0}
+					role="button"
+					aria-label="시간 만료 바텀시트 닫기"
+				>
 					<div className="flex w-full flex-col items-center rounded-t-[28px] bg-component-gray-secondary px-5 pb-[34px] pt-6">
 						<h2 className="t3 mt-4 text-center text-gray-normal">
 							{initialTask.title}

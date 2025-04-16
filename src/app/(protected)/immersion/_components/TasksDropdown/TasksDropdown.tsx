@@ -199,7 +199,7 @@ export default function TasksDropdown({
 									{truncateText(task.title)}
 								</span>
 								<div
-									className={`flex items-center px-[9.5px] py-[3px] rounded-[8px] ml-2 justify-center ${
+									className={`flex items-center px-[4px] py-[3px] rounded-[8px] ml-2 justify-center ${
 										isUrgent(task)
 											? "c2 text-gray-strong"
 											: "c2 bg-component-gray-primary text-gray-neutral"
@@ -220,8 +220,8 @@ export default function TasksDropdown({
 										<Image
 											src="/icons/immersion/emergency.svg"
 											alt="긴급"
-											width={11}
-											height={11}
+											width={14}
+											height={14}
 											className="mr-1"
 										/>
 									)}
