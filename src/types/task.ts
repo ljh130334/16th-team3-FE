@@ -176,8 +176,11 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
 		}
 
 		// 예상 소요시간 변환
-		let timeRequired = "1시간 소요";
+		// 예상 소요시간 변환
+		let timeRequired = "1시간 소요"; // 기본값
+
 		if (response.estimatedTime) {
+			// 사용자가 직접 지정한 소요시간이 있는 경우
 			const hours = Math.floor(response.estimatedTime / 60);
 			const minutes = response.estimatedTime % 60;
 			if (hours > 0 && minutes > 0) {
@@ -186,6 +189,29 @@ export function convertApiResponseToTask(response: TaskResponse): Task {
 				timeRequired = `${hours}시간 소요`;
 			} else if (minutes > 0) {
 				timeRequired = `${minutes}분 소요`;
+			}
+		} else if (response.createdAt && response.dueDatetime) {
+			// 소요시간이 지정되지 않았지만 생성 시간과 마감 시간이 모두 있는 경우
+			const createdDate = new Date(response.createdAt);
+			const dueDate = new Date(response.dueDatetime);
+
+			const diffMinutes = Math.round(
+				(dueDate.getTime() - createdDate.getTime()) / (1000 * 60),
+			);
+
+			const positiveMinutes = Math.max(diffMinutes, 0);
+
+			const calculatedHours = Math.floor(positiveMinutes / 60);
+			const calculatedMinutes = positiveMinutes % 60;
+
+			if (calculatedHours > 0 && calculatedMinutes > 0) {
+				timeRequired = `${calculatedHours}시간 ${calculatedMinutes}분 소요`;
+			} else if (calculatedHours > 0) {
+				timeRequired = `${calculatedHours}시간 소요`;
+			} else if (calculatedMinutes > 0) {
+				timeRequired = `${calculatedMinutes}분 소요`;
+			} else {
+				timeRequired = "잠시 소요";
 			}
 		}
 
