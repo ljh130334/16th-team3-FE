@@ -13,7 +13,7 @@ const HeaderBar = () => {
 				priority
 				className="w-[54px]"
 			/>
-			<Link href="/my-page">
+			<Link href="/my-page" className="flex items-center">
 				<button type="button">
 					<Image
 						src="/icons/home/mypage.svg"
