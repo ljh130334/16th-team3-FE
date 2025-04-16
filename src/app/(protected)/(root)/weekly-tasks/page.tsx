@@ -41,6 +41,74 @@ const getDurationInMinutes = (task: Task): number => {
 	return estimatedHour * 60 + estimatedMinute;
 };
 
+// 필터에 따른 정렬 함수
+const sortTasksByFilter = (tasks: Task[], filterId: string): Task[] => {
+	return tasks.sort((a, b) => {
+		const aDate = a.dueDatetime
+			? new Date(a.dueDatetime)
+			: a.dueDate
+				? new Date(a.dueDate)
+				: new Date();
+
+		const bDate = b.dueDatetime
+			? new Date(b.dueDatetime)
+			: b.dueDate
+				? new Date(b.dueDate)
+				: new Date();
+
+		const aDuration = getDurationInMinutes(a);
+		const bDuration = getDurationInMinutes(b);
+
+		switch (filterId) {
+			case "due-asc": {
+				// 마감일 가까운 순, 마감일이 같으면 이름순
+				if (aDate.getTime() === bDate.getTime()) {
+					return (a.title || "").localeCompare(b.title || "");
+				}
+				return aDate.getTime() - bDate.getTime();
+			}
+			case "duration-desc": {
+				// 소요시간 긴 순
+				// 소요시간이 같으면 마감일 가까운 순, 마감일도 같으면 이름순
+				if (bDuration === aDuration) {
+					if (aDate.getTime() === bDate.getTime()) {
+						return (a.title || "").localeCompare(b.title || "");
+					}
+					return aDate.getTime() - bDate.getTime();
+				}
+				return bDuration - aDuration;
+			}
+			case "category": {
+				// 마감 유형별
+				// persona.taskKeywordsCombination.taskType.name에 카테고리 정보가 있음
+				const aCategory =
+					a.persona?.taskKeywordsCombination?.taskType?.name || "";
+				const bCategory =
+					b.persona?.taskKeywordsCombination?.taskType?.name || "";
+
+				const aCategoryPriority = CATEGORY_PRIORITY[aCategory] || 999;
+				const bCategoryPriority = CATEGORY_PRIORITY[bCategory] || 999;
+
+				// 같은 카테고리면 마감일 기준으로 정렬, 마감일도 같으면 이름순
+				if (aCategoryPriority === bCategoryPriority) {
+					if (aDate.getTime() === bDate.getTime()) {
+						return (a.title || "").localeCompare(b.title || "");
+					}
+					return aDate.getTime() - bDate.getTime();
+				}
+				return aCategoryPriority - bCategoryPriority;
+			}
+			default: {
+				// 기본값도 마감일 가까운 순, 마감일이 같으면 이름순
+				if (aDate.getTime() === bDate.getTime()) {
+					return (a.title || "").localeCompare(b.title || "");
+				}
+				return aDate.getTime() - bDate.getTime();
+			}
+		}
+	});
+};
+
 const WeeklyTasksPage = () => {
 	const router = useRouter();
 	const { data: homeData, isLoading } = useHomeData();
@@ -105,6 +173,11 @@ const WeeklyTasksPage = () => {
 			return aPriority - bPriority;
 		});
 
+		// 각 카테고리 내에서 마감일 가까운 순으로 정렬
+		for (const category of sortedCategories) {
+			grouped[category] = sortTasksByFilter(grouped[category], "due-asc");
+		}
+
 		return { grouped, sortedCategories };
 	}, []);
 
@@ -150,61 +223,8 @@ const WeeklyTasksPage = () => {
 			return taskIsAfterToday && taskIsBeforeSunday;
 		});
 
-		return filteredTasks.sort((a, b) => {
-			const aDate = a.dueDatetime
-				? new Date(a.dueDatetime)
-				: a.dueDate
-					? new Date(a.dueDate)
-					: new Date();
-
-			const bDate = b.dueDatetime
-				? new Date(b.dueDatetime)
-				: b.dueDate
-					? new Date(b.dueDate)
-					: new Date();
-
-			const aDuration = getDurationInMinutes(a);
-			const bDuration = getDurationInMinutes(b);
-
-			switch (selectedFilter.id) {
-				case "due-asc": {
-					// 마감일 가까운 순
-					return aDate.getTime() - bDate.getTime();
-				}
-				case "duration-desc": {
-					// 소요시간 긴 순
-					// 소요시간이 같으면 마감일 가까운 순, 마감일도 같으면 이름순
-					if (bDuration === aDuration) {
-						if (aDate.getTime() === bDate.getTime()) {
-							return (a.title || "").localeCompare(b.title || "");
-						}
-						return aDate.getTime() - bDate.getTime();
-					}
-					return bDuration - aDuration;
-				}
-				case "category": {
-					// 마감 유형별
-					// persona.taskKeywordsCombination.taskType.name에 카테고리 정보가 있음
-					const aCategory =
-						a.persona?.taskKeywordsCombination?.taskType?.name || "";
-					const bCategory =
-						b.persona?.taskKeywordsCombination?.taskType?.name || "";
-
-					const aCategoryPriority = CATEGORY_PRIORITY[aCategory] || 999;
-					const bCategoryPriority = CATEGORY_PRIORITY[bCategory] || 999;
-
-					// 같은 카테고리면 마감일 기준으로 정렬
-					if (aCategoryPriority === bCategoryPriority) {
-						return aDate.getTime() - bDate.getTime();
-					}
-					return aCategoryPriority - bCategoryPriority;
-				}
-				default: {
-					return aDate.getTime() - bDate.getTime();
-				}
-			}
-		});
-	}, [allTasks, selectedFilter]);
+		return sortTasksByFilter(filteredTasks, selectedFilter.id);
+	}, [allTasks, selectedFilter.id]);
 
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 	const [isDetailSheetOpen, setIsDetailSheetOpen] = useState(false);
@@ -287,7 +307,7 @@ const WeeklyTasksPage = () => {
 				<div className="px-5 pt-[70px]">
 					{weeklyTasks.length > 0 ? (
 						<>
-							<div className="sticky top-0 pt-4 pb-4 bg-background-primary z-10">
+							<div className="pt-[41px] pb-4 bg-background-primary z-10">
 								<div className="flex justify-end">
 									<TaskFilterDropdown
 										options={filterOptions}
