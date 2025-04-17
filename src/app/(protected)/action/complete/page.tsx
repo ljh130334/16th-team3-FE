@@ -44,7 +44,7 @@ export default function Complete() {
 	}, [loadUserProfile]);
 
 	return (
-		<div className="flex h-full w-full flex-col gap-4 bg-background-primary">
+		<div className="flex h-full w-full flex-col gap-8 bg-background-primary">
 			<Header />
 
 			<PhotoCard
