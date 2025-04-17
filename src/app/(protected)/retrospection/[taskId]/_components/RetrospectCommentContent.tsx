@@ -59,7 +59,7 @@ const RetrospectCommentContent = ({
         onFocus={() => setIsFocused(true)}
         onBlur={() => setUnfocused()}
         placeholder="좋았던 점과 개선할 점을 간단히 작성해주세요."
-        className="placeholder-text-gray-normal h-20 w-full resize-none bg-component-gray-tertiary text-b2 text-gray-normal focus:outline-none"
+        className="b2 placeholder-text-gray-normal h-20 w-full resize-none bg-component-gray-tertiary text-gray-normal focus:outline-none"
       />
 
       <div
