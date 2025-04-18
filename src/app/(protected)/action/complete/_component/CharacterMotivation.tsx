@@ -11,7 +11,7 @@ export default function CharacterMotivation({ currentTask, nickname }: Props) {
 			잘했어요! 이제
 			<br />
 			<span className="text-component-accent-secondary">
-				{currentTask.persona?.name} {nickname}
+				{currentTask.persona?.name} {nickname}님
 			</span>
 			으로
 			<br />
