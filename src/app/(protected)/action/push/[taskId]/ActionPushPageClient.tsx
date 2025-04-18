@@ -90,8 +90,6 @@ export default function ActionPushPageClient({
 					onTakePicture={() => handleTakePicture(task?.triggerAction ?? "")}
 				/>
 			</div>
-			<div className="absolute bottom-0 left-1/2 aspect-[424/647] h-[250px] w-full max-w-md -translate-x-1/2 bg-red-500/15 mix-blend-color-dodge blur-[62px]"></div>
-			<div className="relative flex flex-col gap-4 px-5"></div>
 
 			{screenState !== PushScreenState.FINAL_WARNING && (
 				<button

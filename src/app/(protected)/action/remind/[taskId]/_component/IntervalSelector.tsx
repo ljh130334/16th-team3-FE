@@ -63,7 +63,7 @@ export default function IntervalSelector({
 							</p>
 							{selectedInterval === item.value && (
 								<Image
-									src="/icons/common/check-primary.svg.svg"
+									src="/icons/common/check-primary.svg"
 									alt="체크"
 									width={20}
 									height={20}
