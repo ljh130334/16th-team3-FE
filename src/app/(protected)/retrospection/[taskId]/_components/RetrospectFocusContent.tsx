@@ -82,7 +82,6 @@ const RetrospectFocusContent = ({
 		window.addEventListener("touchend", handleEnd);
 	};
 
-	// 슬라이더 위치 계산 - 0일 때 왼쪽 끝에 정확히 위치하도록 조정
 	const sliderPosition =
 		retrospectContent.concentration === 0
 			? "-8px"
