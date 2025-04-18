@@ -79,7 +79,7 @@ export default function ActionStartDrawer({
 
 	return (
 		<div className="relative mt-auto flex flex-col items-center px-5 py-6">
-			<div className="fixed bottom-0 left-0 right-0 h-[245px] bg-component-gray-secondary blur-[75px]" />
+			<div className="fixed bottom-0 left-0 right-0 h-[245px] bg-blur-purple blur-[75px]" />
 			<TimerBadge dueDate={dueDate ?? ""} />
 			<>
 				<Drawer open={open} onOpenChange={setOpen} modal={false}>
@@ -95,17 +95,17 @@ export default function ActionStartDrawer({
 					<DrawerContent>
 						<DrawerHeader>
 							<DrawerTitle className="flex flex-col gap-2">
-								<p className="mt-[30px] text-t3">
+								<p className="mt-6 text-t3 text-gray-strong">
 									작은 행동을 사진으로 찍어주세요
 								</p>
-								<p className="text-sm text-gray-neutral">
+								<p className="text-b3 text-gray-neutral">
 									{isRetried && (
 										<span className="text-component-accent-red">
 											이번 기회는 놓치지 마세요! <br />
 										</span>
 									)}
 									<span
-										className={`mr-1 font-semibold ${
+										className={`text-s3 mr-1 ${
 											countdown < 10
 												? "text-component-accent-red"
 												: "text-component-accent-primary"
@@ -120,7 +120,14 @@ export default function ActionStartDrawer({
 							</DrawerTitle>
 						</DrawerHeader>
 						<div className="px-5">
-							<ActionCard title={smallActionTitle} variant="gradient2" />
+							<ActionCard
+								title={smallActionTitle}
+								variant="gradient2"
+								style={{
+									background:
+										"linear-gradient(180deg, rgba(121, 121, 235, 0.15) 0%, rgba(121, 121, 235, 0.05) 29.17%, rgba(121, 121, 235, 0.00) 100%)",
+								}}
+							/>
 							<Button
 								variant="primary"
 								className="relative mb-[50px] mt-7 w-full"
