@@ -5,15 +5,24 @@ import { Badge } from "@/components/component/Badge";
 import CustomBackHeader from "@/components/customBackHeader/CustomBackHeader";
 import { useUserStore } from "@/store";
 import type { TaskWithRetrospection } from "@/types/myPage";
+import type { Task } from "@/types/task";
 import {
 	convertIsoToMonthDayTimeText,
 	formatTimeFromMinutes,
 } from "@/utils/dateFormat";
+import { getPersonaImage } from "@/utils/getPersonaImage";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+interface TaskWithPersona extends Omit<Task, "persona" | "dueDatetime"> {
+	persona: NonNullable<Task["persona"]>;
+	dueDatetime: string;
+	estimatedHours: number;
+}
+
 type Props = {
 	task: TaskWithRetrospection;
+	initialTask?: TaskWithPersona;
 };
 
 const retrospectItems: RetrospectItems = {
@@ -38,9 +47,19 @@ const BAR = {
 	SLIDER_RADIUS: 9,
 };
 
-export default function ExpiredTaskDetailPage({ task }: Props) {
-	const router = useRouter();
+export default function ExpiredTaskDetailPage({ task, initialTask }: Props) {
+	const effectiveTask = initialTask || {
+		persona: task.personaId
+			? { id: task.personaId, name: task.personaName || "기본 페르소나" }
+			: undefined,
+		dueDatetime: task.dueDateTime,
+		estimatedHours: task.estimatedTime ? task.estimatedTime / 60 : 0,
+	};
 	const { userData } = useUserStore();
+	const personaId = effectiveTask.persona?.id;
+	const personaImageSrc = personaId
+		? getPersonaImage(personaId)
+		: "/icons/character/default.png";
 
 	const satisfaction = task.satisfaction / 20 - 1;
 
@@ -111,23 +130,24 @@ export default function ExpiredTaskDetailPage({ task }: Props) {
 							<div className="relative flex w-full h-[120px] overflow-visible justify-center items-center">
 								<div className="absolute top-1/2 -translate-y-1/2 items-center">
 									<Image
-										src="/icons/mypage/mypage-character.png"
-										alt="mypage-character"
-										width={335}
-										height={254}
+										src={personaImageSrc}
+										alt="페르소나 이미지"
+										width={165}
+										height={165}
 									/>
 								</div>
 							</div>
 							<div className="flex w-full justify-center">
 								<Badge>
-									{task.personaName} {userData.nickname}
+									{task.personaName || "기본 페르소나"}{" "}
+									{userData?.nickname || ""}
 								</Badge>
 							</div>
 						</div>
 
 						{/* Contents - 작업 개요 - 작업 정보 - 페르소나 제외 작업 정보 */}
 						<div className="flex flex-col gap-4 p-5 bg-component-gray-secondary rounded-[16px]">
-							{keys.map((item, index) => (
+							{filtered.map((item, index) => (
 								<div
 									key={index}
 									className="flex justify-between items-center w-full"
@@ -214,8 +234,8 @@ export default function ExpiredTaskDetailPage({ task }: Props) {
 										className="absolute rounded-full bg-line-tertiary"
 										style={{
 											height: `${BAR.HEIGHT}px`,
-											width: `calc(100% + ${BAR.SLIDER_RADIUS * 2}px)`, // 16px 양쪽 추가
-											left: `-${BAR.SLIDER_RADIUS}px`, // 왼쪽으로 16px 이동
+											width: `calc(100% + ${BAR.SLIDER_RADIUS * 2}px)`,
+											left: `-${BAR.SLIDER_RADIUS}px`,
 										}}
 									/>
 
