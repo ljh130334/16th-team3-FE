@@ -82,6 +82,11 @@ const RetrospectFocusContent = ({
 		window.addEventListener("touchend", handleEnd);
 	};
 
+	const sliderPosition =
+		retrospectContent.concentration === 0
+			? "-8px"
+			: `calc(${(retrospectContent.concentration / 5) * 100}% - ${BAR.SLIDER_RADIUS}px)`;
+
 	return (
 		<div className="w-full mx-2 mt-1">
 			<div
@@ -98,8 +103,8 @@ const RetrospectFocusContent = ({
 					className="absolute rounded-full bg-line-tertiary"
 					style={{
 						height: `${BAR.HEIGHT}px`,
-						width: `calc(100% + ${BAR.SLIDER_RADIUS * 2}px)`, // 16px 양쪽 추가
-						left: `-${BAR.SLIDER_RADIUS}px`, // 왼쪽으로 16px 이동
+						width: `calc(100% + ${BAR.SLIDER_RADIUS * 2}px)`,
+						left: `-${BAR.SLIDER_RADIUS}px`,
 					}}
 				/>
 
@@ -132,11 +137,11 @@ const RetrospectFocusContent = ({
 
 				{/* 슬라이더 핸들 */}
 				<div
-					className="absolute m-3 z-30 rounded-full border-2 border-white bg-white shadow"
+					className="absolute z-30 rounded-full border-2 border-white bg-white shadow"
 					style={{
-						width: `${BAR.SLIDER_RADIUS * 2}px`,
-						height: `${BAR.SLIDER_RADIUS * 2}px`,
-						left: `calc(${(retrospectContent.concentration / 5) * 100}% - ${BAR.SLIDER_RADIUS * 2}px)`,
+						width: `${BAR.SLIDER_RADIUS * 2 - 2}px`,
+						height: `${BAR.SLIDER_RADIUS * 2 - 2}px`,
+						left: sliderPosition,
 						transition: "left 0.2s ease",
 					}}
 				/>

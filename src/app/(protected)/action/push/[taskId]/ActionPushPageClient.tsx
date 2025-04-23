@@ -62,8 +62,23 @@ export default function ActionPushPageClient({
 		setCurrentTask(task);
 	}, [task, setCurrentTask]);
 
+	// 배경 스타일 설정
+	const backgroundStyle =
+		screenState === PushScreenState.FINAL_WARNING
+			? {
+					backgroundImage: "url(/icons/action/bg-final.png)",
+					backgroundSize: "cover",
+					backgroundPosition: "center",
+				}
+			: {
+					background: "var(--background-primary)",
+				};
+
 	return (
-		<div className="flex h-full flex-col gap-4 bg-background-primary">
+		<div
+			className="flex h-full flex-col gap-4 overflow-hidden"
+			style={backgroundStyle}
+		>
 			<Header content={SCREEN_CONTENT[screenState]} />
 
 			<div className="flex flex-col gap-4 px-5">
@@ -78,10 +93,11 @@ export default function ActionPushPageClient({
 			</div>
 
 			<div className="relative mt-auto flex flex-col items-center px-5 pt-6">
-				<div className="fixed bottom-0 left-0 right-0 h-[245px] bg-[rgba(65,65,137,0.40)] blur-[75px]" />
-				{screenState === PushScreenState.FINAL_WARNING && (
-					<div className="purple-blur-effect absolute inset-0" />
+				{/* 기본 블러 배경 - FINAL_WARNING 상태가 아닐 때만 표시 */}
+				{screenState !== PushScreenState.FINAL_WARNING && (
+					<div className="fixed bottom-0 left-0 right-0 h-[245px] bg-[rgba(65,65,137,0.40)] blur-[75px]" />
 				)}
+
 				<CountdownTimer timeLeft={task?.dueDatetime ?? ""} />
 
 				<ActionDrawer
@@ -90,8 +106,6 @@ export default function ActionPushPageClient({
 					onTakePicture={() => handleTakePicture(task?.triggerAction ?? "")}
 				/>
 			</div>
-			<div className="absolute bottom-0 left-1/2 aspect-[424/647] h-[250px] w-full max-w-md -translate-x-1/2 bg-red-500/15 mix-blend-color-dodge blur-[62px]"></div>
-			<div className="relative flex flex-col gap-4 px-5"></div>
 
 			{screenState !== PushScreenState.FINAL_WARNING && (
 				<button

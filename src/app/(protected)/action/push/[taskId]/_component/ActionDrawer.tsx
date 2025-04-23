@@ -66,6 +66,17 @@ export default function PushActionDrawer({
 						className={`relative w-full ${
 							screenState === PushScreenState.FINAL_WARNING ? "mb-[34px]" : ""
 						}`}
+						style={{
+							background:
+								screenState === PushScreenState.FINAL_WARNING
+									? "linear-gradient(269deg, #DDD9F8 6.08%, #E4E4FF 31.42%, #CCE4FF 62.59%)"
+									: "linear-gradient(104deg, #4F62FC -5.48%, #867CFF 87.33%)",
+							borderImage:
+								screenState === PushScreenState.FINAL_WARNING
+									? "linear-gradient(269deg, #DDD9F8 6.08%, #E4E4FF 31.42%, #CCE4FF 62.59%)"
+									: "linear-gradient(104deg, #4F62FC -5.48%, #867CFF 87.33%)",
+							borderImageSlice: 1,
+						}}
 						onClick={handleTriggerClick}
 					>
 						시작하기
