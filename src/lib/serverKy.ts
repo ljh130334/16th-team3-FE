@@ -1,28 +1,26 @@
-import ky from "ky";
-
+import ky, { type KyResponse } from "ky";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 const REFRESH_ENDPOINT = "/v1/auth/token/refresh";
 const UNAUTHORIZED_CODE = 401;
 
+let refreshPromise: Promise<string> | null = null;
+
 export const serverApi = ky.create({
 	prefixUrl: process.env.NEXT_PUBLIC_API_URL,
 	credentials: "include",
-	headers: {
-		"Content-Type": "application/json",
-	},
+	headers: { "Content-Type": "application/json" },
 	retry: {
 		limit: 2,
 		methods: ["get", "post"],
-		statusCodes: [401, 408, 413, 429, 500, 502, 503, 504],
+		statusCodes: [408, 413, 429, 500, 502, 503, 504],
 	},
 	hooks: {
 		beforeRequest: [
 			async (request) => {
 				const cookieStore = await cookies();
 				const accessToken = cookieStore.get("accessToken")?.value;
-
 				if (accessToken) {
 					request.headers.set("Authorization", `Bearer ${accessToken}`);
 				}
@@ -30,50 +28,40 @@ export const serverApi = ky.create({
 		],
 		afterResponse: [
 			async (request, options, response) => {
-				const cookieStore = await cookies();
-				const currentAccessToken = cookieStore.get("accessToken")?.value;
-				const refreshToken = cookieStore.get("refreshToken")?.value;
+				if (response.status !== UNAUTHORIZED_CODE) {
+					return response;
+				}
 
-				if (response.status === UNAUTHORIZED_CODE || !currentAccessToken) {
-					try {
-						const refreshResponse = await fetch(
+				if (!refreshPromise) {
+					refreshPromise = (async () => {
+						const cookieStore = await cookies();
+						const oldRefreshToken = cookieStore.get("refreshToken")?.value;
+
+						const refreshRes = await fetch(
 							`${process.env.NEXT_PUBLIC_API_URL}${REFRESH_ENDPOINT}`,
 							{
 								method: "POST",
 								headers: { "Content-Type": "application/json" },
-								body: JSON.stringify({
-									refreshToken: refreshToken,
-								}),
+								body: JSON.stringify({ refreshToken: oldRefreshToken }),
 							},
 						);
 
-						if (!refreshResponse.ok) {
-							const errText = await refreshResponse.text();
-
-							console.error("Refresh API 실패:", errText);
-
+						if (!refreshRes.ok) {
 							cookieStore.delete("accessToken");
 							cookieStore.delete("refreshToken");
-
-							return NextResponse.redirect(new URL("/login", request.url));
+							throw new Error("Refresh failed");
 						}
 
-						const {
-							accessToken: newAccessToken,
-							refreshToken: newRefreshToken,
-						} = (await refreshResponse.json()) as {
-							accessToken: string;
-							refreshToken: string;
-						};
+						const { accessToken, refreshToken: newRefreshToken } =
+							await refreshRes.json();
 
-						cookieStore.set("accessToken", newAccessToken, {
+						cookieStore.set("accessToken", accessToken, {
 							httpOnly: true,
 							secure: true,
 							sameSite: "none",
 							path: "/",
 							maxAge: 60 * 60,
 						});
-
 						cookieStore.set("refreshToken", newRefreshToken, {
 							httpOnly: true,
 							secure: true,
@@ -82,15 +70,19 @@ export const serverApi = ky.create({
 							maxAge: 60 * 60 * 24 * 7,
 						});
 
-						return serverApi(request, options);
-					} catch (error) {
-						console.error("refresh 요청 중 에러 발생:", error);
-
-						return NextResponse.redirect(new URL("/login", request.url));
-					}
+						return accessToken;
+					})();
 				}
 
-				return response;
+				try {
+					const newToken = await refreshPromise;
+					request.headers.set("Authorization", `Bearer ${newToken}`);
+					return serverApi(request, options);
+				} catch (err) {
+					return NextResponse.redirect(new URL("/login", request.url));
+				} finally {
+					refreshPromise = null;
+				}
 			},
 		],
 	},
