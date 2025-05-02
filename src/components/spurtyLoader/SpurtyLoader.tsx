@@ -43,6 +43,7 @@ const SpurtyLoader = () => {
 					alt="페르소나 이미지"
 					width={165}
 					height={165}
+					priority
 				/>
 			</div>
 			<div className="mt-2 flex justify-center whitespace-pre-line text-center b2">
