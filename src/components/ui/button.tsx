@@ -3,6 +3,7 @@
 import { Slot } from '@radix-ui/react-slot';
 import { type VariantProps, cva } from 'class-variance-authority';
 import type * as React from 'react';
+import { HapticStyles } from '@/types/haptic';
 
 import { cn } from '@/lib/utils';
 
@@ -35,6 +36,7 @@ const buttonVariants = cva(
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
+  haptic?: keyof typeof HapticStyles;
   asChild?: boolean;
 }
 
@@ -42,6 +44,7 @@ const Button = ({
   className,
   variant,
   size,
+  haptic = 'impactLight', // 기본 진동 설정
   asChild = false,
   ...props
 }: ButtonProps) => {
@@ -49,6 +52,7 @@ const Button = ({
   return (
     <Comp
       className={cn(buttonVariants({ variant, size, className }))}
+      data-haptic={haptic}
       {...props}
     />
   );
