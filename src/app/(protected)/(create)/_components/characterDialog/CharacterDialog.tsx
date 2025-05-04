@@ -1,5 +1,6 @@
 "use client";
 
+import Loader from "@/components/loader/Loader";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -18,6 +19,7 @@ interface CharacterDialogProps {
 	taskType: string;
 	personaName: string;
 	personaId?: number;
+	isLoading: boolean;
 	onClick: () => void;
 }
 
@@ -27,13 +29,14 @@ const CharacterDialog = ({
 	taskType,
 	personaName,
 	personaId,
+	isLoading,
 	onClick,
 }: CharacterDialogProps) => {
 	const { userData } = useUserStore();
 	const personaImageSrc = getPersonaImage(personaId);
 
 	return (
-		<Dialog open={isOpen} onOpenChange={onClick}>
+		<Dialog open={isOpen} onOpenChange={onClick} modal>
 			<DialogContent className="w-[328px] rounded-[24px] border-none bg-component-gray-secondary px-4 py-6">
 				<DialogHeader>
 					<DialogTitle className="text-normal t3 mb-1">
@@ -65,7 +68,13 @@ const CharacterDialog = ({
 						<span className="l6 text-inverse">{`${personaName} ${userData.nickname}`}</span>
 					</div>
 				</div>
-				<Button variant="primary" className="w-full" onClick={onClick}>
+				<Button
+					variant="primary"
+					className="w-full"
+					disabled={isLoading}
+					onClick={onClick}
+				>
+					{isLoading && <Loader width={24} height={24} />}
 					{taskType === "instant" ? "시작" : "확인"}
 				</Button>
 			</DialogContent>
