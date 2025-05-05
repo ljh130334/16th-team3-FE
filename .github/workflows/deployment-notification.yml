@@ -16,11 +16,11 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
         with:
-          args: |
-            {
+          args: >-
+            --raw '{
               "embeds": [{
                 "title": "📦 Vercel 배포 알림",
-                "description": "`${{ github.ref_name }}` 브랜치에 새로운 커밋이 푸시되어 Vercel 배포가 시작되었습니다!",
+                "description": "`main` 브랜치에 새로운 커밋이 푸시되어 Vercel 배포가 시작되었습니다!",
                 "color": 3447003,
                 "fields": [
                   {
@@ -33,8 +33,8 @@ jobs:
                   },
                   {
                     "name": "🔗 커밋 링크",
-                    "value": "${{ github.event.head_commit.url }}"
+                    "value": "https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
                   }
                 ]
               }]
-            }
+            }'
