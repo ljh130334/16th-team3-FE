@@ -16,6 +16,8 @@ import PersonaSection from "./_component/PersonaSection";
 import RetrospectSection from "./_component/RetroSpectSection";
 import TaskContainer from "./_component/TaskContainer";
 
+import Setting from "@public/icons/mypage/setting.svg";
+
 export default function MyPage() {
 	const router = useRouter();
 	const userData = useUserStore((state) => state.userData);
@@ -65,12 +67,7 @@ export default function MyPage() {
 			{/* 헤더 부분 */}
 			<CustomBackHeader title="마이페이지" backRoute="/">
 				<Link href="/my-page/setting">
-					<Image
-						src="/icons/mypage/setting.svg"
-						alt="설정"
-						width={24}
-						height={24}
-					/>
+					<Image src={Setting} alt="설정" width={24} height={24} priority />
 				</Link>
 			</CustomBackHeader>
 

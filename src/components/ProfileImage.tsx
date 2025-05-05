@@ -52,7 +52,7 @@ const ProfileImage: React.FC<ProfileImageProps> = ({
 				<div
 					className={`absolute inset-0 animate-pulse bg-gray-200 ${className}`}
 					style={{ width, height }}
-				></div>
+				/>
 			) : (
 				<Image
 					src={isError ? DEFAULT_IMAGE : imageUrl || DEFAULT_IMAGE}
