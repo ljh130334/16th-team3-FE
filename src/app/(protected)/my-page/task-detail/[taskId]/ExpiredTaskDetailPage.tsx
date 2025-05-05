@@ -188,7 +188,6 @@ export default function ExpiredTaskDetailPage({ task, initialTask }: Props) {
 
 				{/* Contents - 작업 회고 내용 */}
 				<div className="flex flex-col">
-					{/* Contents - 작업 회고 내용 - 제목 문구 */}
 					<div>
 						<div className="t3 flex my-3 justify-start">
 							<p>나의 회고</p>
