@@ -1,11 +1,11 @@
 import { useFormatDueTime } from "@/hooks/useFormatDueTime";
 import type { Task } from "@/types/task";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import React from "react";
 
 interface HeaderProps {
 	task: Task;
-	personaImageUrl: string;
+	personaImageUrl: StaticImageData | string;
 }
 
 const Header = ({ task, personaImageUrl }: HeaderProps) => {
@@ -32,8 +32,8 @@ const Header = ({ task, personaImageUrl }: HeaderProps) => {
 					alt="Character"
 					width={136}
 					height={136}
-					loading="eager"
 					className="relative z-10"
+					priority
 				/>
 			</div>
 		</>
