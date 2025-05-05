@@ -8,30 +8,33 @@ on:
 
 jobs:
   notify:
+    if: github.repository == 'depromeet/16th-team3-FE'
     runs-on: ubuntu-latest
     steps:
-      - name: Send Discord Notification
-        uses: tsickert/discord-webhook@v5.3.0
+      - name: Send Discord Embed Notification
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
         with:
-          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          content: "🚀 새로운 커밋이 ${{ github.ref_name }} 브랜치에 푸시되어 배포가 시작됩니다!"
-          embed: >-
+          args: |
             {
-              "title": "📦 배포 시작 알림 - ${{ github.repository }}",
-              "description": "해당 커밋이 Vercel에 의해 배포될 예정입니다.",
-              "color": 3447003,
-              "fields": [
-                {
-                  "name": "📄 커밋 메시지",
-                  "value": "${{ github.event.head_commit.message }}"
-                },
-                {
-                  "name": "👤 푸시한 사람",
-                  "value": "${{ github.actor }}"
-                },
-                {
-                  "name": "🔗 커밋 링크",
-                  "value": "${{ github.event.head_commit.url }}"
-                }
-              ]
+              "embeds": [{
+                "title": "📦 Vercel 배포 알림",
+                "description": "`${{ github.ref_name }}` 브랜치에 새로운 커밋이 푸시되어 Vercel 배포가 시작되었습니다!",
+                "color": 3447003,
+                "fields": [
+                  {
+                    "name": "📝 커밋 메시지",
+                    "value": "${{ github.event.head_commit.message }}"
+                  },
+                  {
+                    "name": "👤 작성자",
+                    "value": "${{ github.actor }}"
+                  },
+                  {
+                    "name": "🔗 커밋 링크",
+                    "value": "${{ github.event.head_commit.url }}"
+                  }
+                ]
+              }]
             }
