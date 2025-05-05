@@ -22,7 +22,7 @@ jobs:
               "color": 3447003,
               "fields": [
                 {
-                  "name": "🧾 커밋 메시지",
+                  "name": "📄 커밋 메시지",
                   "value": "${{ github.event.head_commit.message }}"
                 },
                 {
