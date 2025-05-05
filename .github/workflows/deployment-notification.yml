@@ -1,7 +1,7 @@
-name: Vercel Deployment Notification
+name: Discord Notification on Push
 
 on:
-  deployment_status:
+  push:
     branches:
       - main
       - develop
@@ -10,29 +10,28 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Discord Notification
+      - name: Send Discord Notification
         uses: tsickert/discord-webhook@v5.3.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          content: "🚀 Vercel 배포 상태: ${{ github.event.deployment_status.state }}"
-          embed-title: "📦 Deployment Status"
-          embed-description: >
-            ${{ github.event.deployment_status.state == 'failure' && format('❌ 배포 실패: {0}', github.event.deployment_status.description) || 
-               github.event.deployment_status.state == 'error' && format('⚠️ 배포 오류: {0}', github.event.deployment_status.description) ||
-               '✅ 배포 성공' }}
-          embed-color: ${{ github.event.deployment_status.state == 'success' && '65280' || '16711680' }}
-          embed-fields: |
-            [
-              {
-                "name": "Commit",
-                "value": "${{ github.sha }}"
-              },
-              {
-                "name": "Status",
-                "value": "${{ github.event.deployment_status.state }}"
-              },
-              {
-                "name": "Log URL",
-                "value": "${{ github.event.deployment_status.log_url || 'Not available' }}"
-              }
-            ]
+          content: "🚀 새로운 커밋이 ${{ github.ref_name }} 브랜치에 푸시되어 배포가 시작됩니다!"
+          embed: >-
+            {
+              "title": "📦 배포 시작 알림 - ${{ github.repository }}",
+              "description": "해당 커밋이 Vercel에 의해 배포될 예정입니다.",
+              "color": 3447003,
+              "fields": [
+                {
+                  "name": "🧾 커밋 메시지",
+                  "value": "${{ github.event.head_commit.message }}"
+                },
+                {
+                  "name": "👤 푸시한 사람",
+                  "value": "${{ github.actor }}"
+                },
+                {
+                  "name": "🔗 커밋 링크",
+                  "value": "${{ github.event.head_commit.url }}"
+                }
+              ]
+            }
