@@ -1,0 +1,21 @@
+<svg width="21" height="23" viewBox="0 0 21 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Gp/Thunder" filter="url(#filter0_d_3116_70220)">
+<path id="Vector" fill-rule="evenodd" clip-rule="evenodd" d="M14.1598 9.3606H11.0665V6.29393C11.0665 4.99393 9.57313 4.3806 8.77979 5.3606L6.51313 8.1406L3.87313 11.3806C3.12646 12.2939 3.72646 13.7273 4.85313 13.7273H7.94646V16.7273C7.94646 18.0206 9.43979 18.6206 10.2331 17.6539L12.4998 14.9006L15.1398 11.6873C15.8865 10.7806 15.2865 9.3606 14.1598 9.3606Z" fill="url(#paint0_linear_3116_70220)"/>
+</g>
+<defs>
+<filter id="filter0_d_3116_70220" x="-1.5" y="-0.5" width="24" height="24" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dx="1"/>
+<feGaussianBlur stdDeviation="2"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_3116_70220"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_3116_70220" result="shape"/>
+</filter>
+<linearGradient id="paint0_linear_3116_70220" x1="9.50646" y1="4.87793" x2="9.50646" y2="18.1309" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DD6875"/>
+<stop offset="1" stop-color="#ED98A2"/>
+</linearGradient>
+</defs>
+</svg>
