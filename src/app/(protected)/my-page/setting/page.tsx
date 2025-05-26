@@ -109,7 +109,7 @@ export default function MyPage() {
 				</div>
 				<div className="flex items-center justify-between pt-0 pb-4">
 					<div className="b2 text-base text-gray-normal">앱 버전</div>
-					<div className="l5 text-gray-neutral">v1.0.4 최신 버전</div>
+					<div className="l5 text-gray-neutral">v1.0.5 최신 버전</div>
 				</div>
 
 				<Link
