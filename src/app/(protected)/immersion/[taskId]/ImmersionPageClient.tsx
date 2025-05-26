@@ -321,13 +321,14 @@ export default function ImmersionPageClient({ initialTask }: Props) {
 						</p>
 						<DrawerClose asChild>
 							<Link href={`/immersion/complete?taskId=${initialTask.id}`}>
-								<button
-									type="button"
-									className="l2 w-full rounded-[16px] bg-component-accent-primary py-4 text-gray-strong"
+								<Button
+									variant="primary"
+									size="default"
+									className="l2 w-[88vw] mx-4 rounded-[16px] bg-component-accent-primary py-4 text-gray-strong"
 									onClick={handleConfirmComplete}
 								>
 									할일 끝내기
-								</button>
+								</Button>
 							</Link>
 						</DrawerClose>
 						<DrawerClose asChild>
