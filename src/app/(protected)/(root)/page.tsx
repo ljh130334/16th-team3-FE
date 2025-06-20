@@ -188,7 +188,7 @@ const HomePageContent = () => {
 				{isPending ? (
 					<SpurtyLoader />
 				) : (
-					<main className="flex-1 overflow-y-auto px-5 pb-40 pt-28">
+					<main className="flex-1 overflow-y-auto px-5 pb-40 pt-28 opacity-0 animate-fadeIn">
 						{/* 오늘 할일 탭 */}
 						{activeTab === "today" && (
 							<TodayTaskTabWrapper
