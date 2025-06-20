@@ -170,6 +170,7 @@ export default {
 				"expand-down": "expandDown 0.3s ease-out forwards",
 				"expand-list-width": "expandListWidth 0.3s ease-out forwards",
 				"floating-persona": "floating 3s ease-in-out infinite",
+				fadeIn: "fadeIn 0.3s ease-in-out forwards",
 			},
 			keyframes: {
 				toast: {
@@ -206,6 +207,10 @@ export default {
 					"0%": { transform: "translateY(8px)" },
 					"50%": { transform: "translateY(-8px)" },
 					"100%": { transform: "translateY(8px)" },
+				},
+				fadeIn: {
+					"0%": { opacity: "0", transform: "translateY(10px)" },
+					"100%": { opacity: "1", transform: "translateY(0)" },
 				},
 			},
 		},
